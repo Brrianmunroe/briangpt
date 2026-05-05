@@ -1,7 +1,8 @@
 /**
  * Conversation scroll viewport + turns (user block + reply in one section).
- * Focused-turn behavior: the bottom spacer guarantees there is always enough
- * scrollable space for the latest user message to anchor at the top.
+ * Focused-turn behavior is CSS-driven: the last turn reserves a viewport-tall
+ * minimum height so a single native scrollIntoView lands the latest user
+ * message at the top of the viewport.
  */
 
 .viewport {
@@ -11,7 +12,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  /** Prevent the browser from auto-adjusting scroll when children grow (fights our scroll math). */
+  /** Prevent the browser from auto-adjusting scroll when children grow. */
   overflow-anchor: none;
   display: flex;
   flex-direction: column;
@@ -32,22 +33,20 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--spacing-md);
-  min-height: 0;
   flex-shrink: 0;
 }
 
 /**
- * The bottom spacer reserves enough room below the latest turn so it can scroll
- * up to the top of the viewport even when the assistant reply is short. Without
- * this, scrollTop gets clamped and the user message stays in the middle of the
- * screen — which is the bug we are fixing.
+ * The LAST turn reserves a full-viewport minimum height. This is what makes
+ * focused-turn anchoring work: with a viewport-tall last turn, calling
+ * scrollIntoView({ block: 'start' }) on it always lands its top flush at
+ * the viewport top, hiding all previous turns above the viewport.
  *
- * Sized off the viewport so it works on any screen.
+ * The viewport's own `padding-top: var(--spacing-md)` provides the 16px
+ * gap below the header — no scroll-margin-top is needed.
  */
-.bottomSpacer {
-  flex-shrink: 0;
-  width: 100%;
-  pointer-events: none;
+.turn:last-child {
+  min-height: 100%;
 }
 
 .messageRow {
