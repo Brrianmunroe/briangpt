@@ -1,0 +1,20 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  max-width: 720px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.log {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  font-size: 13px;
+  color: var(--color-text-fill-primary);
+}

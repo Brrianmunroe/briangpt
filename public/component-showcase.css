@@ -1,0 +1,298 @@
+/**
+ * Static showcase — mirrors src/components/button/Button.module.css
+ * (plain <button> + design tokens).
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  background: var(--color-background-surface-default);
+  color: var(--color-text-fill-primary);
+  line-height: 1.5;
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2rem 0 0.5rem;
+}
+
+p.lead {
+  margin: 0 0 1rem;
+  font-size: 14px;
+  color: var(--color-text-fill-secondary-2);
+  max-width: 42rem;
+}
+
+code {
+  font-size: 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-300);
+  margin-top: 0.75rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-neutral-500);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table-wrap td {
+  text-align: center;
+}
+
+.table-wrap th.row-head {
+  text-align: left;
+}
+
+th.th-first {
+  width: 8.5rem;
+  color: var(--color-text-fill-secondary-2);
+}
+
+th.th-variant {
+  font-weight: 600;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+th.row-head {
+  color: var(--color-text-fill-secondary-2);
+  border-right: 1px solid var(--color-neutral-500);
+}
+
+tbody tr:last-child td,
+tbody tr:last-child th.row-head {
+  border-bottom: none;
+}
+
+/* --- Buttons (same as Button.module.css, .c-btn = .root) --- */
+
+.c-btn {
+  --button-icon-fill: var(--color-neutral-200);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: 32px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0;
+  box-sizing: border-box;
+  border-radius: var(--radius-full);
+  border: var(--stroke-sm) solid transparent;
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  white-space: nowrap;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.c-btn:focus {
+  outline: none;
+}
+
+.c-btn:disabled {
+  cursor: not-allowed;
+}
+
+.c-btn .c-btn__icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.c-btn .c-btn__icon path {
+  fill: var(--button-icon-fill);
+}
+
+.showcase-icon {
+  display: block;
+}
+
+.c-btn--primary {
+  --button-icon-fill: var(--color-button-primary-text-default);
+  background: var(--color-button-primary-surface-default);
+  color: var(--color-button-primary-text-default);
+  box-shadow: 0 4px 8.7px rgba(0, 0, 0, 0.45);
+}
+
+.c-btn--primary:hover:not(:disabled) {
+  background: var(--color-button-primary-surface-hover);
+}
+
+.c-btn--primary:active:not(:disabled) {
+  background: var(--color-button-primary-surface-pressed);
+}
+
+.c-btn--primary:disabled {
+  background: var(--color-button-primary-surface-disabled);
+  color: var(--color-button-primary-text-disabled);
+  --button-icon-fill: var(--color-button-primary-text-disabled);
+  box-shadow: none;
+}
+
+.c-btn--primary:focus-visible {
+  background: var(--color-button-primary-surface-focused);
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-button-primary-stroke-focused);
+}
+
+.c-btn--secondary {
+  --button-icon-fill: var(--color-button-secondary-text-default);
+  background: var(--color-button-secondary-surface-default);
+  color: var(--color-button-secondary-text-default);
+  border-color: var(--color-button-secondary-stroke-default);
+  box-shadow: 0 4px 8.7px rgba(0, 0, 0, 0.45);
+}
+
+.c-btn--secondary:hover:not(:disabled) {
+  background: var(--color-button-secondary-surface-hover);
+}
+
+.c-btn--secondary:active:not(:disabled) {
+  background: var(--color-button-secondary-surface-pressed);
+}
+
+.c-btn--secondary:disabled {
+  background: var(--color-button-primary-surface-disabled);
+  color: var(--color-button-secondary-text-disabled);
+  border-color: var(--color-button-secondary-stroke-disabled);
+  --button-icon-fill: var(--color-button-secondary-text-disabled);
+  box-shadow: none;
+}
+
+.c-btn--secondary:focus-visible {
+  background: var(--color-button-secondary-surface-focused);
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-button-secondary-stroke-focused);
+}
+
+.c-btn--ghost {
+  --button-icon-fill: var(--color-button-ghost-text-default);
+  background: var(--color-button-ghost-surface-default);
+  color: var(--color-button-ghost-text-default);
+  box-shadow: none;
+}
+
+.c-btn--ghost:hover:not(:disabled) {
+  background: var(--color-button-ghost-surface-hover);
+  color: var(--color-button-ghost-text-hover);
+  --button-icon-fill: var(--color-button-ghost-text-hover);
+}
+
+.c-btn--ghost:active:not(:disabled) {
+  background: var(--color-button-ghost-surface-pressed);
+  color: var(--color-button-ghost-text-pressed);
+  --button-icon-fill: var(--color-button-ghost-text-pressed);
+}
+
+.c-btn--ghost:disabled {
+  color: var(--color-button-ghost-text-disabled);
+  --button-icon-fill: var(--color-button-ghost-text-disabled);
+}
+
+.c-btn--ghost:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.c-btn--no-icon .c-btn__icon {
+  display: none;
+}
+
+.c-btn--icon-only {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  gap: 0;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.c-btn--icon-only .c-btn__icon {
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- Icons --- */
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.icon-card {
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  background: var(--color-neutral-300);
+}
+
+.icon-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.icon-card .meta {
+  margin: 0.35rem 0 0;
+  font-size: 11px;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.icon-card .row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.icon-card .cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.icon-card .cell code {
+  font-size: 11px;
+}

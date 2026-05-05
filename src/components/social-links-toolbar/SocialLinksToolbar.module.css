@@ -1,0 +1,125 @@
+/**
+ * Top toolbar — maps Figma `SocialLinks` (e.g. node 21:898 / 99:1491):
+ * 40×40 hits, 17px icons centered at 11.5 offset, 8px gap, 1px divider, theme, website.
+ */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 54px;
+  padding: 7px;
+  margin: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+}
+
+/** Figma `Links` (145:707) on homepage — 40px bar, 32px icon hits, 16px gaps. */
+.rootLinksOnly {
+  height: 40px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.rootLinksOnly .hit {
+  width: 32px;
+  height: 32px;
+}
+
+.hit {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+  color: inherit;
+  line-height: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.hit svg path {
+  transition: fill 0.12s ease;
+}
+
+.hit:hover {
+  background: var(--color-button-ghost-surface-hover);
+  color: var(--color-button-ghost-text-hover);
+}
+
+.hit:hover svg path {
+  fill: var(--color-button-ghost-text-hover);
+}
+
+.hit:focus {
+  outline: none;
+}
+
+.hit:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.hit svg {
+  display: block;
+}
+
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 28px;
+  margin: 0;
+  border: none;
+  background: color-mix(in srgb, var(--color-neutral-900) 18%, transparent);
+}
+
+.website {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-orange-400);
+  color: var(--color-neutral-900);
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: calc(var(--font-size-label) + 2px);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 0;
+  transition:
+    background-color 0.12s ease,
+    filter 0.12s ease;
+}
+
+.website:hover {
+  background: color-mix(in srgb, var(--color-orange-400) 88%, var(--color-neutral-900) 12%);
+}
+
+.website:focus {
+  outline: none;
+}
+
+.website:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.websiteLabel {
+  line-height: calc(var(--font-line-height-label) + 4px);
+}
+
+.website svg {
+  display: block;
+  flex-shrink: 0;
+}

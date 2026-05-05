@@ -1,0 +1,86 @@
+/**
+ * BrianGPT prompt chip — maps Figma component set `prompt-chip` (frame 141:352)
+ * to `design-tokens/tokens.css` mapped variables.
+ */
+
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 10px 15px;
+  border-radius: var(--radius-full);
+  border: var(--stroke-sm) solid var(--color-prompt-chip-stroke-default);
+  background: var(--color-neutral-300);
+  color: var(--color-prompt-chip-text-default);
+  font: inherit;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.root:focus {
+  outline: none;
+}
+
+.root:hover:not(:disabled),
+.root.forceHover {
+  background: var(--color-prompt-chip-surface-hover);
+  border-color: var(--color-prompt-chip-stroke-hover);
+}
+
+.root:active:not(:disabled),
+.root.forcePressed {
+  background: var(--color-prompt-chip-surface-pressed);
+  border-color: var(--color-prompt-chip-stroke-pressed);
+}
+
+.root:focus-visible:not(:disabled),
+.root.forceFocused {
+  background: var(--color-prompt-chip-surface-focused);
+  border-color: var(--color-prompt-chip-stroke-focused);
+}
+
+.root:disabled,
+.root.forceDisabled {
+  cursor: not-allowed;
+  background: var(--color-prompt-chip-surface-disabled);
+  border-color: var(--color-prompt-chip-stroke-disabled);
+  color: var(--color-prompt-chip-text-disabled);
+}
+
+.label {
+  display: inline-block;
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  line-height: var(--font-line-height-label);
+  color: rgba(244, 238, 228, 0.8);
+  text-shadow: 0 0.25px 0 var(--neutral-white);
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.icon svg {
+  display: block;
+}
+
+.staticPreview {
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,0 +1,86 @@
+/**
+ * BrianGPT Name Tag — maps Figma component `Name Tag` (node 155:341)
+ * to `design-tokens/tokens.css` mapped variables.
+ */
+
+.root {
+  --name-tag-indicator-size: 13px;
+  --name-tag-indicator-inner: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  box-sizing: border-box;
+  min-height: 26px;
+  padding: 0 var(--spacing-md);
+  margin: 0;
+  border-radius: var(--radius-full);
+  border: var(--stroke-sm) solid var(--color-case-study-card-secondary-stroke-default);
+  background: var(--color-case-study-card-secondary-surface-default);
+}
+
+.indicator {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--name-tag-indicator-size);
+  height: var(--name-tag-indicator-size);
+}
+
+.indicatorGlow {
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-orange-400) 45%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.indicatorRing {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--name-tag-indicator-size);
+  height: var(--name-tag-indicator-size);
+  padding: 0.5px;
+  border: var(--stroke-sm) solid var(--orange-200);
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    var(--neutral-white) 0%,
+    var(--orange-500) 49.5%,
+    var(--neutral-0) 100%
+  );
+  box-shadow: 0 0 4px color-mix(in srgb, var(--color-orange-400) 35%, transparent);
+}
+
+.indicatorCore {
+  width: var(--name-tag-indicator-inner);
+  height: var(--name-tag-indicator-inner);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--neutral-300) 0%,
+    var(--neutral-0) 72%
+  );
+}
+
+.label {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  line-height: var(--font-line-height-label);
+  color: var(--color-text-fill-secondary-2);
+  text-align: center;
+  white-space: nowrap;
+}

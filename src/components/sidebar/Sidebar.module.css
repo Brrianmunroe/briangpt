@@ -1,0 +1,624 @@
+/**
+ * App sidebar — comfortable layout from Figma `Sidebar` (341:656), file BrianGPT
+ * https://www.figma.com/design/mlYfMT6fTkpOn91clhFTxs/BrianGPT?node-id=341-656
+ * Compact rail still follows `Side Bar` (3:78).
+ *
+ * Rail uses the same surface token as main content (`--color-background-surface-default`).
+ * Compact rail behavior follows the same system (wireframe 3:78 is layout-only).
+ *
+ * Surfaces and tints use `design-tokens/tokens.css` primitives + `color-mix` where needed.
+ */
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.root {
+  --sidebar-edge: color-mix(in srgb, var(--color-neutral-900) 8%, transparent);
+  --sidebar-text-strong: var(--color-neutral-900);
+  --sidebar-text-muted: var(--color-neutral-600);
+  --sidebar-text-row: color-mix(in srgb, var(--color-neutral-900) 80%, transparent);
+  --sidebar-new-chat-bg: color-mix(in srgb, var(--color-orange-400) 10%, transparent);
+  --sidebar-new-chat-border: color-mix(in srgb, var(--color-orange-400) 20%, transparent);
+  --sidebar-row-hover: color-mix(in srgb, var(--color-neutral-900) 6%, transparent);
+  --sidebar-logo-glow: color-mix(in srgb, var(--color-orange-400) 50%, transparent);
+
+  box-sizing: border-box;
+  display: flex;
+  width: 240px;
+  min-height: 0;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  /** Open (comfortable): `--spacing-sm`; compact overrides below with the same token. */
+  padding: var(--spacing-sm);
+  border-right: var(--stroke-xs) solid color-mix(in srgb, var(--color-neutral-500) 28%, transparent);
+  background: var(--color-background-surface-default);
+  color: var(--sidebar-text-strong);
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  overflow-x: hidden;
+  --sidebar-rail-duration: 0.22s;
+  transition:
+    width var(--sidebar-rail-duration) cubic-bezier(0.25, 0.1, 0.25, 1),
+    padding var(--sidebar-rail-duration) cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color var(--sidebar-rail-duration) ease;
+}
+
+.root[data-density='compact'] .nav {
+  /** Hide project list in collapsed rail (no single-letter chips). */
+  display: none;
+}
+
+.root[data-density='compact'] {
+  /** Rail width hugs the widest control (typically 48px hit targets); no fixed 91px cap. */
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--spacing-sm);
+  align-items: center;
+}
+
+.stack {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  /** Figma 341:656: `gap` = spacing/xl (32px) between header, New Chat, Projects. */
+  gap: var(--spacing-xl);
+  box-sizing: border-box;
+}
+
+.root[data-density='compact'] .stack {
+  /** Centered rail; intrinsic width (`max-content`) so `.root` can `fit-content` on X. */
+  align-self: center;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+}
+
+/** Comfortable gutter comes from `.root` padding — avoids instant stack padding toggle on density change. */
+
+.footerSlot {
+  flex-shrink: 0;
+  /** Root uses `justify-content: space-between`; extra margin would exceed Figma 341:656. */
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.root[data-density='compact'] .footerSlot {
+  display: flex;
+  justify-content: center;
+  width: auto;
+  max-width: 100%;
+  align-self: center;
+}
+
+/* --- Header row (Figma 36px) --- */
+
+.headerRow {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  /** Figma 341:656 `Container`: pl = spacing/md inside padded sidebar (aligns label with nav rows). */
+  padding-left: var(--spacing-md);
+  height: var(--scale-1100);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.root[data-density='compact'] .headerRow {
+  width: auto;
+  max-width: 100%;
+}
+
+.root[data-density='compact'] .headerRow:has(.brandTextOnly) {
+  /** Stay one row so the menu keeps the same Y as expanded; title collapses on X only. */
+  flex-direction: row;
+  height: var(--scale-1100);
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  /** Comfortable mode header uses Figma inset `pl`; rail centers the menu without that inset. */
+  padding-left: 0;
+}
+
+.root[data-density='compact'] .headerRow:not(:has(.brandTextOnly)) {
+  height: auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+}
+
+.brand {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--scale-500);
+}
+
+.brandTextOnly {
+  gap: 0;
+}
+
+.root[data-density='compact'] .brand.brandTextOnly {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.root[data-density='compact'] .brand:not(.brandTextOnly) {
+  position: relative;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+}
+
+.root[data-density='compact'] .brandTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.logoMark {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--scale-1100);
+  height: var(--scale-1100);
+  border-radius: var(--radius-lg);
+  background: var(--color-orange-400);
+  color: var(--color-neutral-900);
+  box-shadow: 0 0 60px 0 var(--sidebar-logo-glow);
+}
+
+.root[data-density='compact'] .logoMark {
+  width: var(--scale-1400);
+  height: var(--scale-1400);
+}
+
+.brandTitle {
+  margin: 0;
+  overflow: hidden;
+  min-width: 0;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.menuButton {
+  display: inline-flex;
+  width: var(--scale-1000);
+  height: var(--scale-1000);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+  color: var(--color-icon-surface-grey);
+  line-height: 0;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.menuButton svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.menuButton svg path {
+  transition: fill 0.12s ease;
+}
+
+.menuButton:hover {
+  background: var(--color-button-ghost-surface-hover);
+  color: var(--color-button-ghost-text-hover);
+}
+
+.menuButton:hover svg path {
+  fill: var(--color-button-ghost-text-hover);
+}
+
+.menuButton:focus {
+  outline: none;
+}
+
+.menuButton:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+/** Collapsed rail: icon-only ghost (transparent) centered in the sidebar column. */
+.root[data-density='compact'] .menuButton {
+  background: transparent;
+}
+
+.root[data-density='compact'] .menuButton:hover {
+  background: var(--color-button-ghost-surface-hover);
+}
+
+/* --- New chat --- */
+
+.newChat {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
+  /** Figma 341:656 button: py 9px, horizontal padding 17px. */
+  padding: 9px calc(var(--spacing-md) + 1px);
+  box-sizing: border-box;
+  border: var(--stroke-sm) solid var(--color-button-secondary-stroke-default);
+  border-radius: var(--radius-full);
+  background: var(--color-button-secondary-surface-default);
+  color: var(--color-button-secondary-text-default);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 4px 4.35px rgba(0, 0, 0, 0.55);
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.root[data-density='compact'] .newChat {
+  width: var(--scale-1400);
+  min-height: var(--scale-1400);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.newChat svg {
+  display: block;
+}
+
+.newChat:hover {
+  background: var(--color-button-secondary-surface-hover);
+  border-color: var(--color-button-secondary-stroke-default);
+}
+
+.newChat:focus {
+  outline: none;
+}
+
+.newChat:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.newChat:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.newChatLabel {
+  display: inline;
+}
+
+.root[data-density='compact'] .newChatLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Nav --- */
+
+.nav {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  /** Figma 341:656: section uses gap 0; label row has its own vertical padding. */
+  gap: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.root[data-density='compact'] .nav {
+  align-items: center;
+  width: 100%;
+  overflow-y: visible;
+}
+
+.navSectionLabel {
+  margin: 0;
+  /** Figma 341:656 “Projects” row: py 8px, pl 16px, pr 0. */
+  padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  line-height: var(--font-line-height-label);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.root[data-density='compact'] .navSectionLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.navList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.navItemWrap {
+  display: flex;
+  width: 100%;
+}
+
+.root[data-density='compact'] .navList {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
+.root[data-density='compact'] .navItemWrap {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 40px;
+  margin: 0;
+  /** Figma 341:656 ghost rows: py 8px, pl 16px, pr 0. */
+  padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-md);
+  box-sizing: border-box;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
+  color: var(--color-button-ghost-text-default);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.root[data-density='compact'] .navItem {
+  display: flex;
+  width: var(--scale-1400);
+  height: var(--scale-1400);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-label);
+  line-height: 1;
+}
+
+.navItem:hover {
+  background: var(--sidebar-row-hover);
+  color: var(--color-button-ghost-text-hover);
+}
+
+.navItem:hover .navCompactMark {
+  color: var(--color-button-ghost-text-hover);
+}
+
+.navItem:focus {
+  outline: none;
+}
+
+.navItem:focus-visible {
+  box-shadow: inset 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.navItemActive {
+  background: var(--sidebar-row-hover);
+  color: var(--sidebar-text-strong);
+}
+
+.navItemBody {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-align: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.root[data-density='compact'] .navItemBody {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.navCompactMark {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--sidebar-text-strong);
+}
+
+/* --- Profile footer --- */
+
+.profile {
+  display: flex;
+  width: 100%;
+  min-height: var(--scale-1500);
+  flex-shrink: 0;
+  align-items: center;
+  /** Figma 341:656 profile row: gap 12px between meta + chevron; inner padding py 6px px 8px. */
+  gap: var(--scale-500);
+  padding: 6px var(--scale-400);
+  box-sizing: border-box;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.12s ease;
+}
+
+.root[data-density='compact'] .profile {
+  width: auto;
+  /**
+   * Match comfortable `.profile` vertical box (min-height + py) so the avatar center
+   * stays on the same Y when collapsing; hidden meta/chevron stay `position: absolute`.
+   */
+  min-height: var(--scale-1500);
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 6px var(--scale-400);
+  border-radius: var(--radius-full);
+}
+
+.profile:hover {
+  background: var(--sidebar-row-hover);
+}
+
+.profile:focus {
+  outline: none;
+}
+
+.profile:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--scale-1200);
+  height: var(--scale-1200);
+  overflow: hidden;
+  border: var(--stroke-md) solid var(--color-orange-400);
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-300);
+}
+
+.profileMeta {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.root[data-density='compact'] .profileMeta,
+.root[data-density='compact'] .chevron {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.profileName {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-fill-primary);
+}
+
+.profileRole {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  line-height: var(--font-line-height-label);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  opacity: 0.85;
+}

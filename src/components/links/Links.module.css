@@ -1,0 +1,55 @@
+/**
+ * BrianGPT Links — maps Figma component `Links` (node 145:707)
+ * to `design-tokens/tokens.css` mapped variables.
+ */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  margin: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+}
+
+.hit {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-button-ghost-surface-default);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.hit svg path {
+  transition: fill 0.12s ease;
+}
+
+.hit:hover {
+  background: var(--color-button-ghost-surface-hover);
+  color: var(--color-button-ghost-text-hover);
+}
+
+.hit:hover svg path {
+  fill: var(--color-button-ghost-text-hover);
+}
+
+.hit:focus {
+  outline: none;
+}
+
+.hit:focus-visible {
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}

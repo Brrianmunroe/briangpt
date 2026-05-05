@@ -1,0 +1,362 @@
+/**
+ * Home — maps Figma `Homepage` (334:449), `Main Content` (341:606 dot field).
+ * https://www.figma.com/design/mlYfMT6fTkpOn91clhFTxs/BrianGPT?node-id=334-449
+ */
+
+.shell {
+  display: flex;
+  min-height: 100dvh;
+  height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  background: var(--color-background-surface-default);
+  color: var(--color-text-fill-primary);
+}
+
+.sidebarHost {
+  flex-shrink: 0;
+  min-height: 0;
+  display: flex;
+  z-index: 2;
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /** Figma `Main Content` (341:606): dot grid on `--color-background-surface-default`; dots at full-opacity neutral 400. */
+  --main-dot-grid: 16px;
+  --main-dot-fill: color-mix(in srgb, var(--color-neutral-400) 100%, transparent);
+  background-color: var(--color-background-surface-default);
+  background-image: radial-gradient(var(--main-dot-fill) 1px, transparent 1px);
+  background-size: var(--main-dot-grid) var(--main-dot-grid);
+  background-position: 0 0;
+}
+
+.mainColumn {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--spacing-md);
+  overflow: hidden;
+}
+
+/** Conversation mode — single column, no whole-page scroll; frame scrolls. */
+.mainColumnChat {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mainHeaderConversation {
+  padding-bottom: var(--spacing-md);
+  margin-bottom: 0;
+  border-bottom: var(--stroke-xs) solid var(--color-chat-input-stroke-default);
+}
+
+/** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
+.chatSectionConversation {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: min(768px + 2 * var(--scale-1900), 100%);
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 0 var(--scale-1900) var(--spacing-md);
+}
+
+/** Figma `Conversation Frame` (360:922) — sole vertical scroll for messages. */
+.conversationFrame {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding-top: var(--spacing-md);
+  scroll-padding-top: var(--spacing-sm);
+}
+
+/** Figma `Chatinput` gradient (360:921) — fade from transparent to surface. */
+.composerGradient {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: var(--spacing-md);
+  background-image: linear-gradient(
+    178.9deg,
+    color-mix(in srgb, var(--color-background-surface-default) 0%, transparent) 5.1%,
+    var(--color-background-surface-default) 19.3%
+  );
+}
+
+.messageRowConversationUser {
+  padding-left: var(--spacing-3xl);
+}
+
+.messageRowConversationAssistant {
+  padding-right: var(--spacing-3xl);
+}
+
+.messageAppear {
+  animation: convUserAppear 280ms ease-out;
+}
+
+@keyframes convUserAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/** 149px gap between top links row and chat stack (Figma `Main Content` column). */
+.mainScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 149px;
+}
+
+.mainHeader {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 var(--spacing-md);
+  box-sizing: border-box;
+}
+
+/** Figma `Chat Section` (334:454): 80px before card row, horizontal 96px padding. */
+.chatSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3xl);
+  width: 100%;
+  max-width: min(768px + 2 * var(--scale-1900), 100%);
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 0 var(--scale-1900) var(--spacing-xl);
+}
+
+/** Figma `Message Container` (334:455): 32px between hero block and composer. */
+.messageBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  width: 100%;
+  max-width: 768px;
+}
+
+.messageHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  text-align: center;
+}
+
+.heroH1 {
+  margin: 0;
+  width: 100%;
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: var(--font-size-heading01);
+  font-weight: 700;
+  line-height: var(--font-line-height-heading01);
+  letter-spacing: var(--letter-spacing-heading);
+  color: #f4eee4;
+  text-align: center;
+}
+
+.actionBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.chatError {
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-body);
+  color: var(--color-orange-400);
+}
+
+.chipScrollWrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.chipRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chipRow::-webkit-scrollbar {
+  display: none;
+}
+
+.chipSlot {
+  flex: 0 0 auto;
+}
+
+.chipScrollFadeRight,
+.chipScrollFadeLeft {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: max(32px, 12%);
+  max-width: 72px;
+}
+
+.chipScrollFadeRight {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--color-background-surface-default) 0%,
+    color-mix(in srgb, var(--color-background-surface-default) 0%, transparent) 100%
+  );
+}
+
+.chipScrollFadeLeft {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--color-background-surface-default) 0%,
+    color-mix(in srgb, var(--color-background-surface-default) 0%, transparent) 100%
+  );
+}
+
+.chipSparkle {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.messages {
+  margin-top: var(--spacing-md);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-height: min(40vh, 360px);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+}
+
+.messageRowUser {
+  justify-content: flex-end;
+}
+
+.messageRowAssistant {
+  justify-content: flex-start;
+}
+
+/** Figma `Card Layout` (334:489): 200px row, 14px gutters, 20px radius on cards. */
+.cardsRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 768px;
+  min-height: 200px;
+}
+
+.cardCell {
+  flex: 1 1 0;
+  min-width: min(100%, 200px);
+  max-width: 320px;
+  height: 200px;
+}
+
+.homeCard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 200px;
+  border-radius: 20px;
+}
+
+@media (max-width: 860px) {
+  .mainScroll {
+    gap: 72px;
+  }
+
+  .chatSection,
+  .chatSectionConversation {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+
+  .mainHeader {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+
+  .messageRowConversationUser {
+    padding-left: var(--spacing-md);
+  }
+
+  .messageRowConversationAssistant {
+    padding-right: var(--spacing-md);
+  }
+}
+
+@media (max-width: 520px) {
+  .cardsRow {
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+  }
+
+  .cardCell {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    min-height: 200px;
+  }
+}

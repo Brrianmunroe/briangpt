@@ -1,0 +1,19 @@
+@import '../../design-tokens/tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/** Show focus rings for keyboard (Tab) navigation only; pointer focus stays visually quiet. */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--color-background-surface-default);
+  color: var(--color-text-fill-primary);
+}

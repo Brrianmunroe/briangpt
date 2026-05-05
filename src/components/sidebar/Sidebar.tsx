@@ -1,0 +1,252 @@
+import * as React from 'react';
+import { Menu, Plus, DownChevron } from '@/components/icons';
+import styles from './Sidebar.module.css';
+
+/** Comfortable `Sidebar` (341:656); compact rail (`Side Bar` 3:78). */
+export type SidebarDensity = 'comfortable' | 'compact';
+
+const SidebarDensityContext = React.createContext<SidebarDensity>('comfortable');
+
+export function useSidebarDensity(): SidebarDensity {
+  return React.useContext(SidebarDensityContext);
+}
+
+function mergeClassNames(...parts: Array<string | undefined | false | null>) {
+  return parts.filter(Boolean).join(' ');
+}
+
+function flattenText(node: React.ReactNode): string {
+  if (node == null || typeof node === 'boolean') return '';
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(flattenText).join('');
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return flattenText(node.props.children);
+  }
+  return '';
+}
+
+/** Small diamond used inside the brand mark (Figma sparkle-style glyph, node 99:1325). */
+function BrandGlyph(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width={16} height={16} viewBox="0 0 16 16" aria-hidden {...props}>
+      <path
+        fill="currentColor"
+        d="M8 1.5 10.35 5.65 14.5 8l-4.15 2.35L8 14.5 5.65 10.35 1.5 8l4.15-2.35L8 1.5Z"
+      />
+    </svg>
+  );
+}
+
+export type SidebarProps = React.HTMLAttributes<HTMLElement> & {
+  /** Use `aside` (default) or `nav` when the whole column is primary navigation. */
+  as?: 'aside' | 'nav';
+  /**
+   * `compact` = icon rail (`width: fit-content`, hugs controls); `comfortable` = 240px (`Sidebar` 341:656).
+   * Width and padding animate on the root.
+   */
+  density?: SidebarDensity;
+};
+
+const SidebarRoot = React.forwardRef<HTMLElement, SidebarProps>(function Sidebar(
+  { as: Comp = 'aside', className, children, density = 'comfortable', ...rest },
+  ref
+) {
+  return (
+    <SidebarDensityContext.Provider value={density}>
+      {React.createElement(
+        Comp,
+        {
+          ref,
+          'data-density': density,
+          className: mergeClassNames(styles.root, className),
+          ...rest,
+        },
+        children
+      )}
+    </SidebarDensityContext.Provider>
+  );
+});
+
+export type SidebarStackProps = React.HTMLAttributes<HTMLDivElement>;
+
+const SidebarStack = React.forwardRef<HTMLDivElement, SidebarStackProps>(function SidebarStack(
+  { className, children, ...rest },
+  ref
+) {
+  return (
+    <div ref={ref} className={mergeClassNames(styles.stack, className)} {...rest}>
+      {children}
+    </div>
+  );
+});
+
+export type SidebarFooterSlotProps = React.HTMLAttributes<HTMLDivElement>;
+
+const SidebarFooterSlot = React.forwardRef<HTMLDivElement, SidebarFooterSlotProps>(
+  function SidebarFooterSlot({ className, children, ...rest }, ref) {
+    return (
+      <div ref={ref} className={mergeClassNames(styles.footerSlot, className)} {...rest}>
+        {children}
+      </div>
+    );
+  }
+);
+
+export type SidebarHeaderRowProps = {
+  title: string;
+  /** Mark shown in the orange circle (default: diamond glyph). */
+  logo?: React.ReactNode;
+  /** Figma homepage sidebar (334:449): title + menu only — no orange mark. */
+  showBrandMark?: boolean;
+  onMenuClick?: () => void;
+  menuButtonProps?: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'>;
+};
+
+function SidebarHeaderRow({
+  title,
+  logo,
+  showBrandMark = true,
+  onMenuClick,
+  menuButtonProps,
+}: SidebarHeaderRowProps) {
+  const { className: menuClass, 'aria-label': menuAriaLabel, ...menuRest } = menuButtonProps ?? {};
+
+  return (
+    <div className={styles.headerRow}>
+      <div className={mergeClassNames(styles.brand, !showBrandMark && styles.brandTextOnly)}>
+        {showBrandMark ? <span className={styles.logoMark}>{logo ?? <BrandGlyph />}</span> : null}
+        <p className={styles.brandTitle}>{title}</p>
+      </div>
+      <button
+        type="button"
+        className={mergeClassNames(styles.menuButton, menuClass)}
+        aria-label={menuAriaLabel ?? 'Toggle menu'}
+        onClick={onMenuClick}
+        {...menuRest}
+      >
+        <Menu color="grey" size={16} />
+      </button>
+    </div>
+  );
+}
+
+export type SidebarNewChatButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'type' | 'children'
+> & {
+  children?: React.ReactNode;
+};
+
+const SidebarNewChatButton = React.forwardRef<HTMLButtonElement, SidebarNewChatButtonProps>(
+  function SidebarNewChatButton({ children = 'New chat', className, ...rest }, ref) {
+    return (
+      <button ref={ref} type="button" className={mergeClassNames(styles.newChat, className)} {...rest}>
+        <Plus color="orange" size={16} aria-hidden />
+        <span className={styles.newChatLabel}>{children}</span>
+      </button>
+    );
+  }
+);
+
+export type SidebarNavSectionProps = {
+  'aria-label'?: string;
+  sectionLabel: string;
+  children: React.ReactNode;
+  className?: string;
+};
+
+function SidebarNavSection({ 'aria-label': ariaLabel, sectionLabel, children, className }: SidebarNavSectionProps) {
+  return (
+    <nav className={mergeClassNames(styles.nav, className)} aria-label={ariaLabel ?? sectionLabel}>
+      <p className={styles.navSectionLabel}>{sectionLabel}</p>
+      <ul className={styles.navList}>{children}</ul>
+    </nav>
+  );
+}
+
+export type SidebarNavItemProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> & {
+  active?: boolean;
+  /** Shown in `density="compact"` instead of a derived letter; falls back to first grapheme of text children. */
+  compactIcon?: React.ReactNode;
+};
+
+const SidebarNavItem = React.forwardRef<HTMLButtonElement, SidebarNavItemProps>(
+  function SidebarNavItem({ active, className, children, compactIcon, ...rest }, ref) {
+    const density = useSidebarDensity();
+    const isCompact = density === 'compact';
+    const textLabel = flattenText(children).trim();
+    const abbrev =
+      textLabel.length > 0
+        ? // first Unicode grapheme when available
+          [...textLabel][0]?.toUpperCase() ?? '·'
+        : '·';
+
+    return (
+      <li className={styles.navItemWrap}>
+        <button
+          ref={ref}
+          type="button"
+          className={mergeClassNames(styles.navItem, active && styles.navItemActive, className)}
+          aria-current={active ? 'page' : undefined}
+          {...rest}
+        >
+          {isCompact ? (
+            <>
+              <span className={styles.navItemBody} aria-hidden>
+                {compactIcon ?? <span className={styles.navCompactMark}>{abbrev}</span>}
+              </span>
+              <span className={styles.visuallyHidden}>{textLabel || 'Navigation item'}</span>
+            </>
+          ) : (
+            <span className={styles.navItemBody}>{children}</span>
+          )}
+        </button>
+      </li>
+    );
+  }
+);
+
+export type SidebarProfileProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> & {
+  name: string;
+  roleLine: string;
+  avatar?: React.ReactNode;
+  showChevron?: boolean;
+};
+
+const SidebarProfile = React.forwardRef<HTMLButtonElement, SidebarProfileProps>(
+  function SidebarProfile({ name, roleLine, avatar, showChevron = true, className, ...rest }, ref) {
+    const aria = `${name}, ${roleLine}`;
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={mergeClassNames(styles.profile, className)}
+        aria-label={aria}
+        {...rest}
+      >
+        <span className={styles.avatar}>{avatar}</span>
+        <span className={styles.profileMeta}>
+          <span className={styles.profileName}>{name}</span>
+          <span className={styles.profileRole}>{roleLine}</span>
+        </span>
+        {showChevron ? (
+          <span className={styles.chevron}>
+            <DownChevron color="grey" size={16} aria-hidden />
+          </span>
+        ) : null}
+      </button>
+    );
+  }
+);
+
+/** App sidebar primitives — Figma `Sidebar` 341:656 (BrianGPT file). */
+export const Sidebar = Object.assign(SidebarRoot, {
+  Stack: SidebarStack,
+  FooterSlot: SidebarFooterSlot,
+  HeaderRow: SidebarHeaderRow,
+  NewChatButton: SidebarNewChatButton,
+  NavSection: SidebarNavSection,
+  NavItem: SidebarNavItem,
+  Profile: SidebarProfile,
+});

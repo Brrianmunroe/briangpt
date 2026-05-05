@@ -1,0 +1,90 @@
+.section {
+  margin-top: 0;
+}
+
+.section + .section {
+  margin-top: var(--spacing-xl);
+}
+
+.h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.lead {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 14px;
+  max-width: 42rem;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  margin-top: var(--spacing-md);
+}
+
+.card {
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  background: var(--color-neutral-300);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.meta {
+  margin: var(--spacing-xs) 0 0;
+  font-size: 11px;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.swatches {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.swatchLabel {
+  font-size: 11px;
+}
+
+.jump {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.jumpLink {
+  font-size: 13px;
+  color: var(--color-orange-400);
+  text-decoration: underline;
+}
+
+.jumpLink:hover {
+  color: var(--color-orange-300);
+}

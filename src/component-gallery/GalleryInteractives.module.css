@@ -1,0 +1,29 @@
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: min(100%, 220px);
+}
+
+.label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-fill-secondary-2);
+}
+
+.form {
+  display: inline-block;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-fill-secondary-2);
+}

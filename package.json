@@ -1,0 +1,27 @@
+{
+  "name": "briangpt",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "build:tokens": "node design-tokens/build.mjs && node scripts/write-component-showcase.mjs",
+    "showcase:html": "node scripts/write-component-showcase.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.60",
+    "@ai-sdk/react": "^3.0.177",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "ai": "^6.0.175",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

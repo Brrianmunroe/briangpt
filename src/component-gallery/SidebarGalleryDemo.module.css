@@ -1,0 +1,32 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.toolbarHint {
+  font-size: var(--font-size-label);
+  line-height: var(--font-line-height-label);
+  color: var(--color-text-fill-secondary-2);
+}
+
+.shell {
+  display: inline-flex;
+  vertical-align: top;
+  border-radius: var(--scale-600);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.sidebar {
+  height: 560px;
+  border-radius: var(--scale-600) 0 0 var(--scale-600);
+}

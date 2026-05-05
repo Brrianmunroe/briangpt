@@ -1,0 +1,27 @@
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-orange-400);
+  text-decoration: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link[aria-current='page'] {
+  color: var(--color-text-fill-primary);
+  background: var(--color-neutral-300);
+  border-color: var(--color-neutral-500);
+  text-decoration: none;
+}
