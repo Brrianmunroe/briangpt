@@ -21,6 +21,8 @@
 }
 
 .chatbot {
+  display: flex;
+  width: 100%;
   padding-inline: 0;
   background: transparent;
   border: none;
@@ -31,13 +33,18 @@
   min-width: 0;
   max-width: min(100%, 28rem);
   font-family: var(--font-style-primary), system-ui, sans-serif;
-  font-size: var(--font-size-label);
-  font-weight: 500;
-  line-height: var(--font-line-height-label);
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
   color: var(--color-text-fill-primary);
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.chatbot .content {
+  width: 100%;
+  max-width: 100%;
 }
 
 .nowrap {
