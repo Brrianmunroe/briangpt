@@ -86,7 +86,7 @@ export type ChatInputProps = Omit<
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   /** Called with trimmed value when user submits (Enter without Shift, or send). */
   onSubmit?: (trimmedValue: string) => void;
-  /** While true (request in flight), the trailing control shows Stop and calls this instead of submit. */
+  /** While true (request in flight: submitted or streaming upstream), the trailing control shows Stop and calls this instead of submit. */
   onStop?: () => void;
   placeholder?: string;
   /** Shown before each rotating suggestion; default ends with `... ` then the typed suffix (lowercase). */
@@ -95,7 +95,7 @@ export type ChatInputProps = Omit<
   rotatingPlaceholderPrompts?: readonly string[];
   followUpPlaceholder?: string;
   streaming?: boolean;
-  /** Follow-up variant styling hook; border behavior still follows default/active/focused state rules. */
+  /** Layout/placeholder emphasis for the follow-up composer; border states follow focus/value like the default composer. */
   followUpEmphasis?: boolean;
   disabled?: boolean;
   /** Locks layout to a Figma `chat-input` variant (static previews / docs only). */
@@ -120,7 +120,7 @@ function mergeClassNames(...parts: Array<string | undefined | null | false>) {
   return parts.filter(Boolean).join(' ');
 }
 
-type InputModality = 'pointer' | 'keyboard';
+type NavigationInput = 'pointer' | 'keyboard';
 
 export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
   function ChatInput(
@@ -154,9 +154,8 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     const isControlled = valueProp !== undefined;
     const [uncontrolled, setUncontrolled] = React.useState(defaultValue);
     const value = isControlled ? String(valueProp ?? '') : uncontrolled;
-    const [textareaFocusVisible, setTextareaFocusVisible] = React.useState(false);
+    const [navigationInput, setNavigationInput] = React.useState<NavigationInput>('pointer');
     const [textareaFocused, setTextareaFocused] = React.useState(false);
-    const modalityRef = React.useRef<InputModality>('pointer');
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const { ref: textareaRefProp, ...restTextareaProps } = (textareaProps ??
       {}) as Partial<React.ComponentPropsWithRef<'textarea'>>;
@@ -180,19 +179,18 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     }, [syncTextareaHeight]);
 
     React.useEffect(() => {
-      const onPointerDown = () => {
-        modalityRef.current = 'pointer';
+      const onPointerDownCapture = () => {
+        setNavigationInput((prev) => (prev === 'pointer' ? prev : 'pointer'));
       };
-      const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Tab') {
-          modalityRef.current = 'keyboard';
-        }
+      const onKeyDownCapture = (ev: KeyboardEvent) => {
+        if (ev.key !== 'Tab') return;
+        setNavigationInput((prev) => (prev === 'keyboard' ? prev : 'keyboard'));
       };
-      window.addEventListener('pointerdown', onPointerDown, true);
-      window.addEventListener('keydown', onKeyDown, true);
+      window.addEventListener('pointerdown', onPointerDownCapture, true);
+      window.addEventListener('keydown', onKeyDownCapture, true);
       return () => {
-        window.removeEventListener('pointerdown', onPointerDown, true);
-        window.removeEventListener('keydown', onKeyDown, true);
+        window.removeEventListener('pointerdown', onPointerDownCapture, true);
+        window.removeEventListener('keydown', onKeyDownCapture, true);
       };
     }, []);
 
@@ -230,6 +228,10 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     const hasValue = value.trim().length > 0;
     const sendEnabled = hasValue && !streaming && !disabled;
 
+    /** Tab-only shell chrome: outline ring, not used for pointer focus. Drops to active once there is text. */
+    const tabFocusChrome =
+      textareaFocused && navigationInput === 'keyboard' && !hasValue;
+
     const rotatingPromptList = rotatingPlaceholderPrompts ?? [];
     const rotatingEligible =
       rotatingPromptList.length > 0 && !previewState && !streaming && !disabled;
@@ -247,15 +249,17 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     if (!previewState) {
       if (streaming) {
         borderClass = styles.borderDefault;
-      } else if (textareaFocusVisible && textareaFocused) {
+      } else if (tabFocusChrome) {
         borderClass = styles.borderFocused;
-      } else if (hasValue || textareaFocused) {
+      } else if (textareaFocused || hasValue) {
         borderClass = styles.borderActive;
+      } else {
+        borderClass = styles.borderDefault;
       }
     } else if (previewState === 'default' || previewState === 'sent') {
       borderClass = styles.borderDefault;
     } else if (previewState === 'followUp') {
-      borderClass = styles.borderFocused;
+      borderClass = styles.borderActive;
     } else {
       borderClass = styles.borderActive;
     }
@@ -385,6 +389,40 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
 
     const { onFocus: onFormFocus, onBlur: onFormBlur, ...formAttrs } = formRest;
 
+    const handleTextareaFocus = React.useCallback(
+      (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        setTextareaFocused(true);
+        restTextareaProps.onFocus?.(e);
+        onFormFocus?.(e as unknown as React.FocusEvent<HTMLFormElement>);
+      },
+      [onFormFocus, restTextareaProps]
+    );
+
+    const handleTextareaBlur = React.useCallback(
+      (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        setTextareaFocused(false);
+        const next = e.relatedTarget as Node | null;
+        if (next && formRef.current?.contains(next)) {
+          restTextareaProps.onBlur?.(e);
+          return;
+        }
+        restTextareaProps.onBlur?.(e);
+        onFormBlur?.(e as unknown as React.FocusEvent<HTMLFormElement>);
+      },
+      [onFormBlur, restTextareaProps]
+    );
+
+    const handleTextareaKeyDown = React.useCallback(
+      (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey && sendEnabled) {
+          e.preventDefault();
+          onSubmit?.(value.trim());
+        }
+        restTextareaProps.onKeyDown?.(e);
+      },
+      [onSubmit, restTextareaProps, sendEnabled, value]
+    );
+
     const sendSizeClass = layout === 'inline' ? styles.send40 : undefined;
 
     const sendControl = streaming ? (
@@ -426,36 +464,11 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   className={mergeClassNames(styles.textarea, styles.textareaInline, restTextareaProps.className)}
                   value={value}
                   onChange={handleChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && sendEnabled) {
-                      e.preventDefault();
-                      onSubmit?.(value.trim());
-                    }
-                    restTextareaProps.onKeyDown?.(e);
-                  }}
+                  onKeyDown={handleTextareaKeyDown}
                   placeholder={placeholderText}
                   disabled={disabled}
-                  onPointerDown={() => {
-                    modalityRef.current = 'pointer';
-                    setTextareaFocusVisible(false);
-                  }}
-                  onFocus={(e) => {
-                    setTextareaFocused(true);
-                    setTextareaFocusVisible(modalityRef.current === 'keyboard');
-                    restTextareaProps.onFocus?.(e);
-                    onFormFocus?.(e as unknown as React.FocusEvent<HTMLFormElement>);
-                  }}
-                  onBlur={(e) => {
-                    setTextareaFocused(false);
-                    setTextareaFocusVisible(false);
-                    const next = e.relatedTarget as Node | null;
-                    if (next && formRef.current?.contains(next)) {
-                      restTextareaProps.onBlur?.(e);
-                      return;
-                    }
-                    restTextareaProps.onBlur?.(e);
-                    onFormBlur?.(e as unknown as React.FocusEvent<HTMLFormElement>);
-                  }}
+                  onFocus={handleTextareaFocus}
+                  onBlur={handleTextareaBlur}
                   aria-label={restTextareaProps['aria-label'] ?? 'Message'}
                 />
                 {showAnimatedPlaceholder ? (
@@ -480,36 +493,11 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   className={mergeClassNames(styles.textarea, restTextareaProps.className)}
                   value={value}
                   onChange={handleChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && sendEnabled) {
-                      e.preventDefault();
-                      onSubmit?.(value.trim());
-                    }
-                    restTextareaProps.onKeyDown?.(e);
-                  }}
+                  onKeyDown={handleTextareaKeyDown}
                   placeholder={placeholderText}
                   disabled={disabled}
-                  onPointerDown={() => {
-                    modalityRef.current = 'pointer';
-                    setTextareaFocusVisible(false);
-                  }}
-                  onFocus={(e) => {
-                    setTextareaFocused(true);
-                    setTextareaFocusVisible(modalityRef.current === 'keyboard');
-                    restTextareaProps.onFocus?.(e);
-                    onFormFocus?.(e as unknown as React.FocusEvent<HTMLFormElement>);
-                  }}
-                  onBlur={(e) => {
-                    setTextareaFocused(false);
-                    setTextareaFocusVisible(false);
-                    const next = e.relatedTarget as Node | null;
-                    if (next && formRef.current?.contains(next)) {
-                      restTextareaProps.onBlur?.(e);
-                      return;
-                    }
-                    restTextareaProps.onBlur?.(e);
-                    onFormBlur?.(e as unknown as React.FocusEvent<HTMLFormElement>);
-                  }}
+                  onFocus={handleTextareaFocus}
+                  onBlur={handleTextareaBlur}
                   aria-label={restTextareaProps['aria-label'] ?? 'Message'}
                 />
                 {showAnimatedPlaceholder ? (

@@ -5,8 +5,10 @@
 
 .shell {
   display: flex;
+  align-items: stretch;
   min-height: 100dvh;
   height: 100vh;
+  max-height: 100dvh;
   width: 100%;
   max-width: 100vw;
   overflow: hidden;
@@ -17,13 +19,14 @@
 .sidebarHost {
   flex-shrink: 0;
   min-height: 0;
+  align-self: stretch;
   display: flex;
   z-index: 2;
 }
 
 .main {
   position: relative;
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -39,7 +42,7 @@
 }
 
 .mainColumn {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -49,7 +52,7 @@
 
 /** Conversation mode — single column, no whole-page scroll; frame scrolls. */
 .mainColumnChat {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
 }
@@ -62,7 +65,7 @@
 
 /** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
 .chatSectionConversation {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -72,6 +75,8 @@
   margin-inline: auto;
   box-sizing: border-box;
   padding: 0 var(--scale-1900) var(--spacing-md);
+  /** Shrink so overflow stays inside the conversation viewport (ConversationPanel), not the whole page. */
+  overflow: hidden;
 }
 
 /** Figma `Chatinput` gradient (360:921) — fade from transparent to surface. */
@@ -85,6 +90,46 @@
     color-mix(in srgb, var(--color-background-surface-default) 0%, transparent) 5.1%,
     var(--color-background-surface-default) 19.3%
   );
+}
+
+/** Empty-state column: grows with main so `.landingCluster` can fill available height. */
+.landingColumn {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 0;
+  min-height: 0;
+}
+
+.landingCluster {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  width: 100%;
+  min-height: 0;
+}
+
+.composerHostLanding {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/** Conversation composer — pinned by flex column (thread flex-grow + this flex-shrink). */
+.composerDock {
+  z-index: 2;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /** 149px gap between top links row and chat stack (Figma `Main Content` column). */
@@ -110,7 +155,9 @@
 .chatSection {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  flex: 1 1 0%;
+  min-height: 0;
   gap: var(--spacing-3xl);
   width: 100%;
   max-width: min(768px + 2 * var(--scale-1900), 100%);
@@ -242,6 +289,7 @@
 
 .messageRow {
   display: flex;
+  flex-shrink: 0;
   width: 100%;
 }
 

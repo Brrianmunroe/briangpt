@@ -57,25 +57,25 @@ function getTextFromMessage(message: UIMessage): string {
     .join('');
 }
 
-function rollbackLastSentTurn(messages: UIMessage[], sentText: string): UIMessage[] {
+/** After Stop, drop the in-flight assistant tail and the matching user turn so the draft is the only copy. */
+function rollbackLastSendTurn(messages: UIMessage[], sentText: string): UIMessage[] {
   const next = [...messages];
-  const trimmed = sentText.trim();
-
+  const trimmedSent = sentText.trim();
   while (next.length > 0) {
-    const last = next[next.length - 1];
-    if (!last) break;
-
+    const last = next[next.length - 1]!;
     if (last.role === 'assistant') {
       next.pop();
       continue;
     }
-
-    if (last.role === 'user' && getTextFromMessage(last).trim() === trimmed) {
-      next.pop();
+    if (last.role === 'user') {
+      const t = getTextFromMessage(last).trim();
+      if (t === trimmedSent) {
+        next.pop();
+      }
+      break;
     }
     break;
   }
-
   return next;
 }
 
@@ -104,9 +104,10 @@ export function PortfolioPage() {
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
   const chipRowRef = React.useRef<HTMLDivElement>(null);
-  const lastSentRef = React.useRef<string | null>(null);
+  const composerHostRef = React.useRef<HTMLDivElement | null>(null);
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
+  const lastSentTextRef = React.useRef<string | null>(null);
 
   const { messages, sendMessage, stop, status, setMessages, error, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
@@ -146,29 +147,30 @@ export function PortfolioPage() {
     async (trimmed: string) => {
       if (!trimmed || requestInFlight) return;
       clearError();
-      lastSentRef.current = trimmed;
+      lastSentTextRef.current = trimmed;
       setDraft('');
       try {
         await sendMessage({ text: trimmed });
       } catch {
-        if (lastSentRef.current != null) {
-          setDraft(lastSentRef.current);
-          lastSentRef.current = null;
+        const snap = lastSentTextRef.current;
+        if (snap != null) {
+          setDraft(snap);
+          lastSentTextRef.current = null;
         }
         return;
       }
-      lastSentRef.current = null;
+      lastSentTextRef.current = null;
     },
     [clearError, requestInFlight, sendMessage]
   );
 
   const handleStop = React.useCallback(() => {
-    const restore = lastSentRef.current;
+    const restore = lastSentTextRef.current;
     void stop();
-    if (!restore) return;
-    lastSentRef.current = null;
+    if (restore == null || restore === '') return;
+    lastSentTextRef.current = null;
     setDraft(restore);
-    setMessages((prev) => rollbackLastSentTurn(prev, restore));
+    setMessages((prev) => rollbackLastSendTurn(prev, restore));
   }, [setMessages, stop]);
 
   const handleNewChat = React.useCallback(() => {
@@ -237,59 +239,61 @@ export function PortfolioPage() {
               </header>
 
               <div className={styles.chatSection}>
-                <div className={styles.messageBlock}>
-                  <div className={styles.messageHeader}>
-                    <NameTag />
-                    <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
-                  </div>
+                <div className={styles.landingColumn}>
+                  <div className={styles.landingCluster}>
+                    <div className={styles.messageHeader}>
+                      <NameTag />
+                      <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
+                    </div>
+                    <div ref={composerHostRef} className={styles.composerHostLanding}>
+                      <ChatInput
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onSubmit={(t) => void handleSend(t)}
+                        streaming={requestInFlight}
+                        onStop={handleStop}
+                        rotatingPlaceholderPrompts={STARTER_PROMPTS}
+                        followUpPlaceholder="Ask a follow up"
+                        followUpEmphasis={false}
+                        layout="stacked"
+                        maxWidth="full"
+                        textareaProps={{ autoFocus: true }}
+                      />
 
-                  <div className={styles.actionBlock}>
-                    <ChatInput
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onSubmit={(t) => void handleSend(t)}
-                      streaming={requestInFlight}
-                      onStop={handleStop}
-                      rotatingPlaceholderPrompts={STARTER_PROMPTS}
-                      followUpPlaceholder="Ask a follow up"
-                      followUpEmphasis={false}
-                      layout="stacked"
-                      maxWidth="full"
-                    />
+                      {error ? (
+                        <p className={styles.chatError} role="alert">
+                          Something went wrong — please try again.
+                        </p>
+                      ) : null}
 
-                    {error ? (
-                      <p className={styles.chatError} role="alert">
-                        Something went wrong — please try again.
-                      </p>
-                    ) : null}
-
-                    <div className={styles.chipScrollWrap}>
-                      <div
-                        ref={chipRowRef}
-                        className={styles.chipRow}
-                        role="list"
-                        aria-label="Suggested prompts"
-                        onScroll={updateChipScrollFade}
-                      >
-                        {STARTER_PROMPTS.map((label) => (
-                          <div key={label} className={styles.chipSlot} role="listitem">
-                            <PromptChip
-                              buttonType="button"
-                              icon={sparkleIcon}
-                              onClick={() => void handleSend(label)}
-                              disabled={requestInFlight}
-                            >
-                              {label}
-                            </PromptChip>
-                          </div>
-                        ))}
+                      <div className={styles.chipScrollWrap}>
+                        <div
+                          ref={chipRowRef}
+                          className={styles.chipRow}
+                          role="list"
+                          aria-label="Suggested prompts"
+                          onScroll={updateChipScrollFade}
+                        >
+                          {STARTER_PROMPTS.map((label) => (
+                            <div key={label} className={styles.chipSlot} role="listitem">
+                              <PromptChip
+                                buttonType="button"
+                                icon={sparkleIcon}
+                                onClick={() => void handleSend(label)}
+                                disabled={requestInFlight}
+                              >
+                                {label}
+                              </PromptChip>
+                            </div>
+                          ))}
+                        </div>
+                        {chipScrollFadeLeftVisible ? (
+                          <div className={styles.chipScrollFadeLeft} aria-hidden />
+                        ) : null}
+                        {chipScrollFadeRightVisible ? (
+                          <div className={styles.chipScrollFadeRight} aria-hidden />
+                        ) : null}
                       </div>
-                      {chipScrollFadeLeftVisible ? (
-                        <div className={styles.chipScrollFadeLeft} aria-hidden />
-                      ) : null}
-                      {chipScrollFadeRightVisible ? (
-                        <div className={styles.chipScrollFadeRight} aria-hidden />
-                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -328,23 +332,25 @@ export function PortfolioPage() {
                   getMessageText={getTextFromMessage}
                 />
 
-                <div className={styles.composerGradient}>
-                  <ChatInput
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    onSubmit={(t) => void handleSend(t)}
-                    streaming={requestInFlight}
-                    onStop={handleStop}
-                    followUpPlaceholder="Ask a follow up"
-                    followUpEmphasis
-                    layout="stacked"
-                    maxWidth="full"
-                  />
-                  {error ? (
-                    <p className={styles.chatError} role="alert">
-                      Something went wrong — please try again.
-                    </p>
-                  ) : null}
+                <div className={styles.composerDock}>
+                  <div className={styles.composerGradient}>
+                    <ChatInput
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onSubmit={(t) => void handleSend(t)}
+                      streaming={requestInFlight}
+                      onStop={handleStop}
+                      followUpPlaceholder="Ask a follow up"
+                      followUpEmphasis
+                      layout="stacked"
+                      maxWidth="full"
+                    />
+                    {error ? (
+                      <p className={styles.chatError} role="alert">
+                        Something went wrong — please try again.
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </>
