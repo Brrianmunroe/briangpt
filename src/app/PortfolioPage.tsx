@@ -58,7 +58,35 @@ function getTextFromMessage(message: UIMessage): string {
     .join('');
 }
 
+/** After Stop, drop the in-flight assistant tail and the matching user turn so the draft is the only copy. */
+function rollbackLastSendTurn(messages: UIMessage[], sentText: string): UIMessage[] {
+  const next = [...messages];
+  const trimmedSent = sentText.trim();
+  while (next.length > 0) {
+    const last = next[next.length - 1]!;
+    if (last.role === 'assistant') {
+      next.pop();
+      continue;
+    }
+    if (last.role === 'user') {
+      const t = getTextFromMessage(last).trim();
+      if (t === trimmedSent) {
+        next.pop();
+      }
+      break;
+    }
+    break;
+  }
+  return next;
+}
+
 const CHIP_SCROLL_SLOP_PX = 2;
+
+/** Distance from bottom within which we keep “stuck” to latest messages. */
+const STICKY_SCROLL_THRESHOLD_PX = 80;
+
+const MSG_ENTER_DURATION_MS = 300;
+const MSG_ENTER_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 function chipRowShowsRightFade(el: HTMLDivElement): boolean {
   const { scrollLeft, clientWidth, scrollWidth } = el;
@@ -87,30 +115,46 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
   return Boolean(last && last.role === 'user');
 }
 
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = React.useState(false);
+  React.useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return reduced;
+}
+
 export function PortfolioPage() {
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
-  const lastUserRowRef = React.useRef<HTMLDivElement | null>(null);
-  const prevScrollUserIdRef = React.useRef<string | null>(null);
   const chipRowRef = React.useRef<HTMLDivElement>(null);
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
+  const lastSentTextRef = React.useRef<string | null>(null);
+
+  const threadScrollRef = React.useRef<HTMLDivElement | null>(null);
+  const threadContentRef = React.useRef<HTMLDivElement | null>(null);
+  const composerHostRef = React.useRef<HTMLDivElement | null>(null);
+  const messageRowElsRef = React.useRef<Map<string, HTMLDivElement>>(new Map());
+  /** When true, keep scroll pinned to the bottom as messages append or grow. */
+  const autoFollowRef = React.useRef(true);
+  /** Ignore `scroll` events triggered by `scrollTop` changes so we don’t flip auto-follow off. */
+  const isProgrammaticScrollRef = React.useRef(false);
+  const flipOriginRectRef = React.useRef<DOMRect | null>(null);
+  const awaitingUserFlipRef = React.useRef(false);
+
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const { messages, sendMessage, stop, status, setMessages, error, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
   const streaming = status === 'streaming';
+  const requestInFlight = status === 'submitted' || status === 'streaming';
   const conversationMode = messages.length > 0;
-  const lastUserMessage = React.useMemo(() => getLastUserMessage(messages), [messages]);
-  const lastUserId = lastUserMessage?.id ?? null;
-
-  React.useLayoutEffect(() => {
-    if (!conversationMode || !lastUserId) return;
-    if (prevScrollUserIdRef.current === lastUserId) return;
-    prevScrollUserIdRef.current = lastUserId;
-    lastUserRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [conversationMode, lastUserId, messages]);
 
   const appendThinking = shouldAppendThinkingRow(messages, status);
 
@@ -119,6 +163,13 @@ export function PortfolioPage() {
     if (!el) return;
     setChipScrollFadeRightVisible(chipRowShowsRightFade(el));
     setChipScrollFadeLeftVisible(chipRowShowsLeftFade(el));
+  }, []);
+
+  const onThreadScroll = React.useCallback(() => {
+    const el = threadScrollRef.current;
+    if (!el || isProgrammaticScrollRef.current) return;
+    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    autoFollowRef.current = distFromBottom <= STICKY_SCROLL_THRESHOLD_PX;
   }, []);
 
   React.useLayoutEffect(() => {
@@ -139,25 +190,172 @@ export function PortfolioPage() {
     };
   }, [updateChipScrollFade]);
 
+  /** Thread fills scrollport height (`--thread-viewport-h`) + snap to bottom while auto-follow is on. */
+  React.useLayoutEffect(() => {
+    const frame = threadScrollRef.current;
+    if (!conversationMode || !frame) return;
+
+    const syncViewportVar = () => {
+      frame.style.setProperty('--thread-viewport-h', `${frame.clientHeight}px`);
+    };
+
+    const runSnap = () => {
+      if (!autoFollowRef.current) return;
+      isProgrammaticScrollRef.current = true;
+      frame.scrollTop = frame.scrollHeight;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          isProgrammaticScrollRef.current = false;
+        });
+      });
+    };
+
+    const syncLayout = () => {
+      syncViewportVar();
+      runSnap();
+      requestAnimationFrame(() => {
+        syncViewportVar();
+        runSnap();
+      });
+    };
+
+    syncLayout();
+
+    const roFrame = new ResizeObserver(syncLayout);
+    roFrame.observe(frame);
+    return () => {
+      roFrame.disconnect();
+      frame.style.removeProperty('--thread-viewport-h');
+    };
+  }, [conversationMode, messages, status, appendThinking, streaming]);
+
+  /** Re-snap when thread grows (streaming reflow) while auto-follow is on. */
+  React.useEffect(() => {
+    const scrollEl = threadScrollRef.current;
+    const contentEl = threadContentRef.current;
+    if (!conversationMode || !scrollEl || !contentEl) return;
+
+    const snapIfFollowing = () => {
+      if (!autoFollowRef.current) return;
+      isProgrammaticScrollRef.current = true;
+      scrollEl.scrollTop = scrollEl.scrollHeight;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          isProgrammaticScrollRef.current = false;
+        });
+      });
+    };
+
+    const ro = new ResizeObserver(snapIfFollowing);
+    ro.observe(contentEl);
+    ro.observe(scrollEl);
+    return () => ro.disconnect();
+  }, [conversationMode]);
+
+  /** FLIP user bubble from composer to thread (same frame as scroll snap). */
+  React.useLayoutEffect(() => {
+    if (!conversationMode || !awaitingUserFlipRef.current) return;
+
+    if (prefersReducedMotion) {
+      awaitingUserFlipRef.current = false;
+      flipOriginRectRef.current = null;
+      return;
+    }
+
+    const origin = flipOriginRectRef.current;
+    const lastUser = getLastUserMessage(messages);
+    if (!origin || !lastUser?.id) {
+      awaitingUserFlipRef.current = false;
+      flipOriginRectRef.current = null;
+      return;
+    }
+
+    const rowEl = messageRowElsRef.current.get(lastUser.id);
+    if (!rowEl) {
+      awaitingUserFlipRef.current = false;
+      flipOriginRectRef.current = null;
+      return;
+    }
+
+    const dest = rowEl.getBoundingClientRect();
+    const dx =
+      origin.left + origin.width / 2 - (dest.left + dest.width / 2);
+    const dy =
+      origin.top + origin.height / 2 - (dest.top + dest.height / 2);
+
+    rowEl.style.willChange = 'transform, opacity';
+    rowEl.style.transition = 'none';
+    rowEl.style.transform = `translate(${dx}px, ${dy}px)`;
+    rowEl.style.opacity = '0';
+
+    awaitingUserFlipRef.current = false;
+    flipOriginRectRef.current = null;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        rowEl.style.transition = `transform ${MSG_ENTER_DURATION_MS}ms ${MSG_ENTER_EASING}, opacity ${MSG_ENTER_DURATION_MS}ms ${MSG_ENTER_EASING}`;
+        rowEl.style.transform = '';
+        rowEl.style.opacity = '';
+        window.setTimeout(() => {
+          rowEl.style.transition = '';
+          rowEl.style.willChange = '';
+        }, MSG_ENTER_DURATION_MS + 50);
+      });
+    });
+  }, [conversationMode, messages, prefersReducedMotion]);
+
+  const setMessageRowRef = React.useCallback(
+    (id: string, node: HTMLDivElement | null) => {
+      if (node) messageRowElsRef.current.set(id, node);
+      else messageRowElsRef.current.delete(id);
+    },
+    []
+  );
+
   const handleSend = React.useCallback(
     async (trimmed: string) => {
-      if (!trimmed || streaming) return;
+      if (!trimmed || requestInFlight) return;
+      const host = composerHostRef.current;
+      if (host) {
+        flipOriginRectRef.current = host.getBoundingClientRect();
+        awaitingUserFlipRef.current = true;
+      }
+      autoFollowRef.current = true;
       clearError();
+      lastSentTextRef.current = trimmed;
       setDraft('');
-      await sendMessage({ text: trimmed });
+      try {
+        await sendMessage({ text: trimmed });
+      } catch {
+        const snap = lastSentTextRef.current;
+        if (snap != null) {
+          setDraft(snap);
+          lastSentTextRef.current = null;
+        }
+        return;
+      }
+      lastSentTextRef.current = null;
     },
-    [clearError, sendMessage, streaming]
+    [clearError, requestInFlight, sendMessage]
   );
 
   const handleStop = React.useCallback(() => {
+    const restore = lastSentTextRef.current;
     void stop();
-  }, [stop]);
+    if (restore == null || restore === '') return;
+    lastSentTextRef.current = null;
+    setDraft(restore);
+    setMessages((prev) => rollbackLastSendTurn(prev, restore));
+  }, [setMessages, stop]);
 
   const handleNewChat = React.useCallback(() => {
     clearError();
     setMessages([]);
     setDraft('');
-    prevScrollUserIdRef.current = null;
+    autoFollowRef.current = true;
+    flipOriginRectRef.current = null;
+    awaitingUserFlipRef.current = false;
+    messageRowElsRef.current.clear();
   }, [clearError, setMessages]);
 
   const toggleSidebarDensity = React.useCallback(() => {
@@ -173,6 +371,8 @@ export function PortfolioPage() {
       className={styles.chipSparkle}
     />
   );
+
+  const lastThreadMessage = messages.length > 0 ? messages[messages.length - 1] : undefined;
 
   return (
     <div className={styles.shell}>
@@ -220,78 +420,77 @@ export function PortfolioPage() {
               </header>
 
               <div className={styles.chatSection}>
-                <div className={styles.messageBlock}>
-                  <div className={styles.messageHeader}>
-                    <NameTag />
-                    <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
-                  </div>
+                <div className={styles.landingColumn}>
+                  <div className={styles.landingCluster}>
+                    <div className={styles.messageHeader}>
+                      <NameTag />
+                      <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
+                    </div>
+                    <div ref={composerHostRef} className={styles.composerHostLanding}>
+                      <ChatInput
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onSubmit={(t) => void handleSend(t)}
+                        streaming={requestInFlight}
+                        onStop={handleStop}
+                        rotatingPlaceholderPrompts={STARTER_PROMPTS}
+                        followUpPlaceholder="Ask a follow up"
+                        followUpEmphasis={false}
+                        layout="stacked"
+                        maxWidth="full"
+                        textareaProps={{ autoFocus: true }}
+                      />
 
-                  <div className={styles.actionBlock}>
-                    <ChatInput
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onSubmit={(t) => void handleSend(t)}
-                      streaming={streaming}
-                      onStop={handleStop}
-                      rotatingPlaceholderPrompts={STARTER_PROMPTS}
-                      followUpPlaceholder="Ask a follow up"
-                      followUpEmphasis={false}
-                      layout="stacked"
-                      maxWidth="full"
-                    />
+                      {error ? (
+                        <p className={styles.chatError} role="alert">
+                          Something went wrong — please try again.
+                        </p>
+                      ) : null}
 
-                    {error ? (
-                      <p className={styles.chatError} role="alert">
-                        Something went wrong — please try again.
-                      </p>
-                    ) : null}
-
-                    <div className={styles.chipScrollWrap}>
-                      <div
-                        ref={chipRowRef}
-                        className={styles.chipRow}
-                        role="list"
-                        aria-label="Suggested prompts"
-                        onScroll={updateChipScrollFade}
-                      >
-                        {STARTER_PROMPTS.map((label) => (
-                          <div key={label} className={styles.chipSlot} role="listitem">
-                            <PromptChip
-                              buttonType="button"
-                              icon={sparkleIcon}
-                              onClick={() => {
-                                clearError();
-                                void sendMessage({ text: label });
-                              }}
-                              disabled={streaming}
-                            >
-                              {label}
-                            </PromptChip>
-                          </div>
-                        ))}
+                      <div className={styles.chipScrollWrap}>
+                        <div
+                          ref={chipRowRef}
+                          className={styles.chipRow}
+                          role="list"
+                          aria-label="Suggested prompts"
+                          onScroll={updateChipScrollFade}
+                        >
+                          {STARTER_PROMPTS.map((label) => (
+                            <div key={label} className={styles.chipSlot} role="listitem">
+                              <PromptChip
+                                buttonType="button"
+                                icon={sparkleIcon}
+                                onClick={() => void handleSend(label)}
+                                disabled={requestInFlight}
+                              >
+                                {label}
+                              </PromptChip>
+                            </div>
+                          ))}
+                        </div>
+                        {chipScrollFadeLeftVisible ? (
+                          <div className={styles.chipScrollFadeLeft} aria-hidden />
+                        ) : null}
+                        {chipScrollFadeRightVisible ? (
+                          <div className={styles.chipScrollFadeRight} aria-hidden />
+                        ) : null}
                       </div>
-                      {chipScrollFadeLeftVisible ? (
-                        <div className={styles.chipScrollFadeLeft} aria-hidden />
-                      ) : null}
-                      {chipScrollFadeRightVisible ? (
-                        <div className={styles.chipScrollFadeRight} aria-hidden />
-                      ) : null}
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.cardsRow}>
-                  {CASE_CARDS.map((c) => (
-                    <div key={c.title} className={styles.cardCell}>
-                      <Card
-                        className={styles.homeCard}
-                        variant={c.variant}
-                        title={c.title}
-                        subtitle={c.subtitle}
-                      />
-                    </div>
-                  ))}
-                </div>
+                {CASE_CARDS.map((c) => (
+                  <div key={c.title} className={styles.cardCell}>
+                    <Card
+                      className={styles.homeCard}
+                      variant={c.variant}
+                      title={c.title}
+                      subtitle={c.subtitle}
+                    />
+                  </div>
+                ))}
+              </div>
               </div>
             </div>
           ) : (
@@ -307,18 +506,34 @@ export function PortfolioPage() {
 
               <div className={styles.chatSectionConversation}>
                 <div
+                  ref={threadScrollRef}
                   className={styles.conversationFrame}
                   role="log"
                   aria-live="polite"
                   aria-relevant="additions text"
+                  onScroll={onThreadScroll}
                 >
-                  {messages.map((m) => {
+                  <div ref={threadContentRef} className={styles.threadContent}>
+                    <div className={styles.threadTopSpacer} aria-hidden />
+                    {messages.map((m) => {
                     const text = getTextFromMessage(m);
+                    const isLastMessageRow = Boolean(
+                      lastThreadMessage && m.id === lastThreadMessage.id
+                    );
                     if (m.role === 'assistant' && !text && streaming) {
+                      const enterClassStreaming =
+                        isLastMessageRow && !prefersReducedMotion ? styles.messageEnter : undefined;
                       return (
                         <div
                           key={m.id}
-                          className={`${styles.messageRow} ${styles.messageRowAssistant} ${styles.messageRowConversationAssistant}`}
+                          className={[
+                            styles.messageRow,
+                            styles.messageRowAssistant,
+                            styles.messageRowConversationAssistant,
+                            enterClassStreaming,
+                          ]
+                            .filter(Boolean)
+                            .join(' ')}
                         >
                           <ThinkingIndicator />
                         </div>
@@ -331,14 +546,26 @@ export function PortfolioPage() {
                       m.role === 'user'
                         ? styles.messageRowConversationUser
                         : styles.messageRowConversationAssistant;
-                    const isLastUser = m.role === 'user' && m.id === lastUserId;
+                    /** CSS enter only for the tail row; users use FLIP unless reduced motion. */
+                    const enterClass =
+                      m.role === 'user'
+                        ? prefersReducedMotion && isLastMessageRow
+                          ? styles.messageEnter
+                          : undefined
+                        : isLastMessageRow && !prefersReducedMotion
+                          ? styles.messageEnter
+                          : undefined;
                     return (
                       <div
                         key={m.id}
-                        ref={isLastUser ? lastUserRowRef : undefined}
-                        className={`${styles.messageRow} ${rowClass} ${convPad} ${isLastUser ? styles.messageAppear : ''}`}
+                        ref={(node) => setMessageRowRef(m.id, node)}
+                        className={[styles.messageRow, rowClass, convPad, enterClass]
+                          .filter(Boolean)
+                          .join(' ')}
                       >
-                        <SpeechBubble variant={variant}>{text || '\u00a0'}</SpeechBubble>
+                        <SpeechBubble variant={variant} wide={variant === 'chatbot'}>
+                          {text || '\u00a0'}
+                        </SpeechBubble>
                       </div>
                     );
                   })}
@@ -349,25 +576,28 @@ export function PortfolioPage() {
                       <ThinkingIndicator />
                     </div>
                   ) : null}
+                  </div>
                 </div>
 
-                <div className={styles.composerGradient}>
-                  <ChatInput
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    onSubmit={(t) => void handleSend(t)}
-                    streaming={streaming}
-                    onStop={handleStop}
-                    followUpPlaceholder="Ask a follow up"
-                    followUpEmphasis
-                    layout="stacked"
-                    maxWidth="full"
-                  />
-                  {error ? (
-                    <p className={styles.chatError} role="alert">
-                      Something went wrong — please try again.
-                    </p>
-                  ) : null}
+                <div ref={composerHostRef} className={styles.composerDock}>
+                  <div className={styles.composerGradient}>
+                    <ChatInput
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onSubmit={(t) => void handleSend(t)}
+                      streaming={requestInFlight}
+                      onStop={handleStop}
+                      followUpPlaceholder="Ask a follow up"
+                      followUpEmphasis
+                      layout="stacked"
+                      maxWidth="full"
+                    />
+                    {error ? (
+                      <p className={styles.chatError} role="alert">
+                        Something went wrong — please try again.
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </>

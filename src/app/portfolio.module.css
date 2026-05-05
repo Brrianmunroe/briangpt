@@ -5,8 +5,10 @@
 
 .shell {
   display: flex;
+  align-items: stretch;
   min-height: 100dvh;
   height: 100vh;
+  max-height: 100dvh;
   width: 100%;
   max-width: 100vw;
   overflow: hidden;
@@ -17,13 +19,14 @@
 .sidebarHost {
   flex-shrink: 0;
   min-height: 0;
+  align-self: stretch;
   display: flex;
   z-index: 2;
 }
 
 .main {
   position: relative;
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
   min-height: 0;
   display: flex;
@@ -39,7 +42,7 @@
 }
 
 .mainColumn {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -49,7 +52,7 @@
 
 /** Conversation mode — single column, no whole-page scroll; frame scrolls. */
 .mainColumnChat {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
 }
@@ -62,7 +65,7 @@
 
 /** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
 .chatSectionConversation {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -72,22 +75,45 @@
   margin-inline: auto;
   box-sizing: border-box;
   padding: 0 var(--scale-1900) var(--spacing-md);
+  /** Let the message column shrink so overflow stays inside `.conversationFrame` (not the whole page). */
+  overflow: hidden;
 }
 
-/** Figma `Conversation Frame` (360:922) — sole vertical scroll for messages. */
+/** Figma `Conversation Frame` (360:922) — bounded-height vertical scroll for messages (`scroll`: stable gutter).
+ * Use block layout here (not flex on this node): a column flex child with `min-height:auto`
+ * can size to its content and defeat scrolling so everything stays “above the fold” visible.
+ */
 .conversationFrame {
-  flex: 1;
+  box-sizing: border-box;
+  flex: 1 1 0%;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--spacing-md);
+  min-width: 0;
   width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  overscroll-behavior-y: contain;
+  overflow-anchor: none;
   padding-top: var(--spacing-md);
   scroll-padding-top: var(--spacing-sm);
+}
+
+/** Message stack inside `.conversationFrame`. `min-height: 100%` + top spacer pins short threads to the
+ * bottom of the scrollport so `scrollTop = scrollHeight` actually moves prior turns above the fold once content overflows. */
+.threadContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--thread-viewport-h, 100%);
+  box-sizing: border-box;
+}
+
+.threadTopSpacer {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  pointer-events: none;
 }
 
 /** Figma `Chatinput` gradient (360:921) — fade from transparent to surface. */
@@ -105,20 +131,73 @@
 
 .messageRowConversationUser {
   padding-left: var(--spacing-3xl);
+  scroll-margin-top: var(--spacing-sm);
 }
 
 .messageRowConversationAssistant {
   padding-right: var(--spacing-3xl);
+  scroll-margin-top: var(--spacing-sm);
 }
 
-.messageAppear {
-  animation: convUserAppear 280ms ease-out;
+/** Empty-state column: grows with main so `.landingCluster` can fill available height. */
+.landingColumn {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 0;
+  min-height: 0;
 }
 
-@keyframes convUserAppear {
+.landingCluster {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  width: 100%;
+  min-height: 0;
+}
+
+.composerHostLanding {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/** Conversation composer — sticky bottom (input bar fixed to lower edge of thread column). */
+/**
+ * Pinned by flex column (thread flex-grow + this flex-shrink), not sticky —
+ * sticky inside a shrink-wrapped ancestor can fight flex min-height:auto and hide overflow.
+ */
+.composerDock {
+  z-index: 2;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/** Enter animation for thread rows (FLIP handles user messages when motion is allowed). */
+.messageEnter {
+  animation: threadMessageEnter 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .messageEnter {
+    animation: none;
+  }
+}
+
+@keyframes threadMessageEnter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(20px);
   }
 
   to {
@@ -150,7 +229,9 @@
 .chatSection {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  flex: 1 1 0%;
+  min-height: 0;
   gap: var(--spacing-3xl);
   width: 100%;
   max-width: min(768px + 2 * var(--scale-1900), 100%);
@@ -282,6 +363,7 @@
 
 .messageRow {
   display: flex;
+  flex-shrink: 0;
   width: 100%;
 }
 
