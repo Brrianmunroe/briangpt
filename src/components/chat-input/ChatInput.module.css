@@ -86,12 +86,18 @@
   border: var(--stroke-sm) solid var(--color-chat-input-stroke-default);
 }
 
+/** Figma `State=Active` — `stroke/sm` + `color/chat-input/stroke/active` (same stroke role as default; active is the orange token). */
 .borderActive {
   border: var(--stroke-sm) solid var(--color-chat-input-stroke-active);
 }
 
+/**
+ * Tab-only (see `navigationInput` in ChatInput.tsx). Border matches active; outer ring matches `Button` focus pattern
+ * (`stroke/lg` + mapped focused color) so focus reads like the rest of the BrianGPT components, not ad-hoc outline.
+ */
 .borderFocused {
-  border: var(--spacing-xs) solid var(--color-chat-input-stroke-focused);
+  border: var(--stroke-sm) solid var(--color-chat-input-stroke-active);
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-chat-input-stroke-focused);
 }
 
 .fieldRow {

@@ -45,3 +45,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.wide {
+  max-width: 100%;
+}

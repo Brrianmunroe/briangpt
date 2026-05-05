@@ -13,6 +13,8 @@ export type SpeechBubbleProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'chil
    * Default allows wrapping for longer messages.
    */
   nowrap?: boolean;
+  /** Chatbot copy spans the full thread width (conversation layout). */
+  wide?: boolean;
 };
 
 const variantClass: Record<SpeechBubbleVariant, string> = {
@@ -26,11 +28,15 @@ function mergeClassNames(...parts: Array<string | undefined>) {
 
 export const SpeechBubble = React.forwardRef<HTMLDivElement, SpeechBubbleProps>(
   function SpeechBubble(
-    { variant = 'user', children, className, nowrap = false, ...rest },
+    { variant = 'user', children, className, nowrap = false, wide = false, ...rest },
     ref
   ) {
     const rootClass = mergeClassNames(styles.root, variantClass[variant], className);
-    const contentClass = mergeClassNames(styles.content, nowrap ? styles.nowrap : undefined);
+    const contentClass = mergeClassNames(
+      styles.content,
+      nowrap ? styles.nowrap : undefined,
+      variant === 'chatbot' && wide ? styles.wide : undefined
+    );
 
     return (
       <div ref={ref} className={rootClass} data-variant={variant} {...rest}>
