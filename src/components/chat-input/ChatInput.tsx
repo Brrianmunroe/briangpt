@@ -86,7 +86,7 @@ export type ChatInputProps = Omit<
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   /** Called with trimmed value when user submits (Enter without Shift, or send). */
   onSubmit?: (trimmedValue: string) => void;
-  /** While `streaming`, the trailing control shows Stop and calls this instead of submit. */
+  /** While true (request in flight), the trailing control shows Stop and calls this instead of submit. */
   onStop?: () => void;
   placeholder?: string;
   /** Shown before each rotating suggestion; default ends with `... ` then the typed suffix (lowercase). */
@@ -95,7 +95,7 @@ export type ChatInputProps = Omit<
   rotatingPlaceholderPrompts?: readonly string[];
   followUpPlaceholder?: string;
   streaming?: boolean;
-  /** When true and the field is empty, shows the thick “follow-up” chrome from Figma `State=Focused`. */
+  /** Follow-up variant styling hook; border behavior still follows default/active/focused state rules. */
   followUpEmphasis?: boolean;
   disabled?: boolean;
   /** Locks layout to a Figma `chat-input` variant (static previews / docs only). */
@@ -119,6 +119,8 @@ export type ChatInputProps = Omit<
 function mergeClassNames(...parts: Array<string | undefined | null | false>) {
   return parts.filter(Boolean).join(' ');
 }
+
+type InputModality = 'pointer' | 'keyboard';
 
 export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
   function ChatInput(
@@ -153,6 +155,8 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     const [uncontrolled, setUncontrolled] = React.useState(defaultValue);
     const value = isControlled ? String(valueProp ?? '') : uncontrolled;
     const [textareaFocusVisible, setTextareaFocusVisible] = React.useState(false);
+    const [textareaFocused, setTextareaFocused] = React.useState(false);
+    const modalityRef = React.useRef<InputModality>('pointer');
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const { ref: textareaRefProp, ...restTextareaProps } = (textareaProps ??
       {}) as Partial<React.ComponentPropsWithRef<'textarea'>>;
@@ -175,18 +179,21 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
       return () => window.removeEventListener('resize', onResize);
     }, [syncTextareaHeight]);
 
-    const syncTextareaFocusVisible = React.useCallback(() => {
-      requestAnimationFrame(() => {
-        const el = textareaRef.current;
-        setTextareaFocusVisible(
-          Boolean(
-            el &&
-              typeof el.matches === 'function' &&
-              document.activeElement === el &&
-              el.matches(':focus-visible')
-          )
-        );
-      });
+    React.useEffect(() => {
+      const onPointerDown = () => {
+        modalityRef.current = 'pointer';
+      };
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Tab') {
+          modalityRef.current = 'keyboard';
+        }
+      };
+      window.addEventListener('pointerdown', onPointerDown, true);
+      window.addEventListener('keydown', onKeyDown, true);
+      return () => {
+        window.removeEventListener('pointerdown', onPointerDown, true);
+        window.removeEventListener('keydown', onKeyDown, true);
+      };
     }, []);
 
     const setTextareaRef = React.useCallback(
@@ -240,9 +247,9 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
     if (!previewState) {
       if (streaming) {
         borderClass = styles.borderDefault;
-      } else if (followUpEmphasis && !hasValue) {
-        borderClass = !textareaFocusVisible ? styles.borderFocused : styles.borderActive;
-      } else if (hasValue || textareaFocusVisible) {
+      } else if (textareaFocusVisible && textareaFocused) {
+        borderClass = styles.borderFocused;
+      } else if (hasValue || textareaFocused) {
         borderClass = styles.borderActive;
       }
     } else if (previewState === 'default' || previewState === 'sent') {
@@ -428,12 +435,18 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   }}
                   placeholder={placeholderText}
                   disabled={disabled}
+                  onPointerDown={() => {
+                    modalityRef.current = 'pointer';
+                    setTextareaFocusVisible(false);
+                  }}
                   onFocus={(e) => {
-                    syncTextareaFocusVisible();
+                    setTextareaFocused(true);
+                    setTextareaFocusVisible(modalityRef.current === 'keyboard');
                     restTextareaProps.onFocus?.(e);
                     onFormFocus?.(e as unknown as React.FocusEvent<HTMLFormElement>);
                   }}
                   onBlur={(e) => {
+                    setTextareaFocused(false);
                     setTextareaFocusVisible(false);
                     const next = e.relatedTarget as Node | null;
                     if (next && formRef.current?.contains(next)) {
@@ -476,12 +489,18 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   }}
                   placeholder={placeholderText}
                   disabled={disabled}
+                  onPointerDown={() => {
+                    modalityRef.current = 'pointer';
+                    setTextareaFocusVisible(false);
+                  }}
                   onFocus={(e) => {
-                    syncTextareaFocusVisible();
+                    setTextareaFocused(true);
+                    setTextareaFocusVisible(modalityRef.current === 'keyboard');
                     restTextareaProps.onFocus?.(e);
                     onFormFocus?.(e as unknown as React.FocusEvent<HTMLFormElement>);
                   }}
                   onBlur={(e) => {
+                    setTextareaFocused(false);
                     setTextareaFocusVisible(false);
                     const next = e.relatedTarget as Node | null;
                     if (next && formRef.current?.contains(next)) {

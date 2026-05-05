@@ -74,22 +74,6 @@
   padding: 0 var(--scale-1900) var(--spacing-md);
 }
 
-/** Figma `Conversation Frame` (360:922) — sole vertical scroll for messages. */
-.conversationFrame {
-  flex: 1;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--spacing-md);
-  width: 100%;
-  padding-top: var(--spacing-md);
-  scroll-padding-top: var(--spacing-sm);
-}
-
 /** Figma `Chatinput` gradient (360:921) — fade from transparent to surface. */
 .composerGradient {
   flex-shrink: 0;
@@ -101,30 +85,6 @@
     color-mix(in srgb, var(--color-background-surface-default) 0%, transparent) 5.1%,
     var(--color-background-surface-default) 19.3%
   );
-}
-
-.messageRowConversationUser {
-  padding-left: var(--spacing-3xl);
-}
-
-.messageRowConversationAssistant {
-  padding-right: var(--spacing-3xl);
-}
-
-.messageAppear {
-  animation: convUserAppear 280ms ease-out;
-}
-
-@keyframes convUserAppear {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /** 149px gap between top links row and chat stack (Figma `Main Content` column). */
@@ -336,17 +296,10 @@
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
   }
-
-  .messageRowConversationUser {
-    padding-left: var(--spacing-md);
-  }
-
-  .messageRowConversationAssistant {
-    padding-right: var(--spacing-md);
-  }
 }
 
 @media (max-width: 520px) {
+  /** Figma `Card Layout` (334:489): stack cards on narrow viewports. */
   .cardsRow {
     flex-direction: column;
     align-items: center;

@@ -1,0 +1,99 @@
+/**
+ * Conversation scroll viewport + turns (user block + reply in one section).
+ * Focused-turn behavior: the bottom spacer guarantees there is always enough
+ * scrollable space for the latest user message to anchor at the top.
+ */
+
+.viewport {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  /** Prevent the browser from auto-adjusting scroll when children grow (fights our scroll math). */
+  overflow-anchor: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding-top: var(--spacing-md);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+/**
+ * The bottom spacer reserves enough room below the latest turn so it can scroll
+ * up to the top of the viewport even when the assistant reply is short. Without
+ * this, scrollTop gets clamped and the user message stays in the middle of the
+ * screen — which is the bug we are fixing.
+ *
+ * Sized off the viewport so it works on any screen.
+ */
+.bottomSpacer {
+  flex-shrink: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.messageRowUser {
+  justify-content: flex-end;
+}
+
+.messageRowAssistant {
+  justify-content: flex-start;
+}
+
+.padUser {
+  padding-left: var(--spacing-3xl);
+}
+
+.padAssistant {
+  padding-right: 0;
+}
+
+.messageAppear {
+  animation: turnUserAppear 280ms ease-out;
+}
+
+@keyframes turnUserAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 860px) {
+  .padUser {
+    padding-left: var(--spacing-md);
+  }
+
+  .padAssistant {
+    padding-right: 0;
+  }
+}

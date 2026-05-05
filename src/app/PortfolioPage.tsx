@@ -10,8 +10,7 @@ import { PromptChip } from '@/components/prompt-chip';
 import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
-import { SpeechBubble } from '@/components/speech-bubble';
-import { ThinkingIndicator } from '@/components/thinking-indicator';
+import { ConversationPanel } from '@/components/conversation-panel';
 import styles from './portfolio.module.css';
 
 /** Leading chip icon — Figma asset on `Prompt Chip` (node 334:466). */
@@ -58,6 +57,28 @@ function getTextFromMessage(message: UIMessage): string {
     .join('');
 }
 
+function rollbackLastSentTurn(messages: UIMessage[], sentText: string): UIMessage[] {
+  const next = [...messages];
+  const trimmed = sentText.trim();
+
+  while (next.length > 0) {
+    const last = next[next.length - 1];
+    if (!last) break;
+
+    if (last.role === 'assistant') {
+      next.pop();
+      continue;
+    }
+
+    if (last.role === 'user' && getTextFromMessage(last).trim() === trimmed) {
+      next.pop();
+    }
+    break;
+  }
+
+  return next;
+}
+
 const CHIP_SCROLL_SLOP_PX = 2;
 
 function chipRowShowsRightFade(el: HTMLDivElement): boolean {
@@ -72,14 +93,6 @@ function chipRowShowsLeftFade(el: HTMLDivElement): boolean {
   return scrollLeft > CHIP_SCROLL_SLOP_PX;
 }
 
-/** Last user message id in list — most recent user turn. */
-function getLastUserMessage(messages: UIMessage[]): UIMessage | null {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].role === 'user') return messages[i];
-  }
-  return null;
-}
-
 function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boolean {
   if (status === 'submitted') return true;
   if (status !== 'streaming') return false;
@@ -90,9 +103,8 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
 export function PortfolioPage() {
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
-  const lastUserRowRef = React.useRef<HTMLDivElement | null>(null);
-  const prevScrollUserIdRef = React.useRef<string | null>(null);
   const chipRowRef = React.useRef<HTMLDivElement>(null);
+  const lastSentRef = React.useRef<string | null>(null);
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
 
@@ -101,17 +113,8 @@ export function PortfolioPage() {
   });
 
   const streaming = status === 'streaming';
+  const requestInFlight = status === 'submitted' || status === 'streaming';
   const conversationMode = messages.length > 0;
-  const lastUserMessage = React.useMemo(() => getLastUserMessage(messages), [messages]);
-  const lastUserId = lastUserMessage?.id ?? null;
-
-  React.useLayoutEffect(() => {
-    if (!conversationMode || !lastUserId) return;
-    if (prevScrollUserIdRef.current === lastUserId) return;
-    prevScrollUserIdRef.current = lastUserId;
-    lastUserRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [conversationMode, lastUserId, messages]);
-
   const appendThinking = shouldAppendThinkingRow(messages, status);
 
   const updateChipScrollFade = React.useCallback(() => {
@@ -141,23 +144,37 @@ export function PortfolioPage() {
 
   const handleSend = React.useCallback(
     async (trimmed: string) => {
-      if (!trimmed || streaming) return;
+      if (!trimmed || requestInFlight) return;
       clearError();
+      lastSentRef.current = trimmed;
       setDraft('');
-      await sendMessage({ text: trimmed });
+      try {
+        await sendMessage({ text: trimmed });
+      } catch {
+        if (lastSentRef.current != null) {
+          setDraft(lastSentRef.current);
+          lastSentRef.current = null;
+        }
+        return;
+      }
+      lastSentRef.current = null;
     },
-    [clearError, sendMessage, streaming]
+    [clearError, requestInFlight, sendMessage]
   );
 
   const handleStop = React.useCallback(() => {
+    const restore = lastSentRef.current;
     void stop();
-  }, [stop]);
+    if (!restore) return;
+    lastSentRef.current = null;
+    setDraft(restore);
+    setMessages((prev) => rollbackLastSentTurn(prev, restore));
+  }, [setMessages, stop]);
 
   const handleNewChat = React.useCallback(() => {
     clearError();
     setMessages([]);
     setDraft('');
-    prevScrollUserIdRef.current = null;
   }, [clearError, setMessages]);
 
   const toggleSidebarDensity = React.useCallback(() => {
@@ -231,7 +248,7 @@ export function PortfolioPage() {
                       value={draft}
                       onChange={(e) => setDraft(e.target.value)}
                       onSubmit={(t) => void handleSend(t)}
-                      streaming={streaming}
+                      streaming={requestInFlight}
                       onStop={handleStop}
                       rotatingPlaceholderPrompts={STARTER_PROMPTS}
                       followUpPlaceholder="Ask a follow up"
@@ -259,11 +276,8 @@ export function PortfolioPage() {
                             <PromptChip
                               buttonType="button"
                               icon={sparkleIcon}
-                              onClick={() => {
-                                clearError();
-                                void sendMessage({ text: label });
-                              }}
-                              disabled={streaming}
+                              onClick={() => void handleSend(label)}
+                              disabled={requestInFlight}
                             >
                               {label}
                             </PromptChip>
@@ -306,57 +320,20 @@ export function PortfolioPage() {
               </header>
 
               <div className={styles.chatSectionConversation}>
-                <div
-                  className={styles.conversationFrame}
-                  role="log"
-                  aria-live="polite"
-                  aria-relevant="additions text"
-                >
-                  {messages.map((m) => {
-                    const text = getTextFromMessage(m);
-                    if (m.role === 'assistant' && !text && streaming) {
-                      return (
-                        <div
-                          key={m.id}
-                          className={`${styles.messageRow} ${styles.messageRowAssistant} ${styles.messageRowConversationAssistant}`}
-                        >
-                          <ThinkingIndicator />
-                        </div>
-                      );
-                    }
-                    const variant = m.role === 'user' ? 'user' : 'chatbot';
-                    const rowClass =
-                      m.role === 'user' ? styles.messageRowUser : styles.messageRowAssistant;
-                    const convPad =
-                      m.role === 'user'
-                        ? styles.messageRowConversationUser
-                        : styles.messageRowConversationAssistant;
-                    const isLastUser = m.role === 'user' && m.id === lastUserId;
-                    return (
-                      <div
-                        key={m.id}
-                        ref={isLastUser ? lastUserRowRef : undefined}
-                        className={`${styles.messageRow} ${rowClass} ${convPad} ${isLastUser ? styles.messageAppear : ''}`}
-                      >
-                        <SpeechBubble variant={variant}>{text || '\u00a0'}</SpeechBubble>
-                      </div>
-                    );
-                  })}
-                  {appendThinking ? (
-                    <div
-                      className={`${styles.messageRow} ${styles.messageRowAssistant} ${styles.messageRowConversationAssistant}`}
-                    >
-                      <ThinkingIndicator />
-                    </div>
-                  ) : null}
-                </div>
+                <ConversationPanel
+                  messages={messages}
+                  status={status}
+                  streaming={requestInFlight}
+                  appendThinking={appendThinking}
+                  getMessageText={getTextFromMessage}
+                />
 
                 <div className={styles.composerGradient}>
                   <ChatInput
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
                     onSubmit={(t) => void handleSend(t)}
-                    streaming={streaming}
+                    streaming={requestInFlight}
                     onStop={handleStop}
                     followUpPlaceholder="Ask a follow up"
                     followUpEmphasis
