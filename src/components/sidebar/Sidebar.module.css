@@ -294,12 +294,12 @@
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 44px;
+  min-height: var(--scale-1200);
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-start;
   gap: var(--spacing-sm);
-  padding: 9px calc(var(--spacing-md) + 1px);
+  padding: 0 calc(var(--spacing-md) + 1px);
   box-sizing: border-box;
   border: var(--stroke-sm) solid var(--color-button-secondary-stroke-default);
   border-radius: var(--radius-full);
@@ -332,10 +332,12 @@
 }
 
 .root[data-density='compact'] .newChat {
-  width: 100%;
-  min-height: var(--scale-1400);
-  padding: 0 14px;
+  width: var(--scale-1200);
+  min-height: var(--scale-1200);
+  padding: 0;
   gap: 0;
+  align-self: center;
+  justify-content: center;
 }
 
 .newChat:hover {
@@ -368,6 +370,15 @@
 }
 
 .root[data-density='compact'] .newChatLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));
   transition:
