@@ -21,6 +21,10 @@
   border: 0;
 }
 
+/* ================================================================
+   ROOT — the sidebar rail itself
+   ================================================================ */
+
 .root {
   --sidebar-edge: color-mix(in srgb, var(--color-neutral-900) 8%, transparent);
   --sidebar-text-strong: var(--color-neutral-900);
@@ -38,32 +42,48 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: space-between;
-  /** Open (comfortable): `--spacing-sm`; compact overrides below with the same token. */
   padding: var(--spacing-sm);
   border-right: var(--stroke-xs) solid var(--color-sidebar-edge-stroke);
   background: var(--color-background-surface-default);
   color: var(--sidebar-text-strong);
   font-family: var(--font-style-primary), system-ui, sans-serif;
-  overflow-x: hidden;
-  --sidebar-rail-duration: 0.22s;
+  overflow: hidden;
+
+  --sidebar-rail-duration: 0.35s;
+  --sidebar-rail-ease: cubic-bezier(0.75, 0.15, 0.05, 0.70);
+  --sidebar-content-duration: 0.30s;
+  --sidebar-content-delay: 0.10s;
+  --sidebar-content-ease: cubic-bezier(0.75, 0.15, 0.01, 1.00);
+  --sidebar-collapse-duration: 0.50s;
+  --sidebar-blur-peak: 10px;
+  /**
+   * Nav labels must fade/blur out faster than the rail narrows; otherwise
+   * `overflow: hidden` clips long text to ~one character before it disappears.
+   */
+  --sidebar-nav-out-duration: 0.16s;
+
   transition:
-    width var(--sidebar-rail-duration) cubic-bezier(0.25, 0.1, 0.25, 1),
-    padding var(--sidebar-rail-duration) cubic-bezier(0.25, 0.1, 0.25, 1),
+    width var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    padding var(--sidebar-rail-duration) var(--sidebar-rail-ease),
     border-color var(--sidebar-rail-duration) ease;
 }
 
-.root[data-density='compact'] .nav {
-  /** Hide project list in collapsed rail (no single-letter chips). */
-  display: none;
+.root[data-density='compact'] {
+  width: 64px;
+  padding: var(--spacing-sm);
+  /**
+   * Hold full rail width until nav text has faded/blurred; then shrink.
+   * Without this delay, `overflow: hidden` clips labels to ~1 character mid-animation.
+   */
+  transition:
+    width var(--sidebar-rail-duration) var(--sidebar-rail-ease) var(--sidebar-nav-out-duration),
+    padding var(--sidebar-rail-duration) var(--sidebar-rail-ease) var(--sidebar-nav-out-duration),
+    border-color var(--sidebar-rail-duration) ease var(--sidebar-nav-out-duration);
 }
 
-.root[data-density='compact'] {
-  /** Rail width hugs the widest control (typically 48px hit targets); no fixed 91px cap. */
-  width: fit-content;
-  max-width: 100%;
-  padding: var(--spacing-sm);
-  align-items: center;
-}
+/* ================================================================
+   STACK — vertical layout container for header, new-chat, nav
+   ================================================================ */
 
 .stack {
   display: flex;
@@ -71,74 +91,51 @@
   flex: 1 1 auto;
   flex-direction: column;
   align-items: stretch;
-  /** Figma 341:656: `gap` = spacing/xl (32px) between header, New Chat, Projects. */
   gap: var(--spacing-xl);
   box-sizing: border-box;
 }
 
-.root[data-density='compact'] .stack {
-  /** Centered rail; intrinsic width (`max-content`) so `.root` can `fit-content` on X. */
-  align-self: center;
-  align-items: center;
-  width: max-content;
-  max-width: 100%;
-}
-
-/** Comfortable gutter comes from `.root` padding — avoids instant stack padding toggle on density change. */
+/* ================================================================
+   FOOTER SLOT
+   ================================================================ */
 
 .footerSlot {
   flex-shrink: 0;
-  /** Root uses `justify-content: space-between`; extra margin would exceed Figma 341:656. */
   margin-top: 0;
   box-sizing: border-box;
 }
 
-.root[data-density='compact'] .footerSlot {
-  display: flex;
-  justify-content: center;
-  width: auto;
-  max-width: 100%;
-  align-self: center;
-}
-
-/* --- Header row (Figma 36px) --- */
+/* ================================================================
+   HEADER ROW
+   The row contains .brand (left) + .menuButton (right).
+   We NEVER change justify-content or flex-direction in compact.
+   The brand collapses to 0 width, so the menu slides left naturally.
+   ================================================================ */
 
 .headerRow {
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  /** Figma 341:656 `Container`: pl = spacing/md inside padded sidebar (aligns label with nav rows). */
   padding-left: var(--spacing-md);
   height: var(--scale-1100);
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
+  transition:
+    padding var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    gap var(--sidebar-rail-duration) var(--sidebar-rail-ease);
 }
 
 .root[data-density='compact'] .headerRow {
-  width: auto;
-  max-width: 100%;
-}
-
-.root[data-density='compact'] .headerRow:has(.brandTextOnly) {
-  /** Stay one row so the menu keeps the same Y as expanded; title collapses on X only. */
-  flex-direction: row;
-  height: var(--scale-1100);
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  /** Comfortable mode header uses Figma inset `pl`; rail centers the menu without that inset. */
   padding-left: 0;
+  gap: 0;
 }
 
-.root[data-density='compact'] .headerRow:not(:has(.brandTextOnly)) {
-  height: auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--spacing-md);
-}
+/* ================================================================
+   BRAND (text-only variant used on portfolio page)
+   Collapses width to 0 so menu button flows left naturally.
+   ================================================================ */
 
 .brand {
   display: flex;
@@ -146,6 +143,11 @@
   flex: 1 1 auto;
   align-items: center;
   gap: var(--scale-500);
+  overflow: hidden;
+  transition:
+    flex var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
 .brandTextOnly {
@@ -153,15 +155,15 @@
 }
 
 .root[data-density='compact'] .brand.brandTextOnly {
-  flex: 0 0 0;
-  width: 0;
+  flex: 0 0 0px;
   min-width: 0;
-  max-width: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
   opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
   pointer-events: none;
+  transition:
+    flex var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    opacity var(--sidebar-collapse-duration) ease,
+    filter var(--sidebar-collapse-duration) ease;
 }
 
 .root[data-density='compact'] .brand:not(.brandTextOnly) {
@@ -174,16 +176,30 @@
   width: 100%;
 }
 
-.root[data-density='compact'] .brandTitle {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+.brandTitle {
+  margin: 0;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  min-width: 0;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
   white-space: nowrap;
-  border: 0;
+  text-overflow: ellipsis;
+  color: var(--color-text-fill-secondary-2);
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
+}
+
+.root[data-density='compact'] .brandTitle {
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  transition:
+    opacity var(--sidebar-collapse-duration) ease,
+    filter var(--sidebar-collapse-duration) ease;
 }
 
 .logoMark {
@@ -204,18 +220,11 @@
   height: var(--scale-1400);
 }
 
-.brandTitle {
-  margin: 0;
-  overflow: hidden;
-  min-width: 0;
-  font-size: var(--font-size-body);
-  font-weight: 400;
-  line-height: var(--font-line-height-body);
-  letter-spacing: 0;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--color-text-fill-secondary-2);
-}
+/* ================================================================
+   MENU BUTTON
+   Stays the same size/shape. Never changes position on its own;
+   the collapsing brand pushes it leftward during the rail shrink.
+   ================================================================ */
 
 .menuButton {
   display: inline-flex;
@@ -225,13 +234,17 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  margin: 0;
   border: none;
   border-radius: var(--radius-full);
   background: var(--color-button-ghost-surface-default);
   color: var(--color-icon-surface-grey);
   line-height: 0;
   cursor: pointer;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease,
+    margin var(--sidebar-rail-duration) var(--sidebar-rail-ease);
 }
 
 .menuButton svg {
@@ -260,18 +273,24 @@
   box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
 }
 
-/** Collapsed rail: icon-only ghost (transparent) centered in the sidebar column. */
 .root[data-density='compact'] .menuButton {
   background: transparent;
+  margin: 0 auto;
 }
 
 .root[data-density='compact'] .menuButton:hover {
   background: var(--color-button-ghost-surface-hover);
 }
 
-/* --- New chat --- */
+/* ================================================================
+   NEW CHAT BUTTON
+   Icon stays 16px always. The button shrinks from full-width pill
+   to a compact circle by transitioning width/padding/gap.
+   Label fades + blurs out instead of disappearing.
+   ================================================================ */
 
 .newChat {
+  position: relative;
   display: flex;
   width: 100%;
   min-height: 44px;
@@ -279,7 +298,6 @@
   align-items: center;
   justify-content: flex-start;
   gap: var(--spacing-sm);
-  /** Figma 341:656 button: py 9px, horizontal padding 17px. */
   padding: 9px calc(var(--spacing-md) + 1px);
   box-sizing: border-box;
   border: var(--stroke-sm) solid var(--color-button-secondary-stroke-default);
@@ -294,25 +312,29 @@
   cursor: pointer;
   text-align: left;
   box-shadow: 0 4px 4.35px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
   transition:
     background-color 0.12s ease,
     border-color 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-.root[data-density='compact'] .newChat {
-  width: var(--scale-1400);
-  min-height: var(--scale-1400);
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  border-radius: var(--radius-full);
+    box-shadow 0.12s ease,
+    width var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    min-height var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    padding var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    gap var(--sidebar-rail-duration) var(--sidebar-rail-ease);
 }
 
 .newChat svg {
   display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.root[data-density='compact'] .newChat {
+  width: 100%;
+  min-height: var(--scale-1400);
+  padding: 0 14px;
+  gap: 0;
 }
 
 .newChat:hover {
@@ -335,21 +357,27 @@
 
 .newChatLabel {
   display: inline;
+  opacity: 1;
+  filter: blur(0);
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
 .root[data-density='compact'] .newChatLabel {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  transition:
+    opacity var(--sidebar-collapse-duration) ease,
+    filter var(--sidebar-collapse-duration) ease;
 }
 
-/* --- Nav --- */
+/* ================================================================
+   NAV SECTION
+   Fades + blurs + collapses height on compact.
+   ================================================================ */
 
 .nav {
   display: flex;
@@ -357,21 +385,36 @@
   flex: 1 1 auto;
   flex-direction: column;
   align-items: stretch;
-  /** Figma 341:656: section uses gap 0; label row has its own vertical padding. */
   gap: 0;
   overflow-y: auto;
   box-sizing: border-box;
+  opacity: 1;
+  filter: blur(0);
+  visibility: visible;
+  max-height: 100vh;
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    visibility 0s linear 0s,
+    max-height 0s linear 0s;
 }
 
 .root[data-density='compact'] .nav {
-  align-items: center;
-  width: 100%;
-  overflow-y: visible;
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  visibility: hidden;
+  pointer-events: none;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    opacity var(--sidebar-nav-out-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-nav-out-duration) var(--sidebar-content-ease),
+    visibility 0s linear var(--sidebar-nav-out-duration),
+    max-height 0s linear var(--sidebar-nav-out-duration);
 }
 
 .navSectionLabel {
   margin: 0;
-  /** Figma 341:656 “Projects” row: py 8px, pl 16px, pr 0. */
   padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-md);
   font-size: var(--font-size-label);
   font-weight: 500;
@@ -379,18 +422,19 @@
   letter-spacing: 0;
   text-transform: none;
   color: var(--color-text-fill-secondary-2);
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
 .root[data-density='compact'] .navSectionLabel {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  transition:
+    opacity var(--sidebar-nav-out-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-nav-out-duration) var(--sidebar-content-ease);
 }
 
 .navList {
@@ -409,13 +453,13 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 }
 
 .root[data-density='compact'] .navItemWrap {
   display: flex;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .navItem {
@@ -427,7 +471,6 @@
   height: auto;
   min-height: 40px;
   margin: 0;
-  /** Figma 341:656 ghost rows: py 8px, pl 16px, pr 0. */
   padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-md);
   box-sizing: border-box;
   border: none;
@@ -446,15 +489,16 @@
 
 .root[data-density='compact'] .navItem {
   display: flex;
-  width: var(--scale-1400);
-  height: var(--scale-1400);
+  width: 100%;
+  height: auto;
+  min-height: 40px;
   flex-shrink: 0;
   align-items: center;
-  justify-content: center;
-  padding: 0;
+  justify-content: flex-start;
+  padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-full);
-  font-size: var(--font-size-label);
-  line-height: 1;
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-body);
 }
 
 .navItem:hover {
@@ -489,12 +533,11 @@
 }
 
 .root[data-density='compact'] .navItemBody {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  display: block;
+  width: auto;
+  height: auto;
+  text-align: inherit;
+  text-overflow: clip;
 }
 
 .navCompactMark {
@@ -509,7 +552,12 @@
   color: var(--sidebar-text-strong);
 }
 
-/* --- Profile footer --- */
+/* ================================================================
+   PROFILE FOOTER
+   Avatar stays put on the left. Meta + chevron fade+blur out.
+   The profile button keeps full width; the rail's overflow clips
+   the right edge during the collapse so the avatar doesn't jump.
+   ================================================================ */
 
 .profile {
   display: flex;
@@ -517,7 +565,6 @@
   min-height: var(--scale-1500);
   flex-shrink: 0;
   align-items: center;
-  /** Figma 341:656 profile row: gap 12px between meta + chevron; inner padding py 6px px 8px. */
   gap: var(--scale-500);
   padding: 6px var(--scale-400);
   box-sizing: border-box;
@@ -528,21 +575,15 @@
   color: inherit;
   cursor: pointer;
   text-align: left;
-  transition: background-color 0.12s ease;
+  transition:
+    background-color 0.12s ease,
+    padding var(--sidebar-rail-duration) var(--sidebar-rail-ease),
+    gap var(--sidebar-rail-duration) var(--sidebar-rail-ease);
 }
 
 .root[data-density='compact'] .profile {
-  width: auto;
-  /**
-   * Match comfortable `.profile` vertical box (min-height + py) so the avatar center
-   * stays on the same Y when collapsing; hidden meta/chevron stay `position: absolute`.
-   */
-  min-height: var(--scale-1500);
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
   padding: 6px var(--scale-400);
-  border-radius: var(--radius-full);
+  gap: 0;
 }
 
 .profile:hover {
@@ -577,19 +618,21 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
+  opacity: 1;
+  filter: blur(0);
+  overflow: hidden;
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
-.root[data-density='compact'] .profileMeta,
-.root[data-density='compact'] .chevron {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.root[data-density='compact'] .profileMeta {
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  pointer-events: none;
+  transition:
+    opacity var(--sidebar-collapse-duration) ease,
+    filter var(--sidebar-collapse-duration) ease;
 }
 
 .profileName {
@@ -621,4 +664,40 @@
   flex-shrink: 0;
   margin-left: auto;
   opacity: 0.85;
+  filter: blur(0);
+  overflow: hidden;
+  transition:
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
+}
+
+.root[data-density='compact'] .chevron {
+  opacity: 0;
+  filter: blur(var(--sidebar-blur-peak));
+  pointer-events: none;
+  transition:
+    opacity var(--sidebar-collapse-duration) ease,
+    filter var(--sidebar-collapse-duration) ease;
+}
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root .nav,
+  .root .brand,
+  .root .brandTitle,
+  .root .brandTextOnly,
+  .root .headerRow,
+  .root .newChat,
+  .root .newChatLabel,
+  .root .navSectionLabel,
+  .root .profile,
+  .root .profileMeta,
+  .root .chevron {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
 }

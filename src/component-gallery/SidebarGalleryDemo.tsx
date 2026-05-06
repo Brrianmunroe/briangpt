@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Button } from '@/components/button';
 import { Globe } from '@/components/icons';
 import { Sidebar, type SidebarDensity } from '@/components/sidebar';
+import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import galleryStyles from './SidebarGalleryDemo.module.css';
 
 const PROJECTS = [
@@ -63,6 +64,7 @@ export function SidebarGalleryDemo() {
         </Sidebar.FooterSlot>
       </Sidebar>
       </div>
+      <SidebarAnimationTuner />
     </div>
   );
 }
