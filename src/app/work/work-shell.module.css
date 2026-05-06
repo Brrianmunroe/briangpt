@@ -2,18 +2,25 @@
   --work-card-inset-top: var(--spacing-3xl);
   --work-card-inset-inline: clamp(12px, 4vw, 40px);
   --work-card-inset-bottom: clamp(12px, 3vh, 28px);
-  --work-modal-enter-duration: 400ms;
-  --work-modal-exit-duration: 180ms;
-  --work-scrim-enter-duration: 250ms;
-  --work-scrim-exit-duration: 180ms;
-  --work-enter-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /** Match sidebar content reveals (`Sidebar.module.css` nav / profileMeta). */
+  --case-content-duration: 380ms;
+  --case-content-ease: cubic-bezier(0.75, 0.15, 0.01, 1);
+  --case-content-delay-base: 140ms;
+  --case-stagger-step: 72ms;
+  --case-content-blur: 4px;
+  --case-content-y: 10px;
+  --work-modal-enter-duration: 750ms;
+  --work-modal-exit-duration: 250ms;
+  --work-scrim-enter-duration: 750ms;
+  --work-scrim-exit-duration: 250ms;
+  --work-enter-ease: cubic-bezier(0.23, 1.1, 0.4, 0.98);
   --work-exit-ease: cubic-bezier(0.4, 0, 1, 1);
   --work-shell-blur: 4px;
   --work-shell-scrim-opacity: 1;
   --work-shell-background: oklch(0 0 0 / 0.55);
-  --work-modal-enter-y: 24px;
+  --work-modal-enter-y: 400px;
   --work-modal-enter-scale: 0.98;
-  --work-modal-exit-y: 12px;
+  --work-modal-exit-y: 400px;
   --work-modal-exit-scale: 0.99;
 
   position: fixed;
@@ -161,42 +168,42 @@
 }
 
 .content {
-  opacity: 0;
+  /** Container stays opaque; stagger children carry the entrance (avoids two fades stacked). */
+  opacity: 1;
 }
 
 .content [data-stagger] {
   opacity: 0;
-  transform: translateY(12px);
-}
-
-.contentMotionReady {
-  transition: opacity var(--work-modal-enter-duration) var(--work-enter-ease);
-}
-
-.contentVisible {
-  opacity: 1;
+  transform: translateY(var(--case-content-y));
+  filter: blur(var(--case-content-blur));
 }
 
 .contentVisible [data-stagger] {
   opacity: 1;
   transform: translateY(0);
+  filter: blur(0);
   transition:
-    opacity 260ms var(--work-enter-ease),
-    transform 260ms var(--work-enter-ease);
-  transition-delay: calc((var(--stagger-index, 0) * 50ms) + 50ms);
+    opacity var(--case-content-duration) var(--case-content-ease),
+    transform var(--case-content-duration) var(--case-content-ease),
+    filter var(--case-content-duration) var(--case-content-ease);
+  transition-delay: calc(
+    var(--case-content-delay-base) + (var(--stagger-index, 0) * var(--case-stagger-step))
+  );
 }
 
 .contentExiting {
   opacity: 0;
-  transition: opacity var(--work-modal-exit-duration) var(--work-exit-ease);
+  transition: opacity calc(var(--work-modal-exit-duration) * 1.25) var(--work-exit-ease);
 }
 
 .contentExiting [data-stagger] {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(6px);
+  filter: blur(var(--case-content-blur));
   transition:
-    opacity var(--work-modal-exit-duration) var(--work-exit-ease),
-    transform var(--work-modal-exit-duration) var(--work-exit-ease);
+    opacity calc(var(--work-modal-exit-duration) * 1.1) var(--work-exit-ease),
+    transform calc(var(--work-modal-exit-duration) * 1.1) var(--work-exit-ease),
+    filter calc(var(--work-modal-exit-duration) * 1.1) var(--work-exit-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -221,14 +228,17 @@
     transition: opacity 90ms linear;
   }
 
-  .contentMotionReady {
-    transition: opacity 200ms linear;
+  .contentVisible [data-stagger] {
+    transform: none;
+    filter: none;
+    transition: opacity 160ms linear;
+    transition-delay: calc(var(--stagger-index, 0) * 40ms);
   }
 
-  .contentVisible [data-stagger],
   .contentExiting [data-stagger] {
     transform: none;
-    transition: opacity 120ms linear;
+    filter: none;
+    transition: opacity 90ms linear;
     transition-delay: 0ms;
   }
 

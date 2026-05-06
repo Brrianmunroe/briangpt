@@ -154,7 +154,6 @@ export function WorkCaseShell({
 
   const contentClass = [
     styles.content,
-    surfaceReady && styles.contentMotionReady,
     visible && !exiting && styles.contentVisible,
     exiting && styles.contentExiting,
   ]
