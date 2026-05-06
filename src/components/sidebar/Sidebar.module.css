@@ -40,7 +40,7 @@
   justify-content: space-between;
   /** Open (comfortable): `--spacing-sm`; compact overrides below with the same token. */
   padding: var(--spacing-sm);
-  border-right: var(--stroke-xs) solid color-mix(in srgb, var(--color-neutral-500) 28%, transparent);
+  border-right: var(--stroke-xs) solid var(--color-sidebar-edge-stroke);
   background: var(--color-background-surface-default);
   color: var(--sidebar-text-strong);
   font-family: var(--font-style-primary), system-ui, sans-serif;

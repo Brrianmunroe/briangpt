@@ -224,12 +224,14 @@ export function PortfolioPage() {
       <main className={styles.main}>
         <div
           className={
-            conversationMode ? `${styles.mainColumn} ${styles.mainColumnChat}` : styles.mainColumn
+            conversationMode
+              ? `${styles.mainColumn} ${styles.mainColumnChat}`
+              : `${styles.mainColumn} ${styles.mainColumnHome}`
           }
         >
           {!conversationMode ? (
-            <div className={styles.mainScroll}>
-              <header className={styles.mainHeader}>
+            <>
+              <header className={`${styles.mainHeader} ${styles.mainHeaderConversation}`}>
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}
@@ -238,65 +240,66 @@ export function PortfolioPage() {
                 />
               </header>
 
-              <div className={styles.chatSection}>
-                <div className={styles.landingColumn}>
-                  <div className={styles.landingCluster}>
-                    <div className={styles.messageHeader}>
-                      <NameTag />
-                      <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
-                    </div>
-                    <div ref={composerHostRef} className={styles.composerHostLanding}>
-                      <ChatInput
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        onSubmit={(t) => void handleSend(t)}
-                        streaming={requestInFlight}
-                        onStop={handleStop}
-                        rotatingPlaceholderPrompts={STARTER_PROMPTS}
-                        followUpPlaceholder="Ask a follow up"
-                        followUpEmphasis={false}
-                        layout="stacked"
-                        maxWidth="full"
-                        textareaProps={{ autoFocus: true }}
-                      />
+              <div className={styles.mainScroll}>
+                <div className={styles.chatSection}>
+                  <div className={styles.landingColumn}>
+                    <div className={styles.landingCluster}>
+                      <div className={styles.messageHeader}>
+                        <NameTag />
+                        <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
+                      </div>
+                      <div ref={composerHostRef} className={styles.composerHostLanding}>
+                        <ChatInput
+                          value={draft}
+                          onChange={(e) => setDraft(e.target.value)}
+                          onSubmit={(t) => void handleSend(t)}
+                          streaming={requestInFlight}
+                          onStop={handleStop}
+                          rotatingPlaceholderPrompts={STARTER_PROMPTS}
+                          followUpPlaceholder="Ask a follow up"
+                          followUpEmphasis={false}
+                          layout="stacked"
+                          maxWidth="full"
+                          textareaProps={{ autoFocus: true }}
+                        />
 
-                      {error ? (
-                        <p className={styles.chatError} role="alert">
-                          Something went wrong — please try again.
-                        </p>
-                      ) : null}
+                        {error ? (
+                          <p className={styles.chatError} role="alert">
+                            Something went wrong — please try again.
+                          </p>
+                        ) : null}
 
-                      <div className={styles.chipScrollWrap}>
-                        <div
-                          ref={chipRowRef}
-                          className={styles.chipRow}
-                          role="list"
-                          aria-label="Suggested prompts"
-                          onScroll={updateChipScrollFade}
-                        >
-                          {STARTER_PROMPTS.map((label) => (
-                            <div key={label} className={styles.chipSlot} role="listitem">
-                              <PromptChip
-                                buttonType="button"
-                                icon={sparkleIcon}
-                                onClick={() => void handleSend(label)}
-                                disabled={requestInFlight}
-                              >
-                                {label}
-                              </PromptChip>
-                            </div>
-                          ))}
+                        <div className={styles.chipScrollWrap}>
+                          <div
+                            ref={chipRowRef}
+                            className={styles.chipRow}
+                            role="list"
+                            aria-label="Suggested prompts"
+                            onScroll={updateChipScrollFade}
+                          >
+                            {STARTER_PROMPTS.map((label) => (
+                              <div key={label} className={styles.chipSlot} role="listitem">
+                                <PromptChip
+                                  buttonType="button"
+                                  icon={sparkleIcon}
+                                  onClick={() => void handleSend(label)}
+                                  disabled={requestInFlight}
+                                >
+                                  {label}
+                                </PromptChip>
+                              </div>
+                            ))}
+                          </div>
+                          {chipScrollFadeLeftVisible ? (
+                            <div className={styles.chipScrollFadeLeft} aria-hidden />
+                          ) : null}
+                          {chipScrollFadeRightVisible ? (
+                            <div className={styles.chipScrollFadeRight} aria-hidden />
+                          ) : null}
                         </div>
-                        {chipScrollFadeLeftVisible ? (
-                          <div className={styles.chipScrollFadeLeft} aria-hidden />
-                        ) : null}
-                        {chipScrollFadeRightVisible ? (
-                          <div className={styles.chipScrollFadeRight} aria-hidden />
-                        ) : null}
                       </div>
                     </div>
                   </div>
-                </div>
 
                 <div className={styles.cardsRow}>
                   {CASE_CARDS.map((c) => (
@@ -311,10 +314,13 @@ export function PortfolioPage() {
                   ))}
                 </div>
               </div>
-            </div>
+              </div>
+            </>
           ) : (
             <>
-              <header className={`${styles.mainHeader} ${styles.mainHeaderConversation}`}>
+              <header
+                className={`${styles.mainHeader} ${styles.mainHeaderConversation} ${styles.mainHeaderChatStroke}`}
+              >
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}

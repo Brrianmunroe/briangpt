@@ -125,6 +125,7 @@ export const aliasPaths = {
 
 export const mappedPaths = {
   "color/background/surface/default": "--color-background-surface-default",
+  "color/sidebar/edge/stroke": "--color-sidebar-edge-stroke",
   "color/button/ghost/stroke/focused": "--color-button-ghost-stroke-focused",
   "color/button/ghost/surface/default": "--color-button-ghost-surface-default",
   "color/button/ghost/surface/disabled": "--color-button-ghost-surface-disabled",
