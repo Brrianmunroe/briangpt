@@ -15,16 +15,6 @@ function mergeClassNames(...parts: Array<string | undefined | false | null>) {
   return parts.filter(Boolean).join(' ');
 }
 
-function flattenText(node: React.ReactNode): string {
-  if (node == null || typeof node === 'boolean') return '';
-  if (typeof node === 'string' || typeof node === 'number') return String(node);
-  if (Array.isArray(node)) return node.map(flattenText).join('');
-  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
-    return flattenText(node.props.children);
-  }
-  return '';
-}
-
 /** Small diamond used inside the brand mark (Figma sparkle-style glyph, node 99:1325). */
 function BrandGlyph(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -166,20 +156,12 @@ function SidebarNavSection({ 'aria-label': ariaLabel, sectionLabel, children, cl
 
 export type SidebarNavItemProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> & {
   active?: boolean;
-  /** Shown in `density="compact"` instead of a derived letter; falls back to first grapheme of text children. */
+  /** Reserved for potential icon-rail mode; not used by current collapse animation. */
   compactIcon?: React.ReactNode;
 };
 
 const SidebarNavItem = React.forwardRef<HTMLButtonElement, SidebarNavItemProps>(
-  function SidebarNavItem({ active, className, children, compactIcon, ...rest }, ref) {
-    const density = useSidebarDensity();
-    const isCompact = density === 'compact';
-    const textLabel = flattenText(children).trim();
-    const abbrev =
-      textLabel.length > 0
-        ? // first Unicode grapheme when available
-          [...textLabel][0]?.toUpperCase() ?? '·'
-        : '·';
+  function SidebarNavItem({ active, className, children, ...rest }, ref) {
 
     return (
       <li className={styles.navItemWrap}>
@@ -190,16 +172,7 @@ const SidebarNavItem = React.forwardRef<HTMLButtonElement, SidebarNavItemProps>(
           aria-current={active ? 'page' : undefined}
           {...rest}
         >
-          {isCompact ? (
-            <>
-              <span className={styles.navItemBody} aria-hidden>
-                {compactIcon ?? <span className={styles.navCompactMark}>{abbrev}</span>}
-              </span>
-              <span className={styles.visuallyHidden}>{textLabel || 'Navigation item'}</span>
-            </>
-          ) : (
-            <span className={styles.navItemBody}>{children}</span>
-          )}
+          <span className={styles.navItemBody}>{children}</span>
         </button>
       </li>
     );

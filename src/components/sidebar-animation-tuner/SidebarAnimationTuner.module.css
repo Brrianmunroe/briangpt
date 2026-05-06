@@ -1,0 +1,324 @@
+.panel {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-height: 80vh;
+  border-radius: var(--radius-lg);
+  border: var(--stroke-sm) solid var(--color-neutral-400);
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  user-select: none;
+  overflow: hidden;
+}
+
+.panelCollapsed {
+  max-height: none;
+  overflow: visible;
+}
+
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-neutral-200);
+  border-bottom: var(--stroke-sm) solid var(--color-neutral-400);
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.handleTitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-neutral-600);
+  pointer-events: none;
+}
+
+.handleButtons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.handleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-neutral-600);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.handleBtn:hover {
+  background: var(--color-neutral-400);
+  color: var(--color-neutral-900);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  overflow-y: auto;
+  max-height: calc(80vh - 42px);
+}
+
+.bodyHidden {
+  display: none;
+}
+
+/* --- Section groups --- */
+
+.sectionHeader {
+  padding: 6px 12px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-neutral-500);
+}
+
+/* --- Slider row --- */
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+}
+
+.sliderLabel {
+  flex-shrink: 0;
+  width: 100px;
+  font-size: 11px;
+  color: var(--color-neutral-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sliderInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--color-neutral-400);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-orange-400);
+  border: 2px solid var(--color-neutral-200);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-orange-400);
+  border: 2px solid var(--color-neutral-200);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.sliderValue {
+  flex-shrink: 0;
+  width: 44px;
+  text-align: right;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-neutral-800);
+}
+
+/* --- Easing curve area --- */
+
+.easingGroup {
+  padding: 4px 12px 8px;
+}
+
+.easingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.easingLabel {
+  font-size: 11px;
+  color: var(--color-neutral-700);
+}
+
+.presetSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 2px 20px 2px 6px;
+  border: var(--stroke-sm) solid var(--color-neutral-400);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239b9a97' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  outline: none;
+}
+
+.presetSelect:focus-visible {
+  border-color: var(--color-orange-400);
+}
+
+.easingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.easingInputs {
+  display: flex;
+  gap: 4px;
+  flex: 1 1 auto;
+}
+
+.easingNumberInput {
+  width: 100%;
+  min-width: 0;
+  padding: 3px 4px;
+  border: var(--stroke-sm) solid var(--color-neutral-400);
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+  font-family: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  outline: none;
+}
+
+.easingNumberInput:focus-visible {
+  border-color: var(--color-orange-400);
+}
+
+.easingPreview {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.easingPreviewPath {
+  fill: none;
+  stroke: var(--color-orange-400);
+  stroke-width: 2;
+}
+
+.easingPreviewFrame {
+  fill: none;
+  stroke: var(--color-neutral-400);
+  stroke-width: 1;
+}
+
+/* --- Action bar --- */
+
+.actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px 8px;
+  border-top: var(--stroke-sm) solid var(--color-neutral-300);
+}
+
+.actionBtn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border: var(--stroke-sm) solid var(--color-neutral-400);
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.actionBtn:hover {
+  background: var(--color-neutral-300);
+  border-color: var(--color-neutral-500);
+}
+
+.actionBtnAccent {
+  border-color: var(--color-orange-400);
+  color: var(--color-orange-400);
+}
+
+.actionBtnAccent:hover {
+  background: color-mix(in srgb, var(--color-orange-400) 12%, transparent);
+}
+
+/* --- Fab (toggle button) --- */
+
+.fab {
+  position: fixed;
+  z-index: 9998;
+  bottom: 24px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: var(--stroke-sm) solid var(--color-neutral-400);
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-200);
+  color: var(--color-orange-400);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.12s ease, transform 0.12s ease;
+}
+
+.fab:hover {
+  background: var(--color-neutral-300);
+  transform: scale(1.06);
+}
+
+.fabHidden {
+  display: none;
+}

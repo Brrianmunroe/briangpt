@@ -11,6 +11,7 @@ import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { ConversationPanel } from '@/components/conversation-panel';
+import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import styles from './portfolio.module.css';
 
 /** Leading chip icon — Figma asset on `Prompt Chip` (node 334:466). */
@@ -363,6 +364,7 @@ export function PortfolioPage() {
           )}
         </div>
       </main>
+      {process.env.NODE_ENV === 'development' ? <SidebarAnimationTuner /> : null}
     </div>
   );
 }
