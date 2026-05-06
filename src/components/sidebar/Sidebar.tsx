@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 import { Menu, Plus, DownChevron } from '@/components/icons';
 import styles from './Sidebar.module.css';
 
@@ -84,6 +85,8 @@ const SidebarFooterSlot = React.forwardRef<HTMLDivElement, SidebarFooterSlotProp
 
 export type SidebarHeaderRowProps = {
   title: string;
+  /** When set, the title becomes a link (e.g. `/` for home). */
+  brandHref?: string;
   /** Mark shown in the orange circle (default: diamond glyph). */
   logo?: React.ReactNode;
   /** Figma homepage sidebar (334:449): title + menu only — no orange mark. */
@@ -94,6 +97,7 @@ export type SidebarHeaderRowProps = {
 
 function SidebarHeaderRow({
   title,
+  brandHref,
   logo,
   showBrandMark = true,
   onMenuClick,
@@ -101,11 +105,20 @@ function SidebarHeaderRow({
 }: SidebarHeaderRowProps) {
   const { className: menuClass, 'aria-label': menuAriaLabel, ...menuRest } = menuButtonProps ?? {};
 
+  const titleEl =
+    brandHref != null && brandHref !== '' ? (
+      <Link href={brandHref} className={styles.brandTitle}>
+        {title}
+      </Link>
+    ) : (
+      <p className={styles.brandTitle}>{title}</p>
+    );
+
   return (
     <div className={styles.headerRow}>
       <div className={mergeClassNames(styles.brand, !showBrandMark && styles.brandTextOnly)}>
         {showBrandMark ? <span className={styles.logoMark}>{logo ?? <BrandGlyph />}</span> : null}
-        <p className={styles.brandTitle}>{title}</p>
+        {titleEl}
       </div>
       <button
         type="button"

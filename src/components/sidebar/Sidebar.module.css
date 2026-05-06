@@ -195,6 +195,25 @@
     filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
+a.brandTitle {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.brandTitle:hover {
+  color: var(--color-text-fill-primary);
+}
+
+a.brandTitle:focus {
+  outline: none;
+}
+
+a.brandTitle:focus-visible {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
+}
+
 .root[data-density='compact'] .brandTitle {
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));

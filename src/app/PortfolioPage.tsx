@@ -187,6 +187,7 @@ export function PortfolioPage() {
           <Sidebar.Stack>
             <Sidebar.HeaderRow
               title="BrianGPT"
+              brandHref="/"
               showBrandMark={false}
               onMenuClick={toggleSidebarDensity}
               menuButtonProps={{
