@@ -1,0 +1,238 @@
+.scene {
+  --work-card-inset-top: var(--spacing-3xl);
+  --work-card-inset-inline: clamp(12px, 4vw, 40px);
+  --work-card-inset-bottom: clamp(12px, 3vh, 28px);
+  --work-modal-enter-duration: 400ms;
+  --work-modal-exit-duration: 180ms;
+  --work-scrim-enter-duration: 250ms;
+  --work-scrim-exit-duration: 180ms;
+  --work-enter-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --work-exit-ease: cubic-bezier(0.4, 0, 1, 1);
+  --work-shell-blur: 4px;
+  --work-shell-scrim-opacity: 1;
+  --work-shell-background: oklch(0 0 0 / 0.55);
+  --work-modal-enter-y: 24px;
+  --work-modal-enter-scale: 0.98;
+  --work-modal-exit-y: 12px;
+  --work-modal-exit-scale: 0.99;
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.liveWillChange {
+  will-change: transform, opacity;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  /** Let clicks reach the page whenever the scrim isn’t visibly blocking (exit/faded). */
+  pointer-events: none;
+  cursor: pointer;
+  opacity: 0;
+  background: var(--work-shell-background);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.scrimMotionReady {
+  transition: opacity var(--work-scrim-enter-duration) var(--work-enter-ease);
+}
+
+.scrimVisible {
+  opacity: var(--work-shell-scrim-opacity);
+  pointer-events: auto;
+}
+
+.scrimExiting {
+  opacity: 0;
+  transition: opacity var(--work-scrim-exit-duration) var(--work-exit-ease);
+}
+
+.modalLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  /** Full-screen layer must not steal clicks during exit or before open — same bug as an invisible glass sheet over the UI. */
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(var(--work-modal-enter-y)) scale(var(--work-modal-enter-scale));
+}
+
+.modalMotionReady {
+  transition:
+    opacity var(--work-modal-enter-duration) var(--work-enter-ease),
+    transform var(--work-modal-enter-duration) var(--work-enter-ease);
+}
+
+.modalVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.modalExiting {
+  opacity: 0;
+  transform: translateY(var(--work-modal-exit-y)) scale(var(--work-modal-exit-scale));
+  transition:
+    opacity var(--work-modal-exit-duration) var(--work-exit-ease),
+    transform var(--work-modal-exit-duration) var(--work-exit-ease);
+}
+
+.cardWrap {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: var(--work-card-inset-top) var(--work-card-inset-inline) var(--work-card-inset-bottom);
+}
+
+.card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1120px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-100) 94%, var(--color-neutral-900));
+  border: var(--stroke-xs) solid color-mix(in srgb, var(--color-neutral-400) 55%, transparent);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    0 0 0 1px color-mix(in srgb, var(--color-neutral-900) 8%, transparent) inset;
+  overflow: hidden;
+}
+
+.cardHeader {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-sm) 0;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: var(--stroke-sm) solid color-mix(in srgb, var(--color-orange-400) 55%, transparent);
+  background: color-mix(in srgb, var(--color-neutral-200) 80%, transparent);
+  color: var(--color-orange-400);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: color-mix(in srgb, var(--color-orange-400) 12%, var(--color-neutral-200));
+  border-color: var(--color-orange-400);
+}
+
+.closeBtn:focus {
+  outline: none;
+}
+
+.closeBtn:focus-visible {
+  outline: var(--stroke-lg) solid var(--color-orange-400);
+  outline-offset: 2px;
+}
+
+.cardBody {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.content {
+  opacity: 0;
+}
+
+.content [data-stagger] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.contentMotionReady {
+  transition: opacity var(--work-modal-enter-duration) var(--work-enter-ease);
+}
+
+.contentVisible {
+  opacity: 1;
+}
+
+.contentVisible [data-stagger] {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 260ms var(--work-enter-ease),
+    transform 260ms var(--work-enter-ease);
+  transition-delay: calc((var(--stagger-index, 0) * 50ms) + 50ms);
+}
+
+.contentExiting {
+  opacity: 0;
+  transition: opacity var(--work-modal-exit-duration) var(--work-exit-ease);
+}
+
+.contentExiting [data-stagger] {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--work-modal-exit-duration) var(--work-exit-ease),
+    transform var(--work-modal-exit-duration) var(--work-exit-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalLayer {
+    transform: none;
+  }
+
+  .modalMotionReady {
+    transition: opacity 200ms linear;
+  }
+
+  .modalExiting {
+    transform: none;
+    transition: opacity 90ms linear;
+  }
+
+  .scrimMotionReady {
+    transition: opacity 125ms linear;
+  }
+
+  .scrimExiting {
+    transition: opacity 90ms linear;
+  }
+
+  .contentMotionReady {
+    transition: opacity 200ms linear;
+  }
+
+  .contentVisible [data-stagger],
+  .contentExiting [data-stagger] {
+    transform: none;
+    transition: opacity 120ms linear;
+    transition-delay: 0ms;
+  }
+
+  .liveWillChange {
+    will-change: auto;
+  }
+}

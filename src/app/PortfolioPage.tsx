@@ -3,6 +3,8 @@
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type ChatStatus, type UIMessage } from 'ai';
 import * as React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/card';
 import { ChatInput } from '@/components/chat-input';
 import { NameTag } from '@/components/name-tag';
@@ -12,6 +14,7 @@ import { Sidebar } from '@/components/sidebar';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { ConversationPanel } from '@/components/conversation-panel';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
+import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './portfolio.module.css';
 
 /** Leading chip icon — Figma asset on `Prompt Chip` (node 334:466). */
@@ -32,24 +35,6 @@ const STARTER_PROMPTS = [
   'Your design philosophy',
   'How you use AI in design',
 ] as const;
-
-const CASE_CARDS = [
-  {
-    variant: 'primary' as const,
-    title: 'AI Chat Interface',
-    subtitle: 'Modern chatbot UI with NLP',
-  },
-  {
-    variant: 'secondary' as const,
-    title: 'Enterprise Design System',
-    subtitle: 'Scalable component library for fintech products',
-  },
-  {
-    variant: 'secondary' as const,
-    title: 'Mobile Banking App',
-    subtitle: 'Award-winning mobile experience',
-  },
-];
 
 function getTextFromMessage(message: UIMessage): string {
   return message.parts
@@ -102,6 +87,7 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
 }
 
 export function PortfolioPage() {
+  const router = useRouter();
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
   const chipRowRef = React.useRef<HTMLDivElement>(null);
@@ -211,8 +197,10 @@ export function PortfolioPage() {
             />
             <Sidebar.NewChatButton onClick={handleNewChat}>New Chat</Sidebar.NewChatButton>
             <Sidebar.NavSection sectionLabel="Projects">
-              {CASE_CARDS.map((c) => (
-                <Sidebar.NavItem key={c.title}>{c.title}</Sidebar.NavItem>
+              {CASE_STUDY_LIST.map((c) => (
+                <Sidebar.NavItem key={c.slug} onClick={() => router.push(`/work/${c.slug}`)}>
+                  {c.title}
+                </Sidebar.NavItem>
               ))}
             </Sidebar.NavSection>
           </Sidebar.Stack>
@@ -303,14 +291,20 @@ export function PortfolioPage() {
                   </div>
 
                 <div className={styles.cardsRow}>
-                  {CASE_CARDS.map((c) => (
-                    <div key={c.title} className={styles.cardCell}>
-                      <Card
-                        className={styles.homeCard}
-                        variant={c.variant}
-                        title={c.title}
-                        subtitle={c.subtitle}
-                      />
+                  {CASE_STUDY_LIST.map((c) => (
+                    <div key={c.slug} className={styles.cardCell}>
+                      <Link
+                        href={`/work/${c.slug}`}
+                        className={styles.cardLink}
+                        aria-label={`Open case study: ${c.title}`}
+                      >
+                        <Card
+                          className={styles.homeCard}
+                          variant={c.variant}
+                          title={c.title}
+                          subtitle={c.subtitle}
+                        />
+                      </Link>
                     </div>
                   ))}
                 </div>
