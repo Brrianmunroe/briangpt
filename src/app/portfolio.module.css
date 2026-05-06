@@ -348,6 +348,23 @@
   height: 200px;
 }
 
+.cardLink {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  border-radius: inherit;
+}
+
+.cardLink:focus {
+  outline: none;
+}
+
+.cardLink:focus-visible .homeCard {
+  outline: var(--stroke-lg) solid var(--color-orange-400);
+  outline-offset: 2px;
+}
+
 .homeCard {
   box-sizing: border-box;
   width: 100%;
