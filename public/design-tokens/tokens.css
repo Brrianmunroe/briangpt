@@ -127,6 +127,8 @@
   --stroke-xs: var(--scale-50);
 
   /* --- 03 - Mapped (70) --- */
+  /** Pane edge (sidebar outer border — same hue/weight as Sidebar.module.css `.root`). */
+  --color-sidebar-edge-stroke: color-mix(in srgb, var(--color-neutral-500) 28%, transparent);
   --color-background-surface-default: var(--color-neutral-200);
   --color-button-ghost-stroke-focused: var(--color-neutral-200);
   --color-button-ghost-surface-default: var(--color-neutral-200);

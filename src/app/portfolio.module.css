@@ -55,12 +55,17 @@
   flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
+  /** Flush the conversation chrome to the top so the header aligns with the sidebar gutter. */
+  padding-top: 0;
 }
 
-.mainHeaderConversation {
-  padding-bottom: var(--spacing-md);
-  margin-bottom: 0;
-  border-bottom: var(--stroke-xs) solid var(--color-chat-input-stroke-default);
+/**
+ * Landing home — same top flush as chat so `SocialLinksToolbar` shares x/y with chat header.
+ * `gap` replaces the old `mainScroll` gap between toolbar and hero (was 149px).
+ */
+.mainColumn.mainColumnHome {
+  padding-top: 0;
+  gap: 149px;
 }
 
 /** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
@@ -149,6 +154,29 @@
   justify-content: flex-end;
   padding: 0 var(--spacing-md);
   box-sizing: border-box;
+}
+
+/**
+ * Conversation: align SocialLinksToolbar vertical center with sidebar `.headerRow`
+ * (sidebar: `--spacing-sm` top pad + `--scale-1100` row height). Toolbar is 40px
+ * (`SocialLinksToolbar` `.rootLinksOnly`); nudge top padding so midlines match.
+ */
+.mainHeader.mainHeaderConversation {
+  --conversation-social-toolbar-h: 40px;
+  justify-content: right;
+  align-items: center;
+  width: 100%;
+  padding-top: calc(
+    var(--spacing-sm) + (var(--scale-1100) / 2) - (var(--conversation-social-toolbar-h) / 2)
+  );
+  padding-bottom: var(--spacing-sm);
+  padding-inline: var(--spacing-md);
+  margin: 0;
+}
+
+/** Chat view only: divider under the social toolbar (home uses the same toolbar alignment without a line). */
+.mainHeader.mainHeaderConversation.mainHeaderChatStroke {
+  border-bottom: var(--stroke-xs) solid var(--color-sidebar-edge-stroke);
 }
 
 /** Figma `Chat Section` (334:454): 80px before card row, horizontal 96px padding. */
