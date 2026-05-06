@@ -48,6 +48,7 @@
   color: var(--sidebar-text-strong);
   font-family: var(--font-style-primary), system-ui, sans-serif;
   overflow: hidden;
+  container-type: inline-size;
 
   --sidebar-rail-duration: 0.35s;
   --sidebar-rail-ease: cubic-bezier(0.75, 0.15, 0.05, 0.70);
@@ -55,7 +56,7 @@
   --sidebar-content-delay: 0.10s;
   --sidebar-content-ease: cubic-bezier(0.75, 0.15, 0.01, 1.00);
   --sidebar-collapse-duration: 0.50s;
-  --sidebar-blur-peak: 10px;
+  --sidebar-blur-peak: 4px;
   /**
    * Nav labels must fade/blur out faster than the rail narrows; otherwise
    * `overflow: hidden` clips long text to ~one character before it disappears.
@@ -162,8 +163,8 @@
   pointer-events: none;
   transition:
     flex var(--sidebar-rail-duration) var(--sidebar-rail-ease),
-    opacity var(--sidebar-collapse-duration) ease,
-    filter var(--sidebar-collapse-duration) ease;
+    opacity var(--sidebar-collapse-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-collapse-duration) var(--sidebar-content-ease);
 }
 
 .root[data-density='compact'] .brand:not(.brandTextOnly) {
@@ -198,8 +199,8 @@
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));
   transition:
-    opacity var(--sidebar-collapse-duration) ease,
-    filter var(--sidebar-collapse-duration) ease;
+    opacity var(--sidebar-collapse-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-collapse-duration) var(--sidebar-content-ease);
 }
 
 .logoMark {
@@ -370,8 +371,8 @@
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));
   transition:
-    opacity var(--sidebar-collapse-duration) ease,
-    filter var(--sidebar-collapse-duration) ease;
+    opacity var(--sidebar-collapse-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-collapse-duration) var(--sidebar-content-ease);
 }
 
 /* ================================================================
@@ -554,9 +555,10 @@
 
 /* ================================================================
    PROFILE FOOTER
-   Avatar stays put on the left. Meta + chevron fade+blur out.
-   The profile button keeps full width; the rail's overflow clips
-   the right edge during the collapse so the avatar doesn't jump.
+   Compact: meta/chevron take no flex space. Horizontal padding uses
+   clamp(…) + 100cqi so the avatar stays left-gutter aligned while the
+   rail is wide, then eases into center as the rail narrows — no
+   discrete @container breakpoint snap.
    ================================================================ */
 
 .profile {
@@ -582,8 +584,24 @@
 }
 
 .root[data-density='compact'] .profile {
-  padding: 6px var(--scale-400);
   gap: 0;
+  width: 100%;
+  justify-content: flex-start;
+  padding-block: 6px;
+  /**
+   * cqi = .root content-box width (see container-type on .root).
+   * While wide: cap at --scale-400 so layout matches open sidebar.
+   * As rail narrows: symmetric padding approaches (cqi - avatar) / 2 → centered.
+   * Omit padding from transition so padding tracks width each frame (no lag).
+   */
+  padding-inline: clamp(
+    0px,
+    calc((100cqi - var(--scale-1200)) / 2),
+    var(--scale-400)
+  );
+  transition:
+    background-color 0.12s ease,
+    gap var(--sidebar-rail-duration) var(--sidebar-rail-ease);
 }
 
 .profile:hover {
@@ -627,12 +645,20 @@
 }
 
 .root[data-density='compact'] .profileMeta {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));
   pointer-events: none;
   transition:
-    opacity var(--sidebar-collapse-duration) ease,
-    filter var(--sidebar-collapse-duration) ease;
+    opacity var(--sidebar-collapse-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-collapse-duration) var(--sidebar-content-ease);
 }
 
 .profileName {
@@ -672,17 +698,21 @@
 }
 
 .root[data-density='compact'] .chevron {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   opacity: 0;
   filter: blur(var(--sidebar-blur-peak));
   pointer-events: none;
   transition:
-    opacity var(--sidebar-collapse-duration) ease,
-    filter var(--sidebar-collapse-duration) ease;
+    opacity var(--sidebar-collapse-duration) var(--sidebar-content-ease),
+    filter var(--sidebar-collapse-duration) var(--sidebar-content-ease);
 }
-
-/* ================================================================
-   REDUCED MOTION
-   ================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .root,

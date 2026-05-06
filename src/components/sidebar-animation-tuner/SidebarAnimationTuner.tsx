@@ -15,7 +15,7 @@ const DEFAULTS = {
   contentDelay: 0.10,
   contentEase: [0.75, 0.15, 0.01, 1.00] as [number, number, number, number],
   collapseDuration: 0.50,
-  blurPeak: 10,
+  blurPeak: 4,
 } as const;
 
 type EasingTuple = [number, number, number, number];
