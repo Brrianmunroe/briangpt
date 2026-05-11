@@ -87,6 +87,8 @@ export type SidebarHeaderRowProps = {
   title: string;
   /** When set, the title becomes a link (e.g. `/` for home). */
   brandHref?: string;
+  /** Extra props for the brand `Link` (e.g. `onClick` to reset client state when `href` is already active). */
+  brandLinkProps?: Omit<React.ComponentProps<typeof Link>, 'href' | 'children'>;
   /** Mark shown in the orange circle (default: diamond glyph). */
   logo?: React.ReactNode;
   /** Figma homepage sidebar (334:449): title + menu only — no orange mark. */
@@ -98,6 +100,7 @@ export type SidebarHeaderRowProps = {
 function SidebarHeaderRow({
   title,
   brandHref,
+  brandLinkProps,
   logo,
   showBrandMark = true,
   onMenuClick,
@@ -107,7 +110,7 @@ function SidebarHeaderRow({
 
   const titleEl =
     brandHref != null && brandHref !== '' ? (
-      <Link href={brandHref} className={styles.brandTitle}>
+      <Link href={brandHref} className={styles.brandTitle} {...brandLinkProps}>
         {title}
       </Link>
     ) : (
@@ -197,17 +200,22 @@ export type SidebarProfileProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElem
   roleLine: string;
   avatar?: React.ReactNode;
   showChevron?: boolean;
+  /** When true, skip row hover background and default cursor (shell until menu returns). */
+  disableRowHover?: boolean;
 };
 
 const SidebarProfile = React.forwardRef<HTMLButtonElement, SidebarProfileProps>(
-  function SidebarProfile({ name, roleLine, avatar, showChevron = true, className, ...rest }, ref) {
+  function SidebarProfile(
+    { name, roleLine, avatar, showChevron = true, disableRowHover = false, className, ...rest },
+    ref
+  ) {
     const aria = `${name}, ${roleLine}`;
 
     return (
       <button
         ref={ref}
         type="button"
-        className={mergeClassNames(styles.profile, className)}
+        className={mergeClassNames(styles.profile, disableRowHover && styles.profileNoRowHover, className)}
         aria-label={aria}
         {...rest}
       >

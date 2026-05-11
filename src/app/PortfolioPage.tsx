@@ -4,7 +4,7 @@ import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type ChatStatus, type UIMessage } from 'ai';
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Card } from '@/components/card';
 import { ChatInput } from '@/components/chat-input';
 import { NameTag } from '@/components/name-tag';
@@ -88,6 +88,7 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
 
 export function PortfolioPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
   const chipRowRef = React.useRef<HTMLDivElement>(null);
@@ -166,6 +167,21 @@ export function PortfolioPage() {
     setDraft('');
   }, [clearError, setMessages]);
 
+  /** Home link must clear chat when already on `/` — same URL does not remount or reset `useChat`. */
+  const handleBrandHomeClick = React.useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.button !== 0) return;
+      clearError();
+      setMessages([]);
+      setDraft('');
+      if (pathname === '/') {
+        e.preventDefault();
+      }
+    },
+    [clearError, pathname, setMessages]
+  );
+
   const toggleSidebarDensity = React.useCallback(() => {
     setSidebarDensity((d) => (d === 'comfortable' ? 'compact' : 'comfortable'));
   }, []);
@@ -188,6 +204,7 @@ export function PortfolioPage() {
             <Sidebar.HeaderRow
               title="BrianGPT"
               brandHref="/"
+              brandLinkProps={{ onClick: handleBrandHomeClick }}
               showBrandMark={false}
               onMenuClick={toggleSidebarDensity}
               menuButtonProps={{
@@ -206,7 +223,21 @@ export function PortfolioPage() {
             </Sidebar.NavSection>
           </Sidebar.Stack>
           <Sidebar.FooterSlot>
-            <Sidebar.Profile name="Brian Munroe" roleLine="Product Designer" />
+            <Sidebar.Profile
+              name="Brian Munroe"
+              roleLine="Product Designer"
+              showChevron={false}
+              disableRowHover
+              avatar={
+                <img
+                  src="/avatars/brian-profile.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  decoding="async"
+                />
+              }
+            />
           </Sidebar.FooterSlot>
         </Sidebar>
       </div>
