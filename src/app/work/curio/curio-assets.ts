@@ -2,8 +2,8 @@
 const c = (filename: string) => `/work/curio/${encodeURIComponent(filename)}`;
 
 export const curioImg = {
-  /** Cursor / Curio / Copilot-style tool strip (96×32 SVG). */
-  toolIconsStrip: c('curio-tools.svg'),
+  /** Cursor / Curio / Copilot-style tool strip (108×21 SVG). */
+  toolIconsStrip: c('case-study-tool-icons.svg'),
   screenCollage: c('Screen Collage.png'),
   curioLogo: c('Curio Logo.png'),
   colorPalette: c('Color Palette.png'),
