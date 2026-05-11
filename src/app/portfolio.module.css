@@ -334,7 +334,8 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: stretch;
   gap: 14px;
   width: 100%;
   max-width: 768px;
@@ -342,10 +343,10 @@
 }
 
 .cardCell {
-  flex: 1 1 0;
+  flex: 1 1 200px;
   min-width: min(100%, 200px);
-  max-width: 320px;
   height: 200px;
+  box-sizing: border-box;
 }
 
 .cardLink {
@@ -374,6 +375,11 @@
   border-radius: 20px;
 }
 
+/** Beat `Card` root `max-width` so tiles span the full cell width. */
+.cardCell .homeCard {
+  max-width: none;
+}
+
 @media (max-width: 860px) {
   .mainScroll {
     gap: 72px;
@@ -395,14 +401,15 @@
   /** Figma `Card Layout` (334:489): stack cards on narrow viewports. */
   .cardsRow {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     min-height: 0;
   }
 
   .cardCell {
     width: 100%;
-    max-width: 360px;
+    max-width: none;
     height: auto;
     min-height: 200px;
+    flex: 1 1 auto;
   }
 }
