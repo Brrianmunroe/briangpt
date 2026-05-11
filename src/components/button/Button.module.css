@@ -147,13 +147,13 @@
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--color-button-ghost-surface-hover);
+  background: var(--color-button-ghost-surface-default);
   color: var(--color-button-ghost-text-hover);
   --button-icon-fill: var(--color-button-ghost-text-hover);
 }
 
 .ghost:active:not(:disabled) {
-  background: var(--color-button-ghost-surface-pressed);
+  background: var(--color-button-ghost-surface-default);
   color: var(--color-button-ghost-text-pressed);
   --button-icon-fill: var(--color-button-ghost-text-pressed);
 }

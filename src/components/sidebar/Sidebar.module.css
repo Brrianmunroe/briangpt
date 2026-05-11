@@ -196,13 +196,34 @@
 }
 
 a.brandTitle {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-fill-secondary-2);
+  font-family: inherit;
   text-decoration: none;
   cursor: pointer;
+  transition:
+    color 0.12s ease,
+    box-shadow 0.12s ease,
+    opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
+    filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
 }
 
 a.brandTitle:hover {
-  color: var(--color-text-fill-primary);
+  color: var(--color-button-ghost-text-hover);
+}
+
+a.brandTitle:active {
+  color: var(--color-button-ghost-text-pressed);
 }
 
 a.brandTitle:focus {
@@ -210,7 +231,6 @@ a.brandTitle:focus {
 }
 
 a.brandTitle:focus-visible {
-  border-radius: var(--radius-sm);
   box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
 }
 
@@ -277,7 +297,7 @@ a.brandTitle:focus-visible {
 }
 
 .menuButton:hover {
-  background: var(--color-button-ghost-surface-hover);
+  background: var(--color-button-ghost-surface-default);
   color: var(--color-button-ghost-text-hover);
 }
 
@@ -299,7 +319,7 @@ a.brandTitle:focus-visible {
 }
 
 .root[data-density='compact'] .menuButton:hover {
-  background: var(--color-button-ghost-surface-hover);
+  background: transparent;
 }
 
 /* ================================================================
@@ -646,6 +666,14 @@ a.brandTitle:focus-visible {
   box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
 }
 
+.profileNoRowHover {
+  cursor: default;
+}
+
+.profileNoRowHover:hover {
+  background: transparent;
+}
+
 .avatar {
   display: flex;
   flex-shrink: 0;
@@ -657,6 +685,14 @@ a.brandTitle:focus-visible {
   border: var(--stroke-md) solid var(--color-orange-400);
   border-radius: var(--radius-full);
   background: var(--color-neutral-300);
+}
+
+.avatar > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .profileMeta {
