@@ -1,4 +1,4 @@
-export const CASE_STUDY_SLUGS = ['curio', 'ai-chat-interface'] as const;
+export const CASE_STUDY_SLUGS = ['selectai', 'curio'] as const;
 
 export type CaseStudySlug = (typeof CASE_STUDY_SLUGS)[number];
 
@@ -36,26 +36,26 @@ export const CASE_STUDIES = {
       },
     ],
   },
-  'ai-chat-interface': {
-    slug: 'ai-chat-interface',
+  selectai: {
+    slug: 'selectai',
     variant: 'primary',
-    title: 'AI Chat Interface',
-    subtitle: 'Modern chatbot UI with NLP',
+    title: 'SelexAI',
+    subtitle: 'Tackling the Corporate Work Paradox',
     description:
-      'A conversational surface tuned for clarity, speed, and trust — streaming replies, crisp hierarchy, and guardrails that keep the experience on-brand.',
+      'SelexAI helps video editors cut interviews faster without losing creative control. As sole designer, I led end-to-end discovery, design, and development from research to MVP. User interviews surfaced what I call the "corporate work paradox": corporate projects pay the most but feel the least creatively fulfilling. Combined with post-production overhead, the result is procrastination and burnout. After mapping workflows, I uncovered three bottlenecks and scoped the MVP around the one editors ranked highest: cutting interview selects. My hypothesis was that AI could surface strong moments, letting editors move straight into crafting the narrative. Usability testing confirmed the prototype felt intuitive but exposed a key tension — editors feared losing details by delegating to AI. Rather than hiding AI\'s role, I built features that made its decisions visible and kept creators in control. In testing, early users estimated up to 30% time savings in post-production. Next would be to launch in beta and talk with users about time saved and quality of the AI cuts.',
     features: [
-      'Streaming assistant responses with stop and retry affordances',
-      'Composer and thread layout aligned to a strict design system',
-      'Grounded answers with visible error and empty states',
+      'Scoped the MVP on the highest-ranked bottleneck: cutting interview selects from long-form interviews.',
+      'Made AI decisions visible and kept editors in control after usability tests surfaced fear of losing detail.',
+      'Estimated up to 30% post-production time savings in early testing; next step is beta launch and outcome validation.',
     ],
     panels: [
       {
-        heading: 'Conversation frame',
-        body: 'The chat region scrolls independently while the composer stays pinned, mirroring the live BrianGPT layout.',
+        heading: 'Corporate work paradox',
+        body: 'Interviews showed well-paid corporate work often felt the least creatively fulfilling, which — combined with post-production overhead — led to procrastination and burnout. That reframed the problem around reducing edit friction without stripping agency.',
       },
       {
-        heading: 'Input and chips',
-        body: 'Starter prompts and follow-ups reduce cold-start friction; chips scroll with edge fades on smaller viewports.',
+        heading: 'Trust and transparency',
+        body: 'Editors worried about handing judgment to AI. The product direction emphasized surfacing what the model was doing so creators could stay in the loop instead of hiding automation behind a black box.',
       },
     ],
   },

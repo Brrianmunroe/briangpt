@@ -8,8 +8,8 @@ import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import galleryStyles from './SidebarGalleryDemo.module.css';
 
 const PROJECTS = [
+  'SelexAI',
   'Curio',
-  'AI Chat Interface',
   'E-commerce Platform',
   'Analytics Dashboard',
 ] as const;
