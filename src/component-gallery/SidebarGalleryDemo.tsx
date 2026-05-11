@@ -8,9 +8,8 @@ import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import galleryStyles from './SidebarGalleryDemo.module.css';
 
 const PROJECTS = [
+  'Curio',
   'AI Chat Interface',
-  'Design System',
-  'Mobile Banking App',
   'E-commerce Platform',
   'Analytics Dashboard',
 ] as const;

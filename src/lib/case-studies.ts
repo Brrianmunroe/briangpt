@@ -1,8 +1,4 @@
-export const CASE_STUDY_SLUGS = [
-  'ai-chat-interface',
-  'enterprise-design-system',
-  'mobile-banking-app',
-] as const;
+export const CASE_STUDY_SLUGS = ['curio', 'ai-chat-interface'] as const;
 
 export type CaseStudySlug = (typeof CASE_STUDY_SLUGS)[number];
 
@@ -17,6 +13,29 @@ export type CaseStudy = {
 };
 
 export const CASE_STUDIES = {
+  curio: {
+    slug: 'curio',
+    variant: 'secondary',
+    title: 'Curio',
+    subtitle: 'Conversational AI built for retention',
+    description:
+      'Curio is a concept chatbot feature that helps users build a hyper-personalized Spotify library faster. When Spotify set a goal of adding 10M MAUs in a quarter, I explored whether growth could come from converting users on competing platforms. I surveyed 23 users and 70% said they would never consider switching. Interviews with Spotify and Apple Music users revealed why: users were deeply satisfied. Their libraries felt personal, recommendations were dialed, and both reinforced a strong sense of investment. An import tool could remove friction, but without intent to switch, there was no real opportunity. The real opportunity was accelerating personalization for brand new users. Operating on this new hypothesis, I tested two concepts, Chat and Curate. Chat, a playlist building chatbot, performed stronger in usability testing. Curate was shelved while Chat was integrated into onboarding, aiming to help users build one or more personalized playlist before signing up. Although this carries potential risks, I would monitor for dips in activation rates and I would track 7-day and 30-day retention compared to the standard sign up flow to validate success.',
+    features: [
+      'Survey (n = 23): 70% would not consider switching — pivoted from an import hypothesis to accelerating personalization for new users.',
+      'Shipped two concepts to usability: Chat (playlist-building chatbot) vs Curate; Chat won, Curate shelved, Chat integrated into onboarding.',
+      'Aim for one or more personalized playlists before signup; plan to compare activation and 7- / 30-day retention against the standard flow.',
+    ],
+    panels: [
+      {
+        heading: 'Research and pivot',
+        body: 'Interviews showed libraries and recommendations already felt dialed in — high satisfaction and emotional investment. Without switch intent, the leverage point became helping brand-new users reach that "invested" state faster, not dragging libraries over from competitors.',
+      },
+      {
+        heading: 'Chat vs Curate',
+        body: 'In a five-participant study, Chat averaged far fewer errors and faster task time than Curate, with higher completion; most participants preferred Chat. That evidence backed prioritizing Chat in onboarding while monitoring activation and retention at 7 and 30 days versus control.',
+      },
+    ],
+  },
   'ai-chat-interface': {
     slug: 'ai-chat-interface',
     variant: 'primary',
@@ -37,52 +56,6 @@ export const CASE_STUDIES = {
       {
         heading: 'Input and chips',
         body: 'Starter prompts and follow-ups reduce cold-start friction; chips scroll with edge fades on smaller viewports.',
-      },
-    ],
-  },
-  'enterprise-design-system': {
-    slug: 'enterprise-design-system',
-    variant: 'secondary',
-    title: 'Enterprise Design System',
-    subtitle: 'Scalable component library for fintech products',
-    description:
-      'Tokens-first foundations, documented components, and accessibility built in so product teams ship consistently without reinventing basics.',
-    features: [
-      'Mapped tokens from Figma to CSS with repeatable automation',
-      'Card, sidebar, and composer patterns shared across experiences',
-      'Focus-visible and reduced-motion accessibility defaults',
-    ],
-    panels: [
-      {
-        heading: 'Token pipeline',
-        body: 'Primitives roll up into semantic colors, spacing, and typography so theming and visual consistency stay mechanical.',
-      },
-      {
-        heading: 'Composition',
-        body: 'Layout primitives mirror design-language blocks, making handoff between design and engineering faster.',
-      },
-    ],
-  },
-  'mobile-banking-app': {
-    slug: 'mobile-banking-app',
-    variant: 'secondary',
-    title: 'Mobile Banking App',
-    subtitle: 'Award-winning mobile experience',
-    description:
-      'Motion, density, and progressive disclosure tuned for one-handed use so critical flows stay obvious while secondary actions stay reachable.',
-    features: [
-      'Adaptive density for balances, transactions, and alerts',
-      'Biometric-first auth with clear recovery paths',
-      'Real-time spend insights without overwhelming the home screen',
-    ],
-    panels: [
-      {
-        heading: 'Home and accounts',
-        body: 'Balances lead; transfers and payees tuck behind primary actions to keep cognitive load low at first glance.',
-      },
-      {
-        heading: 'Spending insights',
-        body: 'Category breakdowns use consistent chart grammar and tap targets sized for thumbs on common device widths.',
       },
     ],
   },
