@@ -15,7 +15,15 @@ export const NameTag = React.forwardRef<HTMLDivElement, NameTagProps>(
     return (
       <div ref={ref} className={rootClass} {...rest}>
         <div className={styles.indicator} aria-hidden>
-          <div className={styles.indicatorGlow} />
+          <div className={styles.indicatorGlow}>
+            <img
+              className={styles.indicatorGlowImg}
+              src="/name-tag-indicator-glow.svg"
+              alt=""
+              width={24}
+              height={24}
+            />
+          </div>
           <div className={styles.indicatorRing}>
             <div className={styles.indicatorCore} />
           </div>
