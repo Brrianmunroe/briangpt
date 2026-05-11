@@ -1,0 +1,47 @@
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 var(--spacing-xl) var(--spacing-xl);
+  /** Match Curio article shell (`curio-case-study.module.css` `.root`). */
+  background: transparent;
+  color: var(--color-text-fill-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/**
+ * Curio `.heroTop` sets `margin-bottom: var(--spacing-xl)` for block layout.
+ * This page uses flex `gap` for media rhythm, so zero the hero margin to avoid double spacing.
+ */
+.heroTopFlexChild {
+  margin-bottom: 0;
+}
+
+/** Full-width media: no wrapper fill or shadow — image defines the visual block. */
+.blockImg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+}
+
+.rowEqual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  width: 100%;
+  min-width: 0;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .rowEqual {
+    grid-template-columns: 1fr;
+  }
+}

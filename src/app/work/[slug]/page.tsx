@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CASE_STUDY_SLUGS, getCaseStudy, isCaseStudySlug } from '@/lib/case-studies';
 import { CaseStudyContent } from '../CaseStudyContent';
+import { CurioCaseStudy } from '../curio/CurioCaseStudy';
+import { SelectAiCaseStudy } from '../selectai/SelectAiCaseStudy';
 import { WorkCaseShell } from '../WorkCaseShell';
 
 type PageProps = {
@@ -28,10 +30,16 @@ export default async function CaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
   if (!isCaseStudySlug(slug)) notFound();
   const study = getCaseStudy(slug)!;
+  const body =
+    slug === 'curio' ? (
+      <CurioCaseStudy study={study} />
+    ) : slug === 'selectai' ? (
+      <SelectAiCaseStudy study={study} />
+    ) : (
+      <CaseStudyContent study={study} />
+    );
 
   return (
-    <WorkCaseShell>
-      <CaseStudyContent study={study} />
-    </WorkCaseShell>
+    <WorkCaseShell headerExtraGap={slug === 'selectai'}>{body}</WorkCaseShell>
   );
 }

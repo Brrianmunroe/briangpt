@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/button/Button';
 import { parseWorkShellDurationMs } from './parseWorkShellDurationMs';
 import styles from './work-shell.module.css';
 
@@ -17,9 +18,12 @@ function motionReduced(): boolean {
 export function WorkCaseShell({
   children,
   scaleBackground = false,
+  headerExtraGap = false,
 }: {
   children: React.ReactNode;
   scaleBackground?: boolean;
+  /** Extra space below the header close (SelectAI). */
+  headerExtraGap?: boolean;
 }) {
   const router = useRouter();
   const sceneRef = React.useRef<HTMLDivElement | null>(null);
@@ -171,15 +175,22 @@ export function WorkCaseShell({
       <div className={modalClass}>
         <div className={styles.cardWrap}>
           <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <button
-                type="button"
-                className={styles.closeBtn}
-                onClick={requestClose}
+            <div
+              className={[
+                styles.cardHeader,
+                headerExtraGap ? styles.cardHeaderGhost : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <Button
+                buttonType="button"
+                variant="secondary"
+                iconOnly
+                icon={<CloseGlyph />}
                 aria-label="Close case study"
-              >
-                <CloseGlyph />
-              </button>
+                onClick={requestClose}
+              />
             </div>
             <div className={styles.cardBody}>
               <div className={contentClass}>{children}</div>

@@ -89,8 +89,16 @@
 
 .toolStrip {
   display: block;
-  width: 96px;
-  height: 32px;
+  width: 108px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+/** Curio: show first three tiles only (fourth starts at x ≈ 87 in the 108×21 asset). */
+.toolStripClip {
+  width: 87px;
+  height: 21px;
+  overflow: hidden;
   flex-shrink: 0;
 }
 

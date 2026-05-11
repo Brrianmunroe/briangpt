@@ -14,13 +14,15 @@ export function CurioCaseStudy({ study }: { study: CaseStudy }) {
           <div className={styles.toolsWrap}>
             <p className={styles.toolsLabel}>Tools</p>
             <div className={styles.toolRow}>
-              <img
-                src={curioImg.toolIconsStrip}
-                alt=""
-                width={96}
-                height={32}
-                className={styles.toolStrip}
-              />
+              <div className={styles.toolStripClip}>
+                <img
+                  src={curioImg.toolIconsStrip}
+                  alt=""
+                  width={108}
+                  height={21}
+                  className={styles.toolStrip}
+                />
+              </div>
             </div>
           </div>
         </div>
