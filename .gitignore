@@ -12,3 +12,6 @@ out/
 # misc
 .DS_Store
 *.log
+
+# Local-only security backlog — do not push to shared remotes
+SECURITY_IMPROVEMENTS.md
