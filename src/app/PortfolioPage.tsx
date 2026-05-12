@@ -136,6 +136,20 @@ export function PortfolioPage() {
     };
   }, [updateChipScrollFade]);
 
+  /** Home is a locked-height shell; lock document scroll so the viewport doesn’t creep past 100dvh (rubber-band / scrollbar). */
+  React.useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
   const handleSend = React.useCallback(
     async (trimmed: string) => {
       if (!trimmed || requestInFlight) return;
