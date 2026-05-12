@@ -61,11 +61,13 @@
 
 /**
  * Landing home — same top flush as chat so `SocialLinksToolbar` shares x/y with chat header.
- * `gap` replaces the old `mainScroll` gap between toolbar and hero (was 149px).
+ * `gap` collapses smoothly on shorter viewports so the homepage stays single-screen.
+ * Bottom padding keeps the case-study cards 32px off the frame edge.
  */
 .mainColumn.mainColumnHome {
   padding-top: 0;
-  gap: 149px;
+  padding-bottom: var(--spacing-xl);
+  gap: clamp(48px, 12vh, 149px);
 }
 
 /** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
@@ -137,15 +139,17 @@
   box-sizing: border-box;
 }
 
-/** 149px gap between top links row and chat stack (Figma `Main Content` column). */
+/**
+ * Home column body — fits a single viewport (no whole-page scroll). The chat
+ * section flex-grows to absorb height; cards anchor to the bottom of this frame.
+ */
 .mainScroll {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 149px;
+  gap: clamp(24px, 4vh, 56px);
 }
 
 .mainHeader {
@@ -179,7 +183,10 @@
   border-bottom: var(--stroke-xs) solid var(--color-sidebar-edge-stroke);
 }
 
-/** Figma `Chat Section` (334:454): 80px before card row, horizontal 96px padding. */
+/**
+ * Figma `Chat Section` (334:454): 80px before card row, horizontal 96px padding.
+ * Bottom viewport gutter is only on `.mainColumnHome` (32px) so it is not doubled.
+ */
 .chatSection {
   display: flex;
   flex-direction: column;
@@ -191,7 +198,7 @@
   max-width: min(768px + 2 * var(--scale-1900), 100%);
   margin-inline: auto;
   box-sizing: border-box;
-  padding: 0 var(--scale-1900) var(--spacing-xl);
+  padding: 0 var(--scale-1900) 0;
 }
 
 /** Figma `Message Container` (334:455): 32px between hero block and composer. */
@@ -375,10 +382,6 @@
 }
 
 @media (max-width: 860px) {
-  .mainScroll {
-    gap: 72px;
-  }
-
   .chatSection,
   .chatSectionConversation {
     padding-left: var(--spacing-md);
