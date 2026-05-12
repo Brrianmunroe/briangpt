@@ -8,6 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Card } from '@/components/card';
 import { ChatInput } from '@/components/chat-input';
 import { NameTag } from '@/components/name-tag';
+import { Prompt } from '@/components/icons';
 import { PromptChip } from '@/components/prompt-chip';
 import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
@@ -17,10 +18,6 @@ import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './portfolio.module.css';
 
-/** Leading chip icon — Figma asset on `Prompt Chip` (node 334:466). */
-const PROMPT_CHIP_SPARKLE_SRC =
-  'https://www.figma.com/api/mcp/asset/3639ed2e-825e-4610-9a36-8c45f8ac7bd2';
-
 const LINKS = {
   linkedin: 'https://www.linkedin.com/in/brian-munroe-75a486a5/',
   github: 'https://github.com/Brrianmunroe',
@@ -28,12 +25,20 @@ const LINKS = {
   website: 'https://www.figma.com/design/mlYfMT6fTkpOn91clhFTxs/BrianGPT',
 } as const;
 
-const STARTER_PROMPTS = [
-  'Your best work',
-  'Your design process',
-  'Your case studies',
-  'Your design philosophy',
-  'How you use AI in design',
+const ROTATING_PLACEHOLDER_PROMPTS = [
+  'my design process.',
+  'my case studies.',
+  'my design philosophy.',
+  'how I use AI in design.',
+  'my favorite project.',
+] as const;
+
+const STARTER_CHIP_QUESTIONS = [
+  "What's your design process?",
+  'What case studies should I look at?',
+  "What's your design philosophy?",
+  'How do you use AI in design?',
+  "What's your favorite project?",
 ] as const;
 
 function getTextFromMessage(message: UIMessage): string {
@@ -186,15 +191,8 @@ export function PortfolioPage() {
     setSidebarDensity((d) => (d === 'comfortable' ? 'compact' : 'comfortable'));
   }, []);
 
-  const sparkleIcon = (
-    <img
-      src={PROMPT_CHIP_SPARKLE_SRC}
-      width={16}
-      height={16}
-      alt=""
-      className={styles.chipSparkle}
-    />
-  );
+  const promptChipIconColor = requestInFlight ? 'grey' : 'orange';
+  const promptChipIcon = <Prompt color={promptChipIconColor} size={16} aria-hidden />;
 
   return (
     <div className={styles.shell}>
@@ -276,7 +274,7 @@ export function PortfolioPage() {
                           onSubmit={(t) => void handleSend(t)}
                           streaming={requestInFlight}
                           onStop={handleStop}
-                          rotatingPlaceholderPrompts={STARTER_PROMPTS}
+                          rotatingPlaceholderPrompts={ROTATING_PLACEHOLDER_PROMPTS}
                           followUpPlaceholder="Ask a follow up"
                           followUpEmphasis={false}
                           layout="stacked"
@@ -298,15 +296,15 @@ export function PortfolioPage() {
                             aria-label="Suggested prompts"
                             onScroll={updateChipScrollFade}
                           >
-                            {STARTER_PROMPTS.map((label) => (
-                              <div key={label} className={styles.chipSlot} role="listitem">
+                            {STARTER_CHIP_QUESTIONS.map((question) => (
+                              <div key={question} className={styles.chipSlot} role="listitem">
                                 <PromptChip
                                   buttonType="button"
-                                  icon={sparkleIcon}
-                                  onClick={() => void handleSend(label)}
+                                  icon={promptChipIcon}
+                                  onClick={() => void handleSend(question)}
                                   disabled={requestInFlight}
                                 >
-                                  {label}
+                                  {question}
                                 </PromptChip>
                               </div>
                             ))}

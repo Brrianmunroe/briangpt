@@ -8,6 +8,7 @@ import {
   Mail,
   Menu,
   Plus,
+  Prompt,
   Stop,
   UpArrow,
 } from '@/components/icons';
@@ -32,6 +33,7 @@ export const ICON_SECTIONS: {
   { title: 'Globe', slug: 'globe', figmaPath: 'icons / globe', Component: Globe },
   { title: 'Down chevron', slug: 'down-chevron', figmaPath: 'icons / down-chevron', Component: DownChevron },
   { title: 'Plus', slug: 'plus', figmaPath: 'icons / plus', Component: Plus },
+  { title: 'Prompt', slug: 'prompt', figmaPath: 'icons / prompt', Component: Prompt },
   { title: 'Menu', slug: 'menu', figmaPath: 'icons / menu', Component: Menu },
   { title: 'GitHub', slug: 'github', figmaPath: 'icons / github', Component: Github },
   { title: 'LinkedIn', slug: 'linkedin', figmaPath: 'icons / linkedin', Component: Linkedin },
