@@ -28,12 +28,20 @@ const LINKS = {
   website: 'https://www.figma.com/design/mlYfMT6fTkpOn91clhFTxs/BrianGPT',
 } as const;
 
-const STARTER_PROMPTS = [
-  'Your best work',
-  'Your design process',
-  'Your case studies',
-  'Your design philosophy',
-  'How you use AI in design',
+const ROTATING_PLACEHOLDER_PROMPTS = [
+  'my design process.',
+  'my case studies.',
+  'my design philosophy.',
+  'how I use AI in design.',
+  'my favorite project.',
+] as const;
+
+const STARTER_CHIP_QUESTIONS = [
+  "What's your design process?",
+  'What case studies should I look at?',
+  "What's your design philosophy?",
+  'How do you use AI in design?',
+  "What's your favorite project?",
 ] as const;
 
 function getTextFromMessage(message: UIMessage): string {
@@ -276,7 +284,7 @@ export function PortfolioPage() {
                           onSubmit={(t) => void handleSend(t)}
                           streaming={requestInFlight}
                           onStop={handleStop}
-                          rotatingPlaceholderPrompts={STARTER_PROMPTS}
+                          rotatingPlaceholderPrompts={ROTATING_PLACEHOLDER_PROMPTS}
                           followUpPlaceholder="Ask a follow up"
                           followUpEmphasis={false}
                           layout="stacked"
@@ -298,15 +306,15 @@ export function PortfolioPage() {
                             aria-label="Suggested prompts"
                             onScroll={updateChipScrollFade}
                           >
-                            {STARTER_PROMPTS.map((label) => (
-                              <div key={label} className={styles.chipSlot} role="listitem">
+                            {STARTER_CHIP_QUESTIONS.map((question) => (
+                              <div key={question} className={styles.chipSlot} role="listitem">
                                 <PromptChip
                                   buttonType="button"
                                   icon={sparkleIcon}
-                                  onClick={() => void handleSend(label)}
+                                  onClick={() => void handleSend(question)}
                                   disabled={requestInFlight}
                                 >
-                                  {label}
+                                  {question}
                                 </PromptChip>
                               </div>
                             ))}

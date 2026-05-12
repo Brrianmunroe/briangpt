@@ -31,7 +31,7 @@ function useRotatingTypewriterSuffix(prompts: readonly string[], enabled: boolea
 
     const runPrompt = () => {
       if (cancelled) return;
-      const prompt = (list[promptIndex % list.length] ?? '').toLowerCase();
+      const prompt = list[promptIndex % list.length] ?? '';
 
       const typeStep = (i: number) => {
         if (cancelled) return;
@@ -89,7 +89,7 @@ export type ChatInputProps = Omit<
   /** While true (request in flight: submitted or streaming upstream), the trailing control shows Stop and calls this instead of submit. */
   onStop?: () => void;
   placeholder?: string;
-  /** Shown before each rotating suggestion; default ends with `... ` then the typed suffix (lowercase). */
+  /** Shown before each rotating suggestion; default ends with `... ` then the typed suffix (as-authored). */
   rotatingPlaceholderPrefix?: string;
   /** When set (non-empty) and the field is empty (not streaming), a typewriter cycles these strings after the prefix instead of a static placeholder. */
   rotatingPlaceholderPrompts?: readonly string[];
