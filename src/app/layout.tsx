@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { MobileOptimizationNotice } from '@/components/mobile-optimization-notice/MobileOptimizationNotice';
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { MobileOptimizationNotice } from '@/components/mobile-optimization-notice/MobileOptimizationNotice';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({
         <div className="appBackground">{children}</div>
         {modal}
         <MobileOptimizationNotice />
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
