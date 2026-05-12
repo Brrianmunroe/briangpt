@@ -14,11 +14,6 @@ export const NameTag = React.forwardRef<HTMLDivElement, NameTagProps>(
 
     return (
       <div ref={ref} className={rootClass} {...rest}>
-        <div className={styles.indicator} aria-hidden>
-          <div className={styles.indicatorRing}>
-            <div className={styles.indicatorCore} />
-          </div>
-        </div>
         <div className={styles.label}>{children}</div>
       </div>
     );
