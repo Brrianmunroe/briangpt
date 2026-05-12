@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { MobileOptimizationNotice } from '@/components/mobile-optimization-notice/MobileOptimizationNotice';
 import './globals.css';
 
@@ -19,6 +20,7 @@ export default function RootLayout({
         <div className="appBackground">{children}</div>
         {modal}
         <MobileOptimizationNotice />
+        <Analytics />
       </body>
     </html>
   );
