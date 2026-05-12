@@ -29,22 +29,6 @@
   height: var(--name-tag-indicator-size);
 }
 
-/**
- * Glow matches Figma `Today Indicator` node 155:337 — exported blur + ring (orange-400 / 200→500).
- */
-.indicatorGlow {
-  position: absolute;
-  inset: -45%;
-  pointer-events: none;
-}
-
-.indicatorGlowImg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-}
-
 .indicatorRing {
   position: relative;
   z-index: 1;
