@@ -265,7 +265,7 @@ export function PortfolioPage() {
                     <div className={styles.landingCluster}>
                       <div className={styles.messageHeader}>
                         <NameTag />
-                        <h1 className={styles.heroH1}>BrianGPT - Building with AI</h1>
+                        <h1 className={styles.heroH1}>Hi, I'm Brian! Ask me a question.</h1>
                       </div>
                       <div ref={composerHostRef} className={styles.composerHostLanding}>
                         <ChatInput
