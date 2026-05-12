@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MobileOptimizationNotice } from '@/components/mobile-optimization-notice/MobileOptimizationNotice';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <div className="appBackground">{children}</div>
         {modal}
+        <MobileOptimizationNotice />
       </body>
     </html>
   );
