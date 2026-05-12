@@ -298,12 +298,6 @@
   );
 }
 
-.chipSparkle {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-
 .messages {
   margin-top: var(--spacing-md);
   width: 100%;
