@@ -1,5 +1,14 @@
 @import '../../design-tokens/tokens.css';
 
+/**
+ * Fullscreen overlay dim + blur — shared by work case study scrim and mobile notice.
+ * (Design tokens file is generated; app chrome lives here.)
+ */
+:root {
+  --overlay-scrim-background: oklch(0 0 0 / 0.55);
+  --overlay-scrim-blur: 4px;
+}
+
 *,
 *::before,
 *::after {

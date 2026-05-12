@@ -15,9 +15,7 @@
   --work-scrim-exit-duration: 250ms;
   --work-enter-ease: cubic-bezier(0.23, 1.1, 0.4, 0.98);
   --work-exit-ease: cubic-bezier(0.4, 0, 1, 1);
-  --work-shell-blur: 4px;
   --work-shell-scrim-opacity: 1;
-  --work-shell-background: oklch(0 0 0 / 0.55);
   --work-modal-enter-y: 400px;
   --work-modal-enter-scale: 0.98;
   --work-modal-exit-y: 400px;
@@ -44,9 +42,9 @@
   pointer-events: none;
   cursor: pointer;
   opacity: 0;
-  background: var(--work-shell-background);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: var(--overlay-scrim-background);
+  backdrop-filter: blur(var(--overlay-scrim-blur));
+  -webkit-backdrop-filter: blur(var(--overlay-scrim-blur));
 }
 
 .scrimMotionReady {
