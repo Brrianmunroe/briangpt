@@ -105,8 +105,7 @@ export function MobileOptimizationNotice() {
             mid-glow-up.
           </h2>
           <p className={styles.body}>
-            I am in the process of optimizing the web-based version because that&apos;s where most of my
-            viewers come from. Thank you for your patience as I develop the mobile-optimized version.
+            I am in the process of optimizing the desktop-based version because that&apos;s where most of the traffic comes from. Thank you for your patience as I develop the mobile-optimized version.
           </p>
         </div>
       </div>
