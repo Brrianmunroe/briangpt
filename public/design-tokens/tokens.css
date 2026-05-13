@@ -199,4 +199,12 @@
   --color-text-fill-pressed: var(--color-neutral-200);
   --color-text-fill-primary: var(--color-neutral-900);
   --color-text-fill-secondary-2: var(--color-neutral-700);
+
+  /* Feature highlight card + feature card tooltip (Figma 03 — Mapped; values align with feature-highlight palette) */
+  --color-feature-highlight-card-surface-default: var(--color-neutral-200);
+  --color-feature-highlight-card-stroke-default: var(--color-neutral-500);
+  --color-feature-highlight-card-text-primary: var(--color-neutral-900);
+  --color-feature-highlight-card-text-secondary: var(--color-neutral-700);
+  --radius-feature-highlight-card-lg: var(--scale-900);
+  --shadow-feature-highlight-card-drop: 0 4px 8.7px rgb(0 0 0 / 100%);
 }

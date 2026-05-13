@@ -1,4 +1,5 @@
 import type { CaseStudy } from '@/lib/case-studies';
+import { SelectAiHeroHotspots } from '@/components/select-ai-hero-hotspots/SelectAiHeroHotspots';
 import { curioImg } from '../curio/curio-assets';
 import curioStyles from '../curio/curio-case-study.module.css';
 import { selectAiImg } from './select-ai-assets';
@@ -31,7 +32,7 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
         </div>
       </div>
 
-      <img src={selectAiImg.hero} alt="" className={styles.blockImg} />
+      <SelectAiHeroHotspots src={selectAiImg.hero} alt="" imgClassName={styles.blockImg} demoMedia />
 
       <div className={styles.rowEqual}>
         <img

@@ -14,6 +14,7 @@ import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { ConversationPanel } from '@/components/conversation-panel';
+import { InteractiveDotField, usePrefersReducedMotion } from '@/components/interactive-dot-field';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './portfolio.module.css';
@@ -94,6 +95,8 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
 export function PortfolioPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const mainRef = React.useRef<HTMLElement | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
   const chipRowRef = React.useRef<HTMLDivElement>(null);
@@ -109,6 +112,7 @@ export function PortfolioPage() {
   const streaming = status === 'streaming';
   const requestInFlight = status === 'submitted' || status === 'streaming';
   const conversationMode = messages.length > 0;
+  const showFluidDots = !conversationMode && !prefersReducedMotion;
   const appendThinking = shouldAppendThinkingRow(messages, status);
 
   const updateChipScrollFade = React.useCallback(() => {
@@ -240,7 +244,13 @@ export function PortfolioPage() {
         </Sidebar>
       </div>
 
-      <main className={styles.main}>
+      <main
+        ref={mainRef}
+        className={
+          showFluidDots ? `${styles.main} ${styles.mainFluidDots}` : styles.main
+        }
+      >
+        {showFluidDots ? <InteractiveDotField containerRef={mainRef} /> : null}
         <div
           className={
             conversationMode

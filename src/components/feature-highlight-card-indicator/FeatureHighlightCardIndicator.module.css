@@ -1,0 +1,25 @@
+/**
+ * Matches Figma `Frame 180` (node 630:13163): 20×20 circular hotspot with
+ * neutral fill + stroke ring and centered orange core (Ellipse 12×12).
+ */
+.root {
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--color-neutral-900);
+  border: 2px solid var(--color-neutral-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.core {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--color-orange-400);
+}
