@@ -2,6 +2,8 @@
 const c = (filename: string) => `/work/curio/${encodeURIComponent(filename)}`;
 
 export const curioImg = {
+  /** Exported from Figma Frame 1 (672:163); hotspot %s vs inner image 1 (835×565). */
+  frame1Hero: c('frame-1-hero.png'),
   /** Cursor / Curio / Copilot-style tool strip (108×21 SVG). */
   toolIconsStrip: c('case-study-tool-icons.svg'),
   screenCollage: c('Screen Collage.png'),
@@ -11,7 +13,6 @@ export const curioImg = {
   chat: c('Chat.png'),
   curateSection: c('Curate Section.png'),
   flow: c('Flow.png'),
-  designDecisions: c('Design Decsions.png'),
 } as const;
 
 /** Bottom grid videos — add MP4/WebM files to public/work/curio/ and list paths here. */

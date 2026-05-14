@@ -1,71 +1,56 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { FeatureHighlightCardIndicator } from '@/components/feature-highlight-card-indicator/FeatureHighlightCardIndicator';
-import {
-  FeatureHighlightCard,
-  type FeatureHighlightCardCorner,
-} from '@/components/feature-highlight-card/FeatureHighlightCard';
+import { HeroImageHotspots, type HeroHotspotConfig } from '@/components/hero-image-hotspots';
 import { selectAiImg } from '@/app/work/selectai/select-ai-assets';
-import styles from './SelectAiHeroHotspots.module.css';
-
-type HotspotConfig = {
-  id: string;
-  leftPct: number;
-  topPct: number;
-  corner: FeatureHighlightCardCorner;
-  title: string;
-  body: string;
-  mediaSrc?: string;
-  mediaAlt?: string;
-};
 
 /**
  * Positions from Figma Frame 179 (663:83): indicator centers as % of inner `image 41` (663:84)
  * bounds (x=32, y≈33.429, w=1056, h≈659.142). Geometry only — no Figma assets in code.
  */
-const HOTSPOTS: HotspotConfig[] = [
+const HOTSPOTS: readonly HeroHotspotConfig[] = [
   {
     id: 'h-timeline',
     leftPct: 37.41,
     topPct: 71.84,
     corner: 'bottom-left',
-    title: 'Timeline',
-    body: 'Placeholder: describe how timeline selection ties to the transcript and playback.',
+    title: 'Tandem Editing',
+    body: 'Edit in transcript or timeline; every cut stays synced so you keep precise narrative control.',
+    mediaSrc: selectAiImg.tandemTimelineHighlightVideo,
+    mediaKind: 'video',
+    mediaAlt: 'Tandem timeline: selection linked to transcript and playback',
   },
   {
     id: 'h-transcript-top',
     leftPct: 37.41,
-    topPct: 14.65,
+    topPct: 18.65,
     corner: 'top-left',
-    title: 'Transcript',
-    body: 'Placeholder: call out transcript-first editing and speaker blocks.',
-  },
-  {
-    id: 'h-video-top',
-    leftPct: 84.56,
-    topPct: 14.65,
-    corner: 'top-right',
-    title: 'Program monitor',
-    body: 'Placeholder: note preview, mark in/out, and transport controls.',
-    mediaSrc: selectAiImg.videoFramePlaceholder,
-    mediaAlt: '',
+    title: 'Highlight Transparency',
+    body: 'See why each highlight was chosen and how it fits your story, before you export.',
+    mediaSrc: selectAiImg.reasoningHighlightVideo,
+    mediaKind: 'video',
+    mediaAlt: 'Reasoning and transcript-first editing in the interview flow',
   },
   {
     id: 'h-video-bottom',
     leftPct: 84.56,
     topPct: 54.38,
     corner: 'bottom-right',
-    title: 'Review actions',
-    body: 'Placeholder: highlight accept, delete, and review affordances.',
+    title: 'Native-Feeling Toolbar',
+    body: 'Familiar toolbar, icons, and hotkeys mirroring major NLEs, making SelexAI instantly comfortable.',
+    mediaSrc: selectAiImg.toolbarHighlightVideo,
+    mediaKind: 'video',
+    mediaAlt: 'Toolbar with review and timeline actions',
   },
   {
     id: 'h-sidebar',
     leftPct: 11.65,
     topPct: 14.65,
     corner: 'top-left',
-    title: 'Navigation',
-    body: 'Placeholder: home, projects, and settings entry points.',
+    title: 'Familiar Pro Layout',
+    body: 'Built like Premiere, Final Cut, and Resolve, so it slots directly into existing workflows.',
+    mediaSrc: selectAiImg.nlesHighlightVideo,
+    mediaKind: 'video',
+    mediaAlt: 'Overview of common non-linear editing applications',
   },
 ];
 
@@ -76,57 +61,5 @@ export type SelectAiHeroHotspotsProps = {
 };
 
 export function SelectAiHeroHotspots({ src, alt = '', imgClassName }: SelectAiHeroHotspotsProps) {
-  const [imageActive, setImageActive] = useState(false);
-  const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
-
-  const onWrapEnter = useCallback(() => {
-    setImageActive(true);
-  }, []);
-
-  const onWrapLeave = useCallback(() => {
-    setImageActive(false);
-    setActiveHotspotId(null);
-  }, []);
-
-  const wrapClass = [styles.heroWrap, imageActive ? styles.wrapActive : ''].filter(Boolean).join(' ');
-
-  return (
-    <div
-      className={wrapClass}
-      onMouseEnter={onWrapEnter}
-      onMouseLeave={onWrapLeave}
-    >
-      <img src={src} alt={alt} className={[styles.heroImg, imgClassName].filter(Boolean).join(' ')} />
-      <div className={styles.overlay} aria-hidden />
-      {HOTSPOTS.map((spot) => {
-        const expanded = imageActive && activeHotspotId === spot.id;
-        const stackClass = [styles.stack, expanded ? styles.stackExpanded : ''].filter(Boolean).join(' ');
-
-        return (
-          <div
-            key={spot.id}
-            className={styles.hotspot}
-            style={{ left: `${spot.leftPct}%`, top: `${spot.topPct}%` }}
-            onMouseEnter={() => setActiveHotspotId(spot.id)}
-            onMouseLeave={() => setActiveHotspotId((prev) => (prev === spot.id ? null : prev))}
-          >
-            <div className={stackClass}>
-              <div className={styles.indicatorLayer}>
-                <FeatureHighlightCardIndicator label={`${spot.title} — highlight marker`} />
-              </div>
-              <div className={styles.cardLayer} data-card-corner={spot.corner}>
-                <FeatureHighlightCard
-                  corner={spot.corner}
-                  title={spot.title}
-                  body={spot.body}
-                  mediaSrc={spot.mediaSrc}
-                  mediaAlt={spot.mediaAlt ?? ''}
-                />
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <HeroImageHotspots src={src} alt={alt} imgClassName={imgClassName} hotspots={HOTSPOTS} />;
 }

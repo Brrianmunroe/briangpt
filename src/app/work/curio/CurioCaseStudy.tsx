@@ -1,4 +1,5 @@
 import type { CaseStudy } from '@/lib/case-studies';
+import { CurioHeroHotspots } from '@/components/curio-hero-hotspots/CurioHeroHotspots';
 import { curioGalleryVideos, curioImg } from './curio-assets';
 import styles from './curio-case-study.module.css';
 
@@ -32,7 +33,7 @@ export function CurioCaseStudy({ study }: { study: CaseStudy }) {
       </div>
 
       <div className={styles.mediaSlot}>
-        <img src={curioImg.screenCollage} alt="" className={styles.fillMedia} />
+        <CurioHeroHotspots imgClassName={styles.fillMedia} />
       </div>
 
       <div className={styles.mediaPair}>
@@ -71,8 +72,8 @@ export function CurioCaseStudy({ study }: { study: CaseStudy }) {
 
       <div className={styles.mediaSlot}>
         <img
-          src={curioImg.designDecisions}
-          alt="Design decisions"
+          src={curioImg.screenCollage}
+          alt="Curio screens across devices"
           className={styles.fillMedia}
         />
       </div>
