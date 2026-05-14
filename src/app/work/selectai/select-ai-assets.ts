@@ -3,7 +3,7 @@ const s = (filename: string) =>
   `/work/selexAI/${filename.split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
 
 /** Bump this when you replace MP4s in place under `public/work/selexAI/videos/` so browsers refetch. */
-const SELECT_AI_VIDEO_CACHE = '4';
+const SELECT_AI_VIDEO_CACHE = '5';
 
 export const selectAiImg = {
   /** Highlight card — reasoning / transcript intelligence (`public/work/selexAI/videos/Reasoning.mp4`). */
