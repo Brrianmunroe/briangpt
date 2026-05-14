@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useCallback, useState } from 'react';
 import { FeatureHighlightCardIndicator } from '@/components/feature-highlight-card-indicator/FeatureHighlightCardIndicator';
 import {
@@ -17,30 +18,50 @@ type HotspotConfig = {
   body: string;
 };
 
+/**
+ * Positions from Figma Frame 179 (663:83): indicator centers as % of inner `image 41` (663:84)
+ * bounds (x=32, y≈33.429, w=1056, h≈659.142). Geometry only — no Figma assets in code.
+ */
 const HOTSPOTS: HotspotConfig[] = [
   {
-    id: 'h1',
-    leftPct: 24,
-    topPct: 30,
+    id: 'h-timeline',
+    leftPct: 37.41,
+    topPct: 71.84,
+    corner: 'bottom-left',
+    title: 'Timeline',
+    body: 'Placeholder: describe how timeline selection ties to the transcript and playback.',
+  },
+  {
+    id: 'h-transcript-top',
+    leftPct: 37.41,
+    topPct: 14.65,
     corner: 'top-left',
-    title: 'Transcript-first editing',
-    body: 'Placeholder: call out how transcript selection ties to the timeline.',
+    title: 'Transcript',
+    body: 'Placeholder: call out transcript-first editing and speaker blocks.',
   },
   {
-    id: 'h2',
-    leftPct: 72,
-    topPct: 38,
-    corner: 'bottom-right',
-    title: 'Review controls',
-    body: 'Placeholder: highlight accept / delete and how they feel in flow.',
-  },
-  {
-    id: 'h3',
-    leftPct: 52,
-    topPct: 58,
+    id: 'h-video-top',
+    leftPct: 84.56,
+    topPct: 14.65,
     corner: 'top-right',
-    title: 'Waveform cueing',
-    body: 'Placeholder: tie waveform affordance to transcript accuracy.',
+    title: 'Program monitor',
+    body: 'Placeholder: note preview, mark in/out, and transport controls.',
+  },
+  {
+    id: 'h-video-bottom',
+    leftPct: 84.56,
+    topPct: 54.38,
+    corner: 'bottom-right',
+    title: 'Review actions',
+    body: 'Placeholder: highlight accept, delete, and review affordances.',
+  },
+  {
+    id: 'h-sidebar',
+    leftPct: 11.65,
+    topPct: 14.65,
+    corner: 'top-left',
+    title: 'Navigation',
+    body: 'Placeholder: home, projects, and settings entry points.',
   },
 ];
 
@@ -48,11 +69,9 @@ export type SelectAiHeroHotspotsProps = {
   src: string;
   alt?: string;
   imgClassName: string;
-  /** Optional: show media on the first hotspot’s highlight card using the same hero image */
-  demoMedia?: boolean;
 };
 
-export function SelectAiHeroHotspots({ src, alt = '', imgClassName, demoMedia }: SelectAiHeroHotspotsProps) {
+export function SelectAiHeroHotspots({ src, alt = '', imgClassName }: SelectAiHeroHotspotsProps) {
   const [imageActive, setImageActive] = useState(false);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
 
@@ -84,7 +103,13 @@ export function SelectAiHeroHotspots({ src, alt = '', imgClassName, demoMedia }:
             key={spot.id}
             className={styles.hotspot}
             data-index={index}
-            style={{ left: `${spot.leftPct}%`, top: `${spot.topPct}%` }}
+            style={
+              {
+                left: `${spot.leftPct}%`,
+                top: `${spot.topPct}%`,
+                '--hotspot-stagger-index': index,
+              } as CSSProperties
+            }
             onMouseEnter={() => setActiveHotspotId(spot.id)}
             onMouseLeave={() => setActiveHotspotId((prev) => (prev === spot.id ? null : prev))}
           >
@@ -93,13 +118,7 @@ export function SelectAiHeroHotspots({ src, alt = '', imgClassName, demoMedia }:
                 <FeatureHighlightCardIndicator label={`${spot.title} — highlight marker`} />
               </div>
               <div className={styles.cardLayer} data-card-corner={spot.corner}>
-                <FeatureHighlightCard
-                  corner={spot.corner}
-                  title={spot.title}
-                  body={spot.body}
-                  mediaSrc={demoMedia && index === 0 ? src : undefined}
-                  mediaAlt={demoMedia && index === 0 ? alt : ''}
-                />
+                <FeatureHighlightCard corner={spot.corner} title={spot.title} body={spot.body} />
               </div>
             </div>
           </div>

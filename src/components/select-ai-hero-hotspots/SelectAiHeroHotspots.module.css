@@ -56,6 +56,7 @@
     opacity 0.35s ease,
     transform 0.35s ease,
     filter 0.35s ease;
+  transition-delay: calc(var(--hotspot-stagger-index, 0) * 45ms);
 }
 
 .heroWrap.wrapActive .stack {
@@ -135,24 +136,13 @@
   pointer-events: auto;
 }
 
-.hotspot[data-index='0'] .stack {
-  transition-delay: 0ms;
-}
-
-.hotspot[data-index='1'] .stack {
-  transition-delay: 45ms;
-}
-
-.hotspot[data-index='2'] .stack {
-  transition-delay: 90ms;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stack,
   .indicatorLayer,
   .cardLayer {
     filter: none !important;
     transition-duration: 0.12s;
+    transition-delay: 0ms !important;
   }
 
   .heroWrap.wrapActive .stack {

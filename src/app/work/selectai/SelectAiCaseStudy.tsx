@@ -32,7 +32,7 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
         </div>
       </div>
 
-      <SelectAiHeroHotspots src={selectAiImg.hero} alt="" imgClassName={styles.blockImg} demoMedia />
+      <SelectAiHeroHotspots src={selectAiImg.hero} alt="" imgClassName={styles.blockImg} />
 
       <div className={styles.rowEqual}>
         <img
