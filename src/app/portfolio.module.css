@@ -34,7 +34,8 @@
   overflow: hidden;
   /** Figma `Main Content` (341:606): dot grid on `--color-background-surface-default`; dots at full-opacity neutral 400. */
   --main-dot-grid: 16px;
-  --main-dot-fill: color-mix(in srgb, var(--color-neutral-400) 100%, transparent);
+  /** Use token directly — `color-mix` inside `radial-gradient` was dropped by some browsers (flat bg on production). */
+  --main-dot-fill: var(--color-neutral-400);
   background-color: var(--color-background-surface-default);
   background-image: radial-gradient(var(--main-dot-fill) 1px, transparent 1px);
   background-size: var(--main-dot-grid) var(--main-dot-grid);
