@@ -70,7 +70,11 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
 
       <img src={selectAiImg.contextBrief} alt="Context brief" className={styles.blockImg} />
 
-      <img src={selectAiImg.timeline} alt="Timeline" className={styles.blockImg} />
+      <img
+        src={selectAiImg.timeline}
+        alt="SelexAI timeline and program monitor layout"
+        className={styles.blockImg}
+      />
 
       <img src={selectAiImg.reasoning} alt="Reasoning and AI transparency" className={styles.blockImg} />
     </article>
