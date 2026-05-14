@@ -1,12 +1,12 @@
 'use client';
 
-import type { CSSProperties } from 'react';
 import { useCallback, useState } from 'react';
 import { FeatureHighlightCardIndicator } from '@/components/feature-highlight-card-indicator/FeatureHighlightCardIndicator';
 import {
   FeatureHighlightCard,
   type FeatureHighlightCardCorner,
 } from '@/components/feature-highlight-card/FeatureHighlightCard';
+import { selectAiImg } from '@/app/work/selectai/select-ai-assets';
 import styles from './SelectAiHeroHotspots.module.css';
 
 type HotspotConfig = {
@@ -16,6 +16,8 @@ type HotspotConfig = {
   corner: FeatureHighlightCardCorner;
   title: string;
   body: string;
+  mediaSrc?: string;
+  mediaAlt?: string;
 };
 
 /**
@@ -46,6 +48,8 @@ const HOTSPOTS: HotspotConfig[] = [
     corner: 'top-right',
     title: 'Program monitor',
     body: 'Placeholder: note preview, mark in/out, and transport controls.',
+    mediaSrc: selectAiImg.videoFramePlaceholder,
+    mediaAlt: '',
   },
   {
     id: 'h-video-bottom',
@@ -94,7 +98,7 @@ export function SelectAiHeroHotspots({ src, alt = '', imgClassName }: SelectAiHe
     >
       <img src={src} alt={alt} className={[styles.heroImg, imgClassName].filter(Boolean).join(' ')} />
       <div className={styles.overlay} aria-hidden />
-      {HOTSPOTS.map((spot, index) => {
+      {HOTSPOTS.map((spot) => {
         const expanded = imageActive && activeHotspotId === spot.id;
         const stackClass = [styles.stack, expanded ? styles.stackExpanded : ''].filter(Boolean).join(' ');
 
@@ -102,14 +106,7 @@ export function SelectAiHeroHotspots({ src, alt = '', imgClassName }: SelectAiHe
           <div
             key={spot.id}
             className={styles.hotspot}
-            data-index={index}
-            style={
-              {
-                left: `${spot.leftPct}%`,
-                top: `${spot.topPct}%`,
-                '--hotspot-stagger-index': index,
-              } as CSSProperties
-            }
+            style={{ left: `${spot.leftPct}%`, top: `${spot.topPct}%` }}
             onMouseEnter={() => setActiveHotspotId(spot.id)}
             onMouseLeave={() => setActiveHotspotId((prev) => (prev === spot.id ? null : prev))}
           >
@@ -118,7 +115,13 @@ export function SelectAiHeroHotspots({ src, alt = '', imgClassName }: SelectAiHe
                 <FeatureHighlightCardIndicator label={`${spot.title} — highlight marker`} />
               </div>
               <div className={styles.cardLayer} data-card-corner={spot.corner}>
-                <FeatureHighlightCard corner={spot.corner} title={spot.title} body={spot.body} />
+                <FeatureHighlightCard
+                  corner={spot.corner}
+                  title={spot.title}
+                  body={spot.body}
+                  mediaSrc={spot.mediaSrc}
+                  mediaAlt={spot.mediaAlt ?? ''}
+                />
               </div>
             </div>
           </div>

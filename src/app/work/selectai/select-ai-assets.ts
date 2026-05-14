@@ -2,6 +2,8 @@
 const s = (filename: string) => `/work/selexAI/${encodeURIComponent(filename)}`;
 
 export const selectAiImg = {
+  /** 16:9 placeholder for program-monitor / video-frame highlight cards */
+  videoFramePlaceholder: s('video-frame-placeholder.svg'),
   hero: s('Hero.png'),
   collage: s('collage.png'),
   designDocumentation: s('design documentation.png'),

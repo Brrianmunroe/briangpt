@@ -45,18 +45,23 @@
   pointer-events: auto;
 }
 
+/**
+ * Indicators: fade + scale together, no stagger (all hotspots in sync).
+ * Easing overshoots slightly past 1 → quick “pop” on hero hover.
+ */
 .stack {
+  --indicator-pop-ease: cubic-bezier(0.33, 1.18, 0.62, 1);
+  --indicator-pop-ms: 0.42s;
   position: relative;
   width: 20px;
   height: 20px;
   opacity: 0;
-  transform: scale(0.94);
-  filter: blur(8px);
+  transform: scale(0.56);
+  filter: blur(5px);
   transition:
-    opacity 0.35s ease,
-    transform 0.35s ease,
-    filter 0.35s ease;
-  transition-delay: calc(var(--hotspot-stagger-index, 0) * 45ms);
+    opacity var(--indicator-pop-ms) var(--indicator-pop-ease),
+    transform var(--indicator-pop-ms) var(--indicator-pop-ease),
+    filter calc(var(--indicator-pop-ms) * 0.9) ease-out;
 }
 
 .heroWrap.wrapActive .stack {
