@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-label="">
+  <defs>
+    <linearGradient id="vfp-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#52525c"/>
+      <stop offset="100%" stop-color="#3f3f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#vfp-bg)"/>
+  <rect x="10" y="10" width="300" height="160" rx="8" fill="rgba(0,0,0,.22)" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+  <polygon points="132,62 132,118 196,90" fill="rgba(255,255,255,.28)"/>
+</svg>

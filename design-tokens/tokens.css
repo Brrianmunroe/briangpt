@@ -127,6 +127,11 @@
   --stroke-xs: var(--scale-50);
 
   /* --- 03 - Mapped (70) --- */
+  /**
+   * Work case study modal shell — main card surface (`work-shell.module.css` `.card`).
+   * Shared with feature highlight cards so hotspots sit on the same “paper” as the page.
+   */
+  --color-work-case-study-card-surface: color-mix(in srgb, var(--color-neutral-100) 94%, var(--color-neutral-900));
   /** Pane edge (sidebar outer border — same hue/weight as Sidebar.module.css `.root`). */
   --color-sidebar-edge-stroke: color-mix(in srgb, var(--color-neutral-500) 28%, transparent);
   --color-background-surface-default: var(--color-neutral-200);
@@ -199,4 +204,12 @@
   --color-text-fill-pressed: var(--color-neutral-200);
   --color-text-fill-primary: var(--color-neutral-900);
   --color-text-fill-secondary-2: var(--color-neutral-700);
+
+  /* Feature highlight card (Figma mapped): surface neutral-300, stroke neutral-500. */
+  --color-feature-highlight-card-surface-default: var(--color-neutral-300);
+  --color-feature-highlight-card-stroke-default: var(--color-neutral-500);
+  --color-feature-highlight-card-text-primary: var(--color-neutral-900);
+  --color-feature-highlight-card-text-secondary: var(--color-neutral-700);
+  --radius-feature-highlight-card-lg: var(--scale-900);
+  --shadow-feature-highlight-card-drop: 0 4px 8.7px rgb(0 0 0 / 100%);
 }

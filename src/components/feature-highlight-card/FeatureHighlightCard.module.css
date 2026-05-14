@@ -1,0 +1,85 @@
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  max-width: 260px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-feature-highlight-card-stroke-default);
+  background: var(--color-feature-highlight-card-surface-default);
+  box-shadow: var(--shadow-feature-highlight-card-drop);
+  color: var(--color-feature-highlight-card-text-primary);
+  font-family: var(--font-style-primary), system-ui, sans-serif;
+  font-size: var(--font-size-12);
+  line-height: var(--font-lineheight-label);
+  font-weight: 500;
+}
+
+.media {
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-neutral-300);
+}
+
+.mediaImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mediaVideo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.title {
+  margin: 0;
+}
+
+.body {
+  margin: 0;
+  color: var(--color-feature-highlight-card-text-secondary);
+}
+
+/* Acute corner = 4px (radius-sm); other three = 28px (token) */
+.root[data-corner='top-left'] {
+  border-top-left-radius: var(--radius-sm);
+  border-top-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-left-radius: var(--radius-feature-highlight-card-lg);
+}
+
+.root[data-corner='top-right'] {
+  border-top-left-radius: var(--radius-feature-highlight-card-lg);
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-left-radius: var(--radius-feature-highlight-card-lg);
+}
+
+.root[data-corner='bottom-left'] {
+  border-top-left-radius: var(--radius-feature-highlight-card-lg);
+  border-top-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.root[data-corner='bottom-right'] {
+  border-top-left-radius: var(--radius-feature-highlight-card-lg);
+  border-top-right-radius: var(--radius-feature-highlight-card-lg);
+  border-bottom-right-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-feature-highlight-card-lg);
+}
