@@ -42,11 +42,6 @@
   background-position: 0 0;
 }
 
-/** Canvas fluid dots replace the CSS radial grid — avoids double layers. */
-.mainFluidDots {
-  background-image: none;
-}
-
 .mainColumn {
   position: relative;
   z-index: 1;
