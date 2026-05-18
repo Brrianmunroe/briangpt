@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from './NameTag.module.css';
 
-const DEFAULT_LABEL = 'Brian Munroe · Product Designer · Building AI with AI';
+const DEFAULT_LABEL = 'Brian Munroe · Product Designer';
 
 export type NameTagProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & {
   /** Badge copy (Figma default is a single line with middle dots). */
