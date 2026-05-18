@@ -275,7 +275,12 @@ export function PortfolioPage() {
         }`}
         {...(isMobileShell && !mobileNavOpen ? ({ inert: true } as const) : {})}
       >
-        <Sidebar density={sidebarDensityEffective} className={isMobileShell ? styles.mobileDrawerSidebar : undefined}>
+        <Sidebar
+          density={sidebarDensityEffective}
+          className={[styles.sidebarColumnFill, isMobileShell ? styles.mobileDrawerSidebar : '']
+            .filter(Boolean)
+            .join(' ')}
+        >
           <Sidebar.Stack className={styles.drawerStack}>
             <Sidebar.HeaderRow
               title="BrianGPT"

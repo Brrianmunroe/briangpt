@@ -24,6 +24,12 @@
   z-index: 2;
 }
 
+/** Sidebar column fills the shell so the profile footer pins to the bottom without clipping. */
+.sidebarColumnFill {
+  height: 100%;
+  min-height: 0;
+}
+
 /** Mobile shell: `PortfolioPage` adds `.sidebarHostMobile` when `matchMedia('(max-width: 768px)')`. */
 .sidebarHost.sidebarHostMobile {
   position: fixed;

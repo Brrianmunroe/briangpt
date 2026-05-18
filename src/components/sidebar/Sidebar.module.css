@@ -94,6 +94,8 @@
   align-items: stretch;
   gap: var(--spacing-xl);
   box-sizing: border-box;
+  /** Keep header/nav from painting over the profile footer when the rail is short. */
+  overflow: hidden;
 }
 
 /* ================================================================
@@ -104,6 +106,7 @@
   flex-shrink: 0;
   margin-top: 0;
   box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* ================================================================
@@ -701,10 +704,12 @@ a.brandTitle:focus-visible {
   flex: 1 1 auto;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0;
+  justify-content: center;
+  gap: 2px;
   opacity: 1;
   filter: blur(0);
-  overflow: hidden;
+  /** Horizontal ellipsis lives on `.profileName` / `.profileRole`; don't clip descenders. */
+  overflow: visible;
   transition:
     opacity var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay),
     filter var(--sidebar-content-duration) var(--sidebar-content-ease) var(--sidebar-content-delay);
