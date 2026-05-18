@@ -153,6 +153,7 @@
 .mainColumn.mainColumnHome {
   padding-top: 0;
   gap: 149px;
+  overflow: visible;
 }
 
 /** Figma Conversation Page `Chat Section` (360:771): fills main, composer at bottom. */
@@ -202,10 +203,10 @@
   flex: 1 1 0%;
   flex-direction: column;
   align-items: stretch;
-  justify-content: safe center;
+  justify-content: center;
   gap: var(--spacing-xl);
   width: 100%;
-  min-height: min-content;
+  min-height: 0;
 }
 
 .composerHostLanding {
