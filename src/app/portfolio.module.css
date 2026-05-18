@@ -71,7 +71,7 @@
 /** Mobile drawer uses the same top rhythm as home content (16px). */
 .mobileDrawerSidebar {
   /* Force same top rhythm as home header row at mobile. */
-  padding: var(--spacing-lg) !important;
+  padding: var(--spacing-md) !important;
 }
 
 
