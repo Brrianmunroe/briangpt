@@ -94,6 +94,8 @@ export type SidebarHeaderRowProps = {
   /** Figma homepage sidebar (334:449): title + menu only — no orange mark. */
   showBrandMark?: boolean;
   onMenuClick?: () => void;
+  /** Optional menu button icon override (defaults to `Menu`). */
+  menuIcon?: React.ReactNode;
   menuButtonProps?: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'onClick'>;
 };
 
@@ -104,6 +106,7 @@ function SidebarHeaderRow({
   logo,
   showBrandMark = true,
   onMenuClick,
+  menuIcon,
   menuButtonProps,
 }: SidebarHeaderRowProps) {
   const { className: menuClass, 'aria-label': menuAriaLabel, ...menuRest } = menuButtonProps ?? {};
@@ -130,7 +133,7 @@ function SidebarHeaderRow({
         onClick={onMenuClick}
         {...menuRest}
       >
-        <Menu color="grey" size={16} />
+        {menuIcon ?? <Menu color="grey" size={16} />}
       </button>
     </div>
   );
