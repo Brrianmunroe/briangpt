@@ -8,21 +8,23 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  min-height: 26px;
-  padding: 0 var(--spacing-md);
+  min-height: 30px;
+  padding: 2px var(--spacing-md);
   margin: 0;
   border-radius: var(--radius-full);
   border: var(--stroke-sm) solid var(--color-case-study-card-secondary-stroke-default);
   background: var(--color-case-study-card-secondary-surface-default);
+  overflow: visible;
 }
 
 .label {
+  display: block;
   margin: 0;
   min-width: 0;
   font-family: var(--font-style-primary), system-ui, sans-serif;
   font-size: var(--font-size-label);
   font-weight: 500;
-  line-height: var(--font-line-height-label);
+  line-height: calc(var(--font-line-height-label) + 2px);
   color: var(--color-text-fill-secondary-2);
   text-align: center;
   white-space: nowrap;
