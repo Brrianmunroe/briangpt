@@ -8,15 +8,32 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Card } from '@/components/card';
 import { ChatInput } from '@/components/chat-input';
 import { NameTag } from '@/components/name-tag';
-import { Prompt } from '@/components/icons';
+import { Close, Menu, Prompt } from '@/components/icons';
 import { PromptChip } from '@/components/prompt-chip';
 import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
+import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { ConversationPanel } from '@/components/conversation-panel';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './portfolio.module.css';
+
+const MOBILE_SHELL_MQ = '(max-width: 768px)';
+
+function useIsMobileShell(): boolean {
+  const subscribe = React.useCallback((onStoreChange: () => void) => {
+    if (typeof window === 'undefined') return () => {};
+    const mq = window.matchMedia(MOBILE_SHELL_MQ);
+    mq.addEventListener('change', onStoreChange);
+    return () => mq.removeEventListener('change', onStoreChange);
+  }, []);
+  return React.useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(MOBILE_SHELL_MQ).matches,
+    () => false
+  );
+}
 
 const LINKS = {
   linkedin: 'https://www.linkedin.com/in/brian-munroe-75a486a5/',
@@ -94,8 +111,10 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
 export function PortfolioPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const isMobileShell = useIsMobileShell();
   const [draft, setDraft] = React.useState('');
   const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const chipRowRef = React.useRef<HTMLDivElement>(null);
   const composerHostRef = React.useRef<HTMLDivElement | null>(null);
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
@@ -118,23 +137,40 @@ export function PortfolioPage() {
     setChipScrollFadeLeftVisible(chipRowShowsLeftFade(el));
   }, []);
 
+  const scrollChipsToEndMobile = React.useCallback(() => {
+    const el = chipRowRef.current;
+    if (!el || !isMobileShell) return;
+    if (el.scrollWidth > el.clientWidth + CHIP_SCROLL_SLOP_PX) {
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+    }
+    updateChipScrollFade();
+  }, [isMobileShell, updateChipScrollFade]);
+
   React.useLayoutEffect(() => {
     const el = chipRowRef.current;
     if (!el) return;
-    updateChipScrollFade();
-    const ro = new ResizeObserver(() => updateChipScrollFade());
+    const syncChipScroll = () => {
+      if (isMobileShell) scrollChipsToEndMobile();
+      else updateChipScrollFade();
+    };
+    syncChipScroll();
+    const ro = new ResizeObserver(syncChipScroll);
     ro.observe(el);
-    window.addEventListener('resize', updateChipScrollFade);
+    window.addEventListener('resize', syncChipScroll);
     let cancelled = false;
     void document.fonts.ready.then(() => {
-      if (!cancelled) updateChipScrollFade();
+      if (!cancelled) syncChipScroll();
     });
     return () => {
       cancelled = true;
       ro.disconnect();
-      window.removeEventListener('resize', updateChipScrollFade);
+      window.removeEventListener('resize', syncChipScroll);
     };
-  }, [updateChipScrollFade]);
+  }, [isMobileShell, scrollChipsToEndMobile, updateChipScrollFade]);
+
+  React.useLayoutEffect(() => {
+    if (!conversationMode && isMobileShell) scrollChipsToEndMobile();
+  }, [conversationMode, isMobileShell, scrollChipsToEndMobile]);
 
   const handleSend = React.useCallback(
     async (trimmed: string) => {
@@ -170,7 +206,8 @@ export function PortfolioPage() {
     clearError();
     setMessages([]);
     setDraft('');
-  }, [clearError, setMessages]);
+    if (isMobileShell) setMobileNavOpen(false);
+  }, [clearError, isMobileShell, setMessages]);
 
   /** Home link must clear chat when already on `/` — same URL does not remount or reset `useChat`. */
   const handleBrandHomeClick = React.useCallback(
@@ -180,47 +217,100 @@ export function PortfolioPage() {
       clearError();
       setMessages([]);
       setDraft('');
+      if (isMobileShell) setMobileNavOpen(false);
       if (pathname === '/') {
         e.preventDefault();
       }
     },
-    [clearError, pathname, setMessages]
+    [clearError, isMobileShell, pathname, setMessages]
   );
 
   const toggleSidebarDensity = React.useCallback(() => {
     setSidebarDensity((d) => (d === 'comfortable' ? 'compact' : 'comfortable'));
   }, []);
 
+  const handleSidebarMenuClick = React.useCallback(() => {
+    if (isMobileShell) setMobileNavOpen((open) => !open);
+    else toggleSidebarDensity();
+  }, [isMobileShell, toggleSidebarDensity]);
+
+  React.useEffect(() => {
+    if (!isMobileShell) setMobileNavOpen(false);
+  }, [isMobileShell]);
+
+  React.useEffect(() => {
+    if (!isMobileShell || !mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileNavOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMobileShell, mobileNavOpen]);
+
+  React.useEffect(() => {
+    if (conversationMode) setMobileNavOpen(false);
+  }, [conversationMode]);
+
   const promptChipIconColor = requestInFlight ? 'grey' : 'orange';
   const promptChipIcon = <Prompt color={promptChipIconColor} size={16} aria-hidden />;
 
+  const sidebarDensityEffective: SidebarDensity = isMobileShell ? 'comfortable' : sidebarDensity;
+
+  const HeroTag = isMobileShell ? 'h2' : 'h1';
+
   return (
     <div className={styles.shell}>
-      <div className={styles.sidebarHost}>
-        <Sidebar density={sidebarDensity}>
-          <Sidebar.Stack>
+      {isMobileShell && mobileNavOpen ? (
+        <button
+          type="button"
+          className={styles.navScrim}
+          aria-label="Close menu"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
+
+      <div
+        className={`${styles.sidebarHost}${isMobileShell ? ` ${styles.sidebarHostMobile}` : ''}${
+          isMobileShell && mobileNavOpen ? ` ${styles.sidebarHostMobileOpen}` : ''
+        }`}
+        {...(isMobileShell && !mobileNavOpen ? ({ inert: true } as const) : {})}
+      >
+        <Sidebar density={sidebarDensityEffective} className={isMobileShell ? styles.mobileDrawerSidebar : undefined}>
+          <Sidebar.Stack className={styles.drawerStack}>
             <Sidebar.HeaderRow
               title="BrianGPT"
               brandHref="/"
               brandLinkProps={{ onClick: handleBrandHomeClick }}
               showBrandMark={false}
-              onMenuClick={toggleSidebarDensity}
+              onMenuClick={handleSidebarMenuClick}
+              menuIcon={isMobileShell && mobileNavOpen ? <Close color="grey" size={16} aria-hidden /> : undefined}
               menuButtonProps={{
-                'aria-label':
-                  sidebarDensity === 'comfortable' ? 'Collapse sidebar to icon rail' : 'Expand sidebar',
-                'aria-expanded': sidebarDensity === 'comfortable',
+                'aria-label': isMobileShell
+                  ? mobileNavOpen
+                    ? 'Close menu'
+                    : 'Open menu'
+                  : sidebarDensity === 'comfortable'
+                    ? 'Collapse sidebar to icon rail'
+                    : 'Expand sidebar',
+                'aria-expanded': isMobileShell ? mobileNavOpen : sidebarDensity === 'comfortable',
               }}
             />
             <Sidebar.NewChatButton onClick={handleNewChat}>New Chat</Sidebar.NewChatButton>
             <Sidebar.NavSection sectionLabel="Projects">
               {CASE_STUDY_LIST.map((c) => (
-                <Sidebar.NavItem key={c.slug} onClick={() => router.push(`/work/${c.slug}`)}>
+                <Sidebar.NavItem
+                  key={c.slug}
+                  onClick={() => {
+                    router.push(`/work/${c.slug}`);
+                    if (isMobileShell) setMobileNavOpen(false);
+                  }}
+                >
                   {c.title}
                 </Sidebar.NavItem>
               ))}
             </Sidebar.NavSection>
           </Sidebar.Stack>
-          <Sidebar.FooterSlot>
+          <Sidebar.FooterSlot className={styles.drawerFooterSlot}>
             <Sidebar.Profile
               name="Brian Munroe"
               roleLine="Product Designer"
@@ -251,6 +341,21 @@ export function PortfolioPage() {
           {!conversationMode ? (
             <>
               <header className={`${styles.mainHeader} ${styles.mainHeaderConversation}`}>
+                {isMobileShell ? (
+                  <button
+                    type="button"
+                    className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
+                    aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+                    aria-expanded={mobileNavOpen}
+                    onClick={() => setMobileNavOpen((open) => !open)}
+                  >
+                    {mobileNavOpen ? (
+                      <Close color="grey" size={16} aria-hidden />
+                    ) : (
+                      <Menu color="grey" size={16} aria-hidden />
+                    )}
+                  </button>
+                ) : null}
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}
@@ -265,7 +370,7 @@ export function PortfolioPage() {
                     <div className={styles.landingCluster}>
                       <div className={styles.messageHeader}>
                         <NameTag />
-                        <h1 className={styles.heroH1}>Hi, I'm Brian! Ask me a question.</h1>
+                        <HeroTag className={styles.heroH1}>Hi, I'm Brian! Ask me a question.</HeroTag>
                       </div>
                       <div ref={composerHostRef} className={styles.composerHostLanding}>
                         <ChatInput
@@ -346,6 +451,21 @@ export function PortfolioPage() {
               <header
                 className={`${styles.mainHeader} ${styles.mainHeaderConversation} ${styles.mainHeaderChatStroke}`}
               >
+                {isMobileShell ? (
+                  <button
+                    type="button"
+                    className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
+                    aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+                    aria-expanded={mobileNavOpen}
+                    onClick={() => setMobileNavOpen((open) => !open)}
+                  >
+                    {mobileNavOpen ? (
+                      <Close color="grey" size={16} aria-hidden />
+                    ) : (
+                      <Menu color="grey" size={16} aria-hidden />
+                    )}
+                  </button>
+                ) : null}
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}

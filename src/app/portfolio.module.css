@@ -24,8 +24,86 @@
   z-index: 2;
 }
 
+/** Mobile shell: `PortfolioPage` adds `.sidebarHostMobile` when `matchMedia('(max-width: 768px)')`. */
+.sidebarHost.sidebarHostMobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  z-index: 30;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.sidebarHost.sidebarHostMobile.sidebarHostMobileOpen {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.navScrim {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 100%;
+  min-height: 100dvh;
+  cursor: pointer;
+  background: rgba(26, 25, 23, 0.5);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/**
+ * Mobile menu button in main header — positioned so it lines up with the sidebar
+ * header row menu button. When the drawer slides out the two overlap perfectly,
+ * giving the impression that the button "belongs" to the drawer.
+ */
+.mobileMenuButton {
+  position: relative;
+  z-index: 31;
+}
+
+/** Mobile drawer uses the same top rhythm as home content (16px). */
+.mobileDrawerSidebar {
+  /* Force same top rhythm as home header row at mobile. */
+  padding: var(--spacing-lg) !important;
+}
+
+
+.drawerStack,
+.drawerFooterSlot {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+.sidebarHost.sidebarHostMobile .drawerStack,
+.sidebarHost.sidebarHostMobile .drawerFooterSlot {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateX(-8px);
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebarHost.sidebarHostMobile.sidebarHostMobileOpen .drawerStack,
+.sidebarHost.sidebarHostMobile.sidebarHostMobileOpen .drawerFooterSlot {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+  transition-delay: 0.08s;
+}
+
 .main {
   position: relative;
+  z-index: 1;
   flex: 1 1 0%;
   min-width: 0;
   min-height: 0;
@@ -394,8 +472,65 @@
   }
 }
 
-@media (max-width: 520px) {
-  /** Figma `Card Layout` (334:489): stack cards on narrow viewports. */
+@media (max-width: 768px) {
+  .mainHeader.mainHeaderConversation {
+    justify-content: space-between;
+    padding-top: var(--spacing-md);
+    padding-bottom: 0;
+  }
+
+  /** Figma 704:136: Main Content uses pt-16px + gap-149px between header and chat section. */
+  .mainColumn.mainColumnHome {
+    padding-top: 0;
+    gap: 149px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .mainScroll {
+    gap: 0;
+    overflow: visible;
+    min-height: min-content;
+  }
+
+  /** Figma 704:141: Chat Section px-16px, gap-80px (spacing-3xl). */
+  .chatSection {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    gap: var(--spacing-3xl);
+  }
+
+  .heroH1 {
+    font-size: var(--font-size-heading02);
+    font-weight: var(--font-weight-heading02);
+    line-height: var(--font-line-height-heading02);
+  }
+
+  /**
+   * Prompt chips: break out of the parent 16px padding so they go edge-to-edge.
+   * Negative margin pulls the row to the viewport edges; the extra inline padding
+   * on the first/last chip provides visual breathing room inside the scroll track.
+   */
+  .chipScrollWrap {
+    margin-left: calc(-1 * var(--spacing-md));
+    margin-right: calc(-1 * var(--spacing-md));
+    width: auto;
+  }
+
+  .chipRow {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+
+  .chipScrollFadeRight {
+    right: 0;
+  }
+
+  .chipScrollFadeLeft {
+    left: 0;
+  }
+
+  /** Figma mobile home: stack case study cards. */
   .cardsRow {
     flex-direction: column;
     align-items: stretch;
@@ -408,5 +543,24 @@
     height: auto;
     min-height: 200px;
     flex: 1 1 auto;
+  }
+
+  .landingColumn {
+    min-height: min-content;
+    flex: 0 1 auto;
+  }
+
+  .landingCluster {
+    flex: 0 1 auto;
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebarHost.sidebarHostMobile,
+  .sidebarHost.sidebarHostMobile .drawerStack,
+  .sidebarHost.sidebarHostMobile .drawerFooterSlot {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }
