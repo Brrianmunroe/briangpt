@@ -370,7 +370,11 @@ export function PortfolioPage() {
                     <div className={styles.landingCluster}>
                       <div className={styles.messageHeader}>
                         <NameTag />
-                        <HeroTag className={styles.heroH1}>Hi, I'm Brian! Ask me a question.</HeroTag>
+                        <HeroTag className={styles.heroH1}>
+                          Hi, I&apos;m Brian!
+                          <br />
+                          Ask me a question.
+                        </HeroTag>
                       </div>
                       <div ref={composerHostRef} className={styles.composerHostLanding}>
                         <ChatInput

@@ -141,6 +141,13 @@
   pointer-events: auto;
 }
 
+/** Case study mobile layout — hero is image-only (no hover hotspots). */
+@media (max-width: 720px) {
+  .hotspot {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .stack,
   .indicatorLayer,
