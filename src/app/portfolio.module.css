@@ -198,15 +198,30 @@
   min-height: 0;
 }
 
+/**
+ * Vertically center hero + composer when there is room. `justify-content: center`
+ * clips the top of the stack when content is taller than the column (overflow
+ * above the scrollport is not reachable). Spacers grow/shrink instead so extra
+ * space centers the block and overflow stays anchored from the top.
+ */
 .landingCluster {
   display: flex;
   flex: 1 1 0%;
   flex-direction: column;
   align-items: stretch;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--spacing-xl);
   width: 100%;
   min-height: 0;
+}
+
+.landingCluster::before,
+.landingCluster::after {
+  content: '';
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  pointer-events: none;
 }
 
 .composerHostLanding {
@@ -234,7 +249,8 @@
   display: flex;
   flex-direction: column;
   gap: 149px;
-  padding-top: var(--spacing-sm);
+  /** Room at the scroll edges so centered hero content (name tag pill) is never clipped. */
+  padding-block: var(--spacing-md);
   box-sizing: border-box;
 }
 
@@ -502,7 +518,7 @@
     gap: 0;
     overflow: visible;
     min-height: min-content;
-    padding-top: var(--spacing-sm);
+    padding-block: var(--spacing-md);
   }
 
   /** Figma 704:141: Chat Section px-16px, gap-80px (spacing-3xl). */
@@ -565,6 +581,11 @@
   .landingCluster {
     flex: 0 1 auto;
     justify-content: flex-start;
+  }
+
+  .landingCluster::before,
+  .landingCluster::after {
+    display: none;
   }
 }
 
