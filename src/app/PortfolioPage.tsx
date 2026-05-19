@@ -129,6 +129,7 @@ export function PortfolioPage() {
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
   const lastSentTextRef = React.useRef<string | null>(null);
   const [localError, setLocalError] = React.useState<ChatDisplayError | null>(null);
+  const [chatEngaged, setChatEngaged] = React.useState(false);
   const online = useOnlineStatus();
 
   const { messages, sendMessage, stop, status, setMessages, error, clearError } = useChat({
@@ -156,7 +157,7 @@ export function PortfolioPage() {
 
   const streaming = status === 'streaming';
   const requestInFlight = status === 'submitted' || status === 'streaming';
-  const conversationMode = messages.length > 0;
+  const conversationMode = messages.length > 0 || chatEngaged;
   const appendThinking = shouldAppendThinkingRow(messages, status);
 
   const updateChipScrollFade = React.useCallback(() => {
@@ -205,6 +206,8 @@ export function PortfolioPage() {
     async (trimmed: string) => {
       if (!trimmed || requestInFlight) return;
 
+      setChatEngaged(true);
+
       const preflight = preflightChatError(trimmed, messages.length, online);
       if (preflight) {
         setLocalError(preflight);
@@ -242,6 +245,7 @@ export function PortfolioPage() {
   const handleNewChat = React.useCallback(() => {
     clearError();
     setLocalError(null);
+    setChatEngaged(false);
     setMessages([]);
     setDraft('');
     if (isMobileShell) setMobileNavOpen(false);
@@ -254,6 +258,7 @@ export function PortfolioPage() {
       if (e.button !== 0) return;
       clearError();
       setLocalError(null);
+      setChatEngaged(false);
       setMessages([]);
       setDraft('');
       if (isMobileShell) setMobileNavOpen(false);
@@ -428,8 +433,8 @@ export function PortfolioPage() {
                       </div>
                       <div ref={composerHostRef} className={styles.composerHostLanding}>
                         <div className={styles.composerInputBlock}>
-                          {errorBanner}
                           <ChatInput
+                            autoGrow={false}
                             value={draft}
                             onChange={(e) => setDraft(e.target.value)}
                             onSubmit={(t) => void handleSend(t)}
