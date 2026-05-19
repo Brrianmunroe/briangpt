@@ -47,7 +47,9 @@
 }
 
 .hit svg path {
-  transition: fill 0.12s ease;
+  transition:
+    fill 0.12s ease,
+    stroke 0.12s ease;
 }
 
 .hit:hover {
@@ -55,8 +57,12 @@
   color: var(--color-button-ghost-text-hover);
 }
 
-.hit:hover svg path {
+.hit:hover svg path[fill] {
   fill: var(--color-button-ghost-text-hover);
+}
+
+.hit:hover svg path[stroke] {
+  stroke: var(--color-button-ghost-text-hover);
 }
 
 .hit:focus {

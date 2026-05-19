@@ -13,4 +13,5 @@ export { Close, type CloseColor, type CloseProps } from './Close';
 export { Github, type GithubColor, type GithubProps } from './Github';
 export { Linkedin, type LinkedinColor, type LinkedinProps } from './Linkedin';
 export { Mail, type MailColor, type MailProps } from './Mail';
+export { Resume, type ResumeColor, type ResumeProps } from './Resume';
 export { ArrowNe, type ArrowNeColor, type ArrowNeProps } from './ArrowNe';

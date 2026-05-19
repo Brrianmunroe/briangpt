@@ -1,22 +1,24 @@
 'use client';
 
 import * as React from 'react';
-import { Github, Globe, Linkedin, Mail } from '@/components/icons';
+import { Github, Globe, Linkedin, Mail, Resume } from '@/components/icons';
 import styles from './SocialLinksToolbar.module.css';
 
 export type SocialLinksToolbarProps = Omit<React.HTMLAttributes<HTMLElement>, 'children'> & {
   /**
    * `full` — Figma `SocialLinks` with theme + website CTA.
-   * `links` — Figma `Links` (145:707): LinkedIn, GitHub, Mail only.
+   * `links` — Figma `Links` (145:707): LinkedIn, GitHub, Mail, Resume.
    */
   variant?: 'full' | 'links';
   linkedinHref: string;
   githubHref: string;
   mailHref: string;
+  resumeHref: string;
   websiteHref?: string;
   linkedinAriaLabel?: string;
   githubAriaLabel?: string;
   mailAriaLabel?: string;
+  resumeAriaLabel?: string;
   websiteAriaLabel?: string;
   themeAriaLabel?: string;
   /** Reflects whether the theme control is in its alternate state (paired with `onToggleTheme`). */
@@ -32,10 +34,12 @@ export const SocialLinksToolbar = React.forwardRef<HTMLElement, SocialLinksToolb
       linkedinHref,
       githubHref,
       mailHref,
+      resumeHref,
       websiteHref = '#',
       linkedinAriaLabel = 'LinkedIn',
       githubAriaLabel = 'GitHub',
       mailAriaLabel = 'Email',
+      resumeAriaLabel = 'Download resume',
       websiteAriaLabel = 'Website',
       themeAriaLabel = 'Toggle color theme',
       themePressed = false,
@@ -70,6 +74,14 @@ export const SocialLinksToolbar = React.forwardRef<HTMLElement, SocialLinksToolb
         </a>
         <a href={mailHref} className={styles.hit} aria-label={mailAriaLabel}>
           <Mail color="grey" size={16} />
+        </a>
+        <a
+          href={resumeHref}
+          className={styles.hit}
+          aria-label={resumeAriaLabel}
+          download="Brian_Munroe_Resume_Product_Design.pdf"
+        >
+          <Resume color="grey" size={16} />
         </a>
         {variant === 'full' ? (
           <>

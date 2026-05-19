@@ -9,6 +9,7 @@ import {
   Menu,
   Plus,
   Prompt,
+  Resume,
   Stop,
   UpArrow,
 } from '@/components/icons';
@@ -38,6 +39,7 @@ export const ICON_SECTIONS: {
   { title: 'GitHub', slug: 'github', figmaPath: 'icons / github', Component: Github },
   { title: 'LinkedIn', slug: 'linkedin', figmaPath: 'icons / linkedin', Component: Linkedin },
   { title: 'Mail', slug: 'mail', figmaPath: 'icons / mail', Component: Mail },
+  { title: 'Resume', slug: 'resume', figmaPath: 'icons / resume', Component: Resume },
   { title: 'Arrow NE', slug: 'arrow-ne', figmaPath: 'icons / Arrow-NE', Component: ArrowNe },
 ];
 

@@ -47,6 +47,7 @@ const LINKS = {
   linkedin: 'https://www.linkedin.com/in/brian-munroe-75a486a5/',
   github: 'https://github.com/Brrianmunroe',
   mail: 'mailto:brian_munroe@icloud.com',
+  resume: '/resume/Brian_Munroe_Resume_Product_Design.pdf',
   website: 'https://www.figma.com/design/mlYfMT6fTkpOn91clhFTxs/BrianGPT',
 } as const;
 
@@ -416,6 +417,7 @@ export function PortfolioPage() {
                   linkedinHref={LINKS.linkedin}
                   githubHref={LINKS.github}
                   mailHref={LINKS.mail}
+                  resumeHref={LINKS.resume}
                 />
               </header>
 
@@ -527,6 +529,7 @@ export function PortfolioPage() {
                   linkedinHref={LINKS.linkedin}
                   githubHref={LINKS.github}
                   mailHref={LINKS.mail}
+                  resumeHref={LINKS.resume}
                 />
               </header>
 
