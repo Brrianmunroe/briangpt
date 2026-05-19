@@ -179,6 +179,10 @@
     { "figma": "color/chat-error-banner/surface/default", "var": "--color-chat-error-banner-surface-default", "ref": "--color-red-100" },
     { "figma": "color/chat-error-banner/stroke/default", "var": "--color-chat-error-banner-stroke-default", "ref": "--color-red-500" },
     { "figma": "color/chat-error-banner/text/default", "var": "--color-chat-error-banner-text-default", "ref": "--color-red-600" },
+    { "figma": "color/feature-highlight-card/stroke/default", "var": "--color-feature-highlight-card-stroke-default", "ref": "--color-neutral-500" },
+    { "figma": "color/feature-highlight-card/surface/default", "var": "--color-feature-highlight-card-surface-default", "ref": "--color-neutral-300" },
+    { "figma": "color/feature-highlight-card/text/primary", "var": "--color-feature-highlight-card-text-primary", "ref": "--color-neutral-900" },
+    { "figma": "color/feature-highlight-card/text/secondary", "var": "--color-feature-highlight-card-text-secondary", "ref": "--color-neutral-700" },
     { "figma": "color/icon/surface/black", "var": "--color-icon-surface-black", "ref": "--color-neutral-200" },
     { "figma": "color/icon/surface/grey", "var": "--color-icon-surface-grey", "ref": "--color-neutral-700" },
     { "figma": "color/icon/surface/orange", "var": "--color-icon-surface-orange", "ref": "--color-orange-400" },
@@ -194,11 +198,14 @@
     { "figma": "color/prompt-chip/surface/pressed", "var": "--color-prompt-chip-surface-pressed", "ref": "--color-neutral-200" },
     { "figma": "color/prompt-chip/text/default", "var": "--color-prompt-chip-text-default", "ref": "--color-neutral-900" },
     { "figma": "color/prompt-chip/text/disabled", "var": "--color-prompt-chip-text-disabled", "ref": "--color-neutral-700" },
+    { "figma": "color/sidebar/edge/stroke", "var": "--color-sidebar-edge-stroke", "value": "color-mix(in srgb, var(--color-neutral-500) 28%, transparent)" },
     { "figma": "color/text/fill/disabled", "var": "--color-text-fill-disabled", "ref": "--color-neutral-500" },
     { "figma": "color/text/fill/focused", "var": "--color-text-fill-focused", "ref": "--color-neutral-200" },
     { "figma": "color/text/fill/hover", "var": "--color-text-fill-hover", "ref": "--color-neutral-300" },
     { "figma": "color/text/fill/pressed", "var": "--color-text-fill-pressed", "ref": "--color-neutral-200" },
     { "figma": "color/text/fill/primary", "var": "--color-text-fill-primary", "ref": "--color-neutral-900" },
-    { "figma": "color/text/fill/secondary 2", "var": "--color-text-fill-secondary-2", "ref": "--color-neutral-700" }
+    { "figma": "color/text/fill/secondary 2", "var": "--color-text-fill-secondary-2", "ref": "--color-neutral-700" },
+    { "figma": "radius/feature-highlight-card/lg", "var": "--radius-feature-highlight-card-lg", "ref": "--scale-900" },
+    { "figma": "shadow/feature-highlight-card/drop", "var": "--shadow-feature-highlight-card-drop", "value": "0 4px 8.7px rgb(0 0 0 / 100%)" }
   ]
 }

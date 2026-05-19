@@ -2,6 +2,11 @@ import fs, { mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
+/**
+ * Token build — **edit `figma-variables.json` only**, then run this script.
+ * Never hand-edit `tokens.css` output: unlisted variables disappear on the next build.
+ */
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const data = JSON.parse(fs.readFileSync(join(__dirname, 'figma-variables.json'), 'utf8'));
 mkdirSync(join(__dirname, 'generated'), { recursive: true });
@@ -40,7 +45,16 @@ for (const a of data.alias) {
 
 css += `\n  /* --- 03 - Mapped (${data.mapped.length}) --- */\n`;
 for (const m of data.mapped) {
-  css += `  ${m.var}: var(${m.ref});\n`;
+  if (m.ref && m.value !== undefined) {
+    throw new Error(`mapped entry must use only one of ref or value: ${JSON.stringify(m)}`);
+  }
+  if (m.ref) {
+    css += `  ${m.var}: var(${m.ref});\n`;
+  } else if (m.value !== undefined) {
+    css += `  ${m.var}: ${m.value};\n`;
+  } else {
+    throw new Error(`mapped entry needs ref or value: ${JSON.stringify(m)}`);
+  }
 }
 
 css += `}\n`;

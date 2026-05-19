@@ -17,6 +17,9 @@ The token system uses **three stacked collections** in order:
 | 2     | **02 - Alias**      | Semantic tokens (e.g. `color/neutral/500`, `spacing/md`) that **alias** primitives.           |
 | 3     | **03 - Mapped**     | **Semantic UI / component tokens** (mostly `color/...` paths) that **alias** the alias layer. |
 
+**Repo source of truth:** `design-tokens/figma-variables.json` → `node design-tokens/build.mjs` → `design-tokens/tokens.css` and `public/design-tokens/tokens.css`. **Do not hand-edit the generated `tokens.css` files** — edits will be overwritten the next time someone runs the build and tokens will appear “deleted.” Add or change variables in the JSON, then regenerate.
+
+**Mapped entries:** use `"ref": "--some-existing-var"` so the output is `name: var(--some-existing-var)`. For values that are not a single `var()` (e.g. **box-shadow** strings, **color-mix** expressions), use `"value": "…raw CSS…"` instead of `ref` (never both).
 
 **Total local variables:** 186 (59 + 57 + 70).
 
@@ -88,6 +91,9 @@ All mapped tokens inspected are **colors**. Names describe **UI surfaces**, grou
 - `color/button/primary|secondary|ghost/...`
 - `color/case-study-card/primary|secondary/...`
 - `color/work/case-study/card/surface` (work modal shell card fill)
+- `color/feature-highlight-card/...` (SelectAI hero highlight card)
+- `color/sidebar/edge/stroke` (sidebar / portfolio chrome line)
+- `radius/feature-highlight-card/lg`, `shadow/feature-highlight-card/drop` (mapped with `ref` / `value` per build rules)
 - `color/prompt-chip/...`
 - `color/text/...`, `color/chat-input/...`, `color/icon/...`, `color/background/...`
 

@@ -183,6 +183,10 @@ export const mappedPaths = {
   "color/chat-error-banner/surface/default": "--color-chat-error-banner-surface-default",
   "color/chat-error-banner/stroke/default": "--color-chat-error-banner-stroke-default",
   "color/chat-error-banner/text/default": "--color-chat-error-banner-text-default",
+  "color/feature-highlight-card/stroke/default": "--color-feature-highlight-card-stroke-default",
+  "color/feature-highlight-card/surface/default": "--color-feature-highlight-card-surface-default",
+  "color/feature-highlight-card/text/primary": "--color-feature-highlight-card-text-primary",
+  "color/feature-highlight-card/text/secondary": "--color-feature-highlight-card-text-secondary",
   "color/icon/surface/black": "--color-icon-surface-black",
   "color/icon/surface/grey": "--color-icon-surface-grey",
   "color/icon/surface/orange": "--color-icon-surface-orange",
@@ -198,12 +202,15 @@ export const mappedPaths = {
   "color/prompt-chip/surface/pressed": "--color-prompt-chip-surface-pressed",
   "color/prompt-chip/text/default": "--color-prompt-chip-text-default",
   "color/prompt-chip/text/disabled": "--color-prompt-chip-text-disabled",
+  "color/sidebar/edge/stroke": "--color-sidebar-edge-stroke",
   "color/text/fill/disabled": "--color-text-fill-disabled",
   "color/text/fill/focused": "--color-text-fill-focused",
   "color/text/fill/hover": "--color-text-fill-hover",
   "color/text/fill/pressed": "--color-text-fill-pressed",
   "color/text/fill/primary": "--color-text-fill-primary",
-  "color/text/fill/secondary 2": "--color-text-fill-secondary-2"
+  "color/text/fill/secondary 2": "--color-text-fill-secondary-2",
+  "radius/feature-highlight-card/lg": "--radius-feature-highlight-card-lg",
+  "shadow/feature-highlight-card/drop": "--shadow-feature-highlight-card-drop"
 } as const;
 
 export type PrimitivePath = keyof typeof primitivePaths;
