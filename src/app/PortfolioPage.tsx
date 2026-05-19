@@ -505,6 +505,10 @@ export function PortfolioPage() {
                       layout="stacked"
                       maxWidth="full"
                     />
+                    <p className={styles.chatWarning}>
+                      Heads up: I&apos;m still refining the system prompt, so some answers may be
+                      inaccurate.
+                    </p>
                     {error ? (
                       <p className={styles.chatError} role="alert">
                         Something went wrong — please try again.

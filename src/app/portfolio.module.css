@@ -339,6 +339,14 @@
   color: var(--color-orange-400);
 }
 
+.chatWarning {
+  margin: var(--spacing-sm) 0 0;
+  font-size: var(--font-size-label);
+  line-height: var(--font-line-height-label);
+  color: var(--color-text-fill-secondary-2);
+  text-align: center;
+}
+
 .chipScrollWrap {
   position: relative;
   width: 100%;
