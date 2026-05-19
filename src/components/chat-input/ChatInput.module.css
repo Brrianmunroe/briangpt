@@ -165,6 +165,15 @@
   outline: none;
 }
 
+/** Home landing: lock ~2-line height; scroll inside (no JS height sync). */
+.textareaFixedGrow {
+  height: calc(var(--font-line-height-body) * 2);
+  min-height: calc(var(--font-line-height-body) * 2);
+  max-height: calc(var(--font-line-height-body) * 2);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 .root:focus-within .textarea:placeholder-shown:not(:disabled)::placeholder {
   color: transparent;
 }

@@ -109,6 +109,8 @@ export type ChatInputProps = Omit<
    * `stacked` — textarea above the trailing control (default).
    */
   layout?: 'stacked' | 'inline';
+  /** When false, textarea height stays fixed and scrolls internally (home landing). Default true. */
+  autoGrow?: boolean;
   /** Passed to the `<textarea>` (except `value` / `defaultValue` / `onChange` / `disabled` / `placeholder`). `ref` is merged with the internal ref. */
   textareaProps?: Omit<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -143,6 +145,7 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
       maxWidth = 'standard',
       dock = 'inline',
       layout = 'stacked',
+      autoGrow = true,
       textareaProps,
       ...formRest
     }: ChatInputProps,
@@ -162,21 +165,22 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
 
     const syncTextareaHeight = React.useCallback(() => {
       const el = textareaRef.current;
-      if (!el || previewState) return;
+      if (!el || previewState || !autoGrow) return;
       const maxPx = Math.round(window.innerHeight * 0.5);
       el.style.height = 'auto';
       el.style.height = `${Math.min(el.scrollHeight, maxPx)}px`;
-    }, [previewState]);
+    }, [autoGrow, previewState]);
 
     React.useLayoutEffect(() => {
       syncTextareaHeight();
     }, [value, streaming, disabled, syncTextareaHeight]);
 
     React.useEffect(() => {
+      if (!autoGrow) return;
       const onResize = () => syncTextareaHeight();
       window.addEventListener('resize', onResize);
       return () => window.removeEventListener('resize', onResize);
-    }, [syncTextareaHeight]);
+    }, [autoGrow, syncTextareaHeight]);
 
     React.useEffect(() => {
       const onPointerDownCapture = () => {
@@ -461,7 +465,12 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   ref={setTextareaRef}
                   id={fieldId}
                   rows={1}
-                  className={mergeClassNames(styles.textarea, styles.textareaInline, restTextareaProps.className)}
+                  className={mergeClassNames(
+                    styles.textarea,
+                    styles.textareaInline,
+                    !autoGrow ? styles.textareaFixedGrow : undefined,
+                    restTextareaProps.className
+                  )}
                   value={value}
                   onChange={handleChange}
                   onKeyDown={handleTextareaKeyDown}
@@ -490,7 +499,11 @@ export const ChatInput = React.forwardRef<HTMLFormElement, ChatInputProps>(
                   ref={setTextareaRef}
                   id={fieldId}
                   rows={1}
-                  className={mergeClassNames(styles.textarea, restTextareaProps.className)}
+                  className={mergeClassNames(
+                    styles.textarea,
+                    !autoGrow ? styles.textareaFixedGrow : undefined,
+                    restTextareaProps.className
+                  )}
                   value={value}
                   onChange={handleChange}
                   onKeyDown={handleTextareaKeyDown}
