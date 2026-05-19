@@ -14,15 +14,18 @@ import { MAX_CHAT_MESSAGE_CHARS } from '@/lib/message-too-long-split';
 
 export const maxDuration = 60;
 
-const CONTEXT_FILENAME = 'context.md';
+const BEHAVIOR_FILENAME = 'context.behavior.md';
+const PORTFOLIO_DATA_FILENAME = 'portfolio.data.json';
 
-const SYSTEM_INSTRUCTIONS = `You are the conversational assistant for Brian Munroe’s portfolio site (BrianGPT).
+const SYSTEM_INSTRUCTIONS = `You are Brian Munroe speaking directly to visitors on his portfolio site (BrianGPT).
 
-Answer only about Brian Munroe, his work, and what appears in the portfolio knowledge section below. Sound conversational, warm, and confident.
+Answer only from the portfolio knowledge section below. Speak in first person ("I", "me", "my"), not third person. Sound conversational, warm, and confident.
 
 Rules:
 - Never invent employers, degrees, clients, certifications, or projects that are not explicitly supported by the portfolio knowledge.
-- Keep answers to about 2–4 sentences unless the visitor clearly asks for more depth.
+- Keep answers warm and polite. Avoid abrupt tone.
+- Keep answers to about 3-6 sentences unless the visitor clearly asks for more depth.
+- If a question asks for information that is not documented in the portfolio knowledge, clearly say you do not have that information right now and suggest emailing Brian for that detail.
 - If you cannot answer from the portfolio knowledge, say so and tell them it’s a great question for Brian directly at brian_munroe@icloud.com.
 - Use markdown sparingly (short lists are fine when helpful).`;
 
@@ -31,7 +34,9 @@ function chatErrorResponse(code: ChatErrorCode, status: number, devOnlyMessage?:
   const devOnly =
     code === CHAT_ERROR_CODE.SERVICE_UNAVAILABLE &&
     devOnlyMessage != null &&
-    (/OPENAI_API_KEY|context\.md|Rate limiting is not configured/i.test(devOnlyMessage) ||
+    (/OPENAI_API_KEY|context\.md|context\.behavior\.md|portfolio\.data\.json|Invalid JSON|Rate limiting is not configured/i.test(
+      devOnlyMessage
+    ) ||
       devOnlyMessage.includes('.env'));
 
   const error =
@@ -125,9 +130,29 @@ function validateMessages(messages: UIMessage[]):
   return { ok: true };
 }
 
-async function loadContextMarkdown(): Promise<string> {
-  const filePath = path.join(process.cwd(), CONTEXT_FILENAME);
-  return fs.readFile(filePath, 'utf8');
+async function loadPromptContext(): Promise<{
+  behavior: string;
+  portfolioDataJson: string;
+}> {
+  const behaviorFilePath = path.join(process.cwd(), BEHAVIOR_FILENAME);
+  const portfolioDataFilePath = path.join(process.cwd(), PORTFOLIO_DATA_FILENAME);
+
+  const [behavior, portfolioDataRaw] = await Promise.all([
+    fs.readFile(behaviorFilePath, 'utf8'),
+    fs.readFile(portfolioDataFilePath, 'utf8'),
+  ]);
+
+  let portfolioDataParsed: unknown;
+  try {
+    portfolioDataParsed = JSON.parse(portfolioDataRaw);
+  } catch {
+    throw new Error(`Invalid JSON in ${PORTFOLIO_DATA_FILENAME}`);
+  }
+
+  return {
+    behavior,
+    portfolioDataJson: JSON.stringify(portfolioDataParsed, null, 2),
+  };
 }
 
 export async function POST(req: Request) {
@@ -174,14 +199,21 @@ export async function POST(req: Request) {
   const validation = validateMessages(messages);
   if (!validation.ok) return validation.response;
 
-  let context: string;
+  let behavior: string;
+  let portfolioDataJson: string;
   try {
-    context = await loadContextMarkdown();
-  } catch {
+    const promptContext = await loadPromptContext();
+    behavior = promptContext.behavior;
+    portfolioDataJson = promptContext.portfolioDataJson;
+  } catch (error) {
+    const details =
+      error instanceof Error
+        ? error.message
+        : `Missing or unreadable ${BEHAVIOR_FILENAME} or ${PORTFOLIO_DATA_FILENAME} at project root`;
     return chatErrorResponse(
       CHAT_ERROR_CODE.SERVICE_UNAVAILABLE,
       500,
-      `Missing or unreadable ${CONTEXT_FILENAME} at project root`
+      details
     );
   }
 
@@ -189,9 +221,15 @@ export async function POST(req: Request) {
 
 ---
 
-## Portfolio knowledge (from ${CONTEXT_FILENAME})
+## Behavior instructions (from ${BEHAVIOR_FILENAME})
 
-${context}`;
+${behavior}
+
+---
+
+## Portfolio data (from ${PORTFOLIO_DATA_FILENAME})
+
+${portfolioDataJson}`;
 
   try {
     const modelMessages = await convertToModelMessages(

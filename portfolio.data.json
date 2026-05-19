@@ -1,0 +1,139 @@
+{
+  "identity": {
+    "name": "Brian Munroe",
+    "title": "Product Designer",
+    "location_public": "Boston, MA",
+    "origin": "Canada",
+    "short_bio": "Originally from Canada and now based in Boston, Brian transitioned from videography and podcast production into product design, with a focus on thoughtful AI-powered product experiences."
+  },
+  "contact": {
+    "email": "brian_munroe@icloud.com",
+    "linkedin": "https://www.linkedin.com/in/brian-munroe-75a486a5/",
+    "github": "https://github.com/Brrianmunroe"
+  },
+  "philosophy": {
+    "design_philosophy": "Balance user goals with business outcomes. Start with ambiguity, use research and customer insight to uncover pain points, then design solutions that are clear, useful, and impactful."
+  },
+  "core_strengths": [
+    "User research and synthesis",
+    "Balancing user needs with business goals",
+    "Comfort being wrong early, learning quickly, and pivoting",
+    "Low-ego collaboration and strong ownership",
+    "Zero-to-one product thinking with practical execution"
+  ],
+  "working_style": "Strong in zero-to-one work, and also comfortable improving existing products, refining features, and working within established design systems.",
+  "tools": [
+    "Perplexity",
+    "Figma",
+    "Figma Make",
+    "Cursor",
+    "Claude Code",
+    "Adobe Creative Suite",
+    "Notion"
+  ],
+  "projects": {
+    "featured": [
+      {
+        "name": "SelexAI",
+        "what_it_is": "AI-assisted video editor designed to reduce post-production effort and turnaround time.",
+        "who_it_is_for": "Videographers and video editors handling long-form footage and interview-driven edits.",
+        "why_it_matters": "Cuts repetitive post-production work so editors can spend more time on creative decisions.",
+        "role_scope": "Owned user research, MVP definition, design system setup, and product iteration end to end.",
+        "deeper_details": {
+          "key_challenge": "Building trust in AI-generated interview highlights while fitting existing editorial workflows.",
+          "important_tradeoff": "Scoped early work to interview-highlight extraction first for faster validation and lower implementation complexity.",
+          "outcome": "Early testing with 6 user interviews and usability feedback indicated up to 30% editing time savings."
+        }
+      },
+      {
+        "name": "Curio",
+        "what_it_is": "Concept project for Spotify onboarding using conversational AI to build tailored playlists.",
+        "who_it_is_for": "New music-streaming users who need faster personalization and early library creation.",
+        "why_it_matters": "Helps users build emotional connection to the product early, which can improve retention.",
+        "role_scope": "Owned product concept, research synthesis, interaction design, testing, and iteration.",
+        "deeper_details": {
+          "key_challenge": "Improving playlist setup speed and clarity without increasing onboarding friction.",
+          "important_tradeoff": "Prioritized conversational flow over a more manual curation path after comparative testing.",
+          "outcome": "Usability tests favored chat-based playlist creation for speed and completion."
+        }
+      }
+    ],
+    "secondary": [
+      {
+        "name": "BeThere",
+        "what_it_is": "AI chatbot experience for social workers supporting youth exiting foster care.",
+        "who_it_is_for": "Social workers and transitioning youth who need clearer support workflows.",
+        "why_it_matters": "Aims to reduce social-worker burden while helping youth build confidence and independence.",
+        "role_scope": "Owned design research and built the foundational design system with PM and engineering collaboration."
+      },
+      {
+        "name": "Eureka",
+        "what_it_is": "Voice-first iOS app where users speak ideas and receive AI summaries with action plans.",
+        "who_it_is_for": "People who think out loud and want to turn ideas into clear next steps quickly.",
+        "why_it_matters": "Reduces friction between idea capture and execution.",
+        "role_scope": "Owned problem framing, product design, design system, and functional build."
+      },
+      {
+        "name": "GetBettr",
+        "what_it_is": "UX research and flow-clarity work for an AI startup.",
+        "who_it_is_for": "Users who needed clearer messaging, content hierarchy, and onboarding flow.",
+        "why_it_matters": "Improved comprehension and product guidance through structured research findings.",
+        "role_scope": "Partnered on 15+ user interviews, synthesized insights, and collaborated with development to implement final designs."
+      },
+      {
+        "name": "Mezza",
+        "what_it_is": "Digital menu UX redesign across 20+ franchise locations.",
+        "who_it_is_for": "Customers ordering in high-volume environments and operators balancing speed with business goals.",
+        "why_it_matters": "Improved clarity and decision flow in a fast-paced ordering context.",
+        "role_scope": "Led end-to-end UX and visual design from research synthesis to high-fidelity UI and handoff."
+      }
+    ]
+  },
+  "experience": [
+    {
+      "role": "Independent Product Designer",
+      "location": "Boston, MA",
+      "period": "Jun 2025 - Present"
+    },
+    {
+      "role": "UX/UI Designer and Video Producer",
+      "company": "This Is Marketing",
+      "location": "Halifax, NS",
+      "period": "Aug 2023 - Jun 2025"
+    },
+    {
+      "role": "Producer",
+      "company": "Launch",
+      "location": "Remote",
+      "period": "Oct 2022 - Aug 2023"
+    },
+    {
+      "role": "Founder",
+      "company": "PACS Productions",
+      "location": "Halifax, NS",
+      "period": "Jan 2021 - Jan 2023"
+    }
+  ],
+  "personal_interests": {
+    "share_mode": "only_when_asked",
+    "items": [
+      "Walking to the beach",
+      "Golfing with friends",
+      "Enjoying a patio on warm days"
+    ]
+  },
+  "preferences": {
+    "preferred_role_types": [
+      "Product design roles with meaningful user impact",
+      "Collaborative teams with strong product and engineering partnership",
+      "Opportunities to blend research, systems thinking, and practical shipping"
+    ]
+  },
+  "privacy": {
+    "share_precise_location": false,
+    "share_family_details": false,
+    "discuss_salary": false,
+    "discuss_availability": false,
+    "do_not_dox": true
+  }
+}
