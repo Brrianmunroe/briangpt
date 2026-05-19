@@ -6,7 +6,7 @@
  * Regenerate: node design-tokens/build.mjs
  */
 :root {
-  /* --- 01 - Primitives (59) --- */
+  /* --- 01 - Primitives (62) --- */
   --font-lineheight-body: 24px;
   --font-lineheight-heading01: 48px;
   --font-lineheight-heading02: 40px;
@@ -44,6 +44,9 @@
   --orange-500: #ce4109;
   --orange-600: #7d2508;
   --orange-700: #23140c;
+  --red-100: #ffb2b2;
+  --red-500: #991b1b;
+  --red-600: #a50000;
   --scale-0: 0px;
   --scale-50: 0.5px;
   --scale-100: 1px;
@@ -67,7 +70,7 @@
   --scale-1900: 96px;
   --scale-2000: 100px;
 
-  /* --- 02 - Alias (57) --- */
+  /* --- 02 - Alias (60) --- */
   --color-neutral-0: var(--neutral-0);
   --color-neutral-100: var(--neutral-100);
   --color-neutral-200: var(--neutral-200);
@@ -87,6 +90,9 @@
   --color-orange-500: var(--orange-500);
   --color-orange-600: var(--orange-600);
   --color-orange-700: var(--orange-700);
+  --color-red-100: var(--red-100);
+  --color-red-500: var(--red-500);
+  --color-red-600: var(--red-600);
   --font-line-height-body: var(--font-lineheight-body);
   --font-line-height-heading01: var(--font-lineheight-heading01);
   --font-line-height-heading02: var(--font-lineheight-heading02);
@@ -126,14 +132,7 @@
   --stroke-sm: var(--scale-100);
   --stroke-xs: var(--scale-50);
 
-  /* --- 03 - Mapped (70) --- */
-  /**
-   * Work case study modal shell — main card surface (`work-shell.module.css` `.card`).
-   * Shared with feature highlight cards so hotspots sit on the same “paper” as the page.
-   */
-  --color-work-case-study-card-surface: color-mix(in srgb, var(--color-neutral-100) 94%, var(--color-neutral-900));
-  /** Pane edge (sidebar outer border — same hue/weight as Sidebar.module.css `.root`). */
-  --color-sidebar-edge-stroke: color-mix(in srgb, var(--color-neutral-500) 28%, transparent);
+  /* --- 03 - Mapped (73) --- */
   --color-background-surface-default: var(--color-neutral-200);
   --color-button-ghost-stroke-focused: var(--color-neutral-200);
   --color-button-ghost-surface-default: var(--color-neutral-200);
@@ -183,6 +182,9 @@
   --color-chat-input-stroke-default: var(--color-neutral-500);
   --color-chat-input-stroke-focused: var(--color-orange-400);
   --color-chat-input-surface-default: var(--color-neutral-300);
+  --color-chat-error-banner-surface-default: var(--color-red-100);
+  --color-chat-error-banner-stroke-default: var(--color-red-500);
+  --color-chat-error-banner-text-default: var(--color-red-600);
   --color-icon-surface-black: var(--color-neutral-200);
   --color-icon-surface-grey: var(--color-neutral-700);
   --color-icon-surface-orange: var(--color-orange-400);
@@ -204,12 +206,4 @@
   --color-text-fill-pressed: var(--color-neutral-200);
   --color-text-fill-primary: var(--color-neutral-900);
   --color-text-fill-secondary-2: var(--color-neutral-700);
-
-  /* Feature highlight card (Figma mapped): surface neutral-300, stroke neutral-500. */
-  --color-feature-highlight-card-surface-default: var(--color-neutral-300);
-  --color-feature-highlight-card-stroke-default: var(--color-neutral-500);
-  --color-feature-highlight-card-text-primary: var(--color-neutral-900);
-  --color-feature-highlight-card-text-secondary: var(--color-neutral-700);
-  --radius-feature-highlight-card-lg: var(--scale-900);
-  --shadow-feature-highlight-card-drop: 0 4px 8.7px rgb(0 0 0 / 100%);
 }

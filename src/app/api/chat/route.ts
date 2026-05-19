@@ -4,12 +4,17 @@ import { Redis } from '@upstash/redis';
 import { convertToModelMessages, streamText, type UIMessage } from 'ai';
 import { promises as fs } from 'fs';
 import path from 'path';
+import {
+  CHAT_API_ERROR_MESSAGE,
+  CHAT_ERROR_CODE,
+  type ChatErrorCode,
+  MAX_CHAT_MESSAGES,
+} from '@/lib/chat-error-codes';
+import { MAX_CHAT_MESSAGE_CHARS } from '@/lib/message-too-long-split';
 
 export const maxDuration = 60;
 
 const CONTEXT_FILENAME = 'context.md';
-const MAX_MESSAGES = 50;
-const MAX_TEXT_PER_MESSAGE = 1000;
 
 const SYSTEM_INSTRUCTIONS = `You are the conversational assistant for Brian Munroe’s portfolio site (BrianGPT).
 
@@ -18,11 +23,34 @@ Answer only about Brian Munroe, his work, and what appears in the portfolio know
 Rules:
 - Never invent employers, degrees, clients, certifications, or projects that are not explicitly supported by the portfolio knowledge.
 - Keep answers to about 2–4 sentences unless the visitor clearly asks for more depth.
-- If you cannot answer from the portfolio knowledge, say so and tell them it’s a great question for Brian directly at hello@brianmunroe.com.
+- If you cannot answer from the portfolio knowledge, say so and tell them it’s a great question for Brian directly at brian_munroe@icloud.com.
 - Use markdown sparingly (short lists are fine when helpful).`;
 
-function jsonResponse(body: unknown, status: number) {
-  return new Response(JSON.stringify(body), {
+function chatErrorResponse(code: ChatErrorCode, status: number, devOnlyMessage?: string) {
+  const isProd = process.env.NODE_ENV === 'production';
+  const devOnly =
+    code === CHAT_ERROR_CODE.SERVICE_UNAVAILABLE &&
+    devOnlyMessage != null &&
+    (/OPENAI_API_KEY|context\.md|Rate limiting is not configured/i.test(devOnlyMessage) ||
+      devOnlyMessage.includes('.env'));
+
+  const error =
+    isProd && devOnly
+      ? CHAT_API_ERROR_MESSAGE.SERVICE_UNAVAILABLE
+      : code === CHAT_ERROR_CODE.RATE_LIMIT
+        ? CHAT_API_ERROR_MESSAGE.RATE_LIMIT
+        : code === CHAT_ERROR_CODE.MESSAGE_TOO_LONG
+          ? CHAT_API_ERROR_MESSAGE.MESSAGE_TOO_LONG
+          : code === CHAT_ERROR_CODE.THREAD_TOO_LONG
+            ? CHAT_API_ERROR_MESSAGE.THREAD_TOO_LONG
+            : devOnlyMessage && !isProd
+              ? devOnlyMessage
+              : CHAT_API_ERROR_MESSAGE.SERVICE_UNAVAILABLE;
+
+  const resolvedCode =
+    isProd && devOnly ? CHAT_ERROR_CODE.SERVICE_UNAVAILABLE : code;
+
+  return new Response(JSON.stringify({ error, code: resolvedCode }), {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
@@ -74,17 +102,23 @@ function validateMessages(messages: UIMessage[]):
   | { ok: true }
   | { ok: false; response: Response } {
   if (messages.length === 0) {
-    return { ok: false, response: jsonResponse({ error: 'messages must not be empty' }, 400) };
+    return {
+      ok: false,
+      response: chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400),
+    };
   }
-  if (messages.length > MAX_MESSAGES) {
-    return { ok: false, response: jsonResponse({ error: 'Too many messages in this chat' }, 400) };
+  if (messages.length > MAX_CHAT_MESSAGES) {
+    return {
+      ok: false,
+      response: chatErrorResponse(CHAT_ERROR_CODE.THREAD_TOO_LONG, 400),
+    };
   }
   for (const message of messages) {
     const len = textLengthFromMessage(message);
-    if (len > MAX_TEXT_PER_MESSAGE) {
+    if (len > MAX_CHAT_MESSAGE_CHARS) {
       return {
         ok: false,
-        response: jsonResponse({ error: 'A message exceeds the maximum length' }, 400),
+        response: chatErrorResponse(CHAT_ERROR_CODE.MESSAGE_TOO_LONG, 400),
       };
     }
   }
@@ -98,22 +132,30 @@ async function loadContextMarkdown(): Promise<string> {
 
 export async function POST(req: Request) {
   if (!process.env.OPENAI_API_KEY) {
-    return jsonResponse({ error: 'Missing OPENAI_API_KEY — check your .env.local file' }, 500);
+    return chatErrorResponse(
+      CHAT_ERROR_CODE.SERVICE_UNAVAILABLE,
+      500,
+      'Missing OPENAI_API_KEY — check your .env.local file'
+    );
   }
 
   if (!originAllowed(req)) {
-    return new Response(null, { status: 403 });
+    return chatErrorResponse(CHAT_ERROR_CODE.FORBIDDEN, 403);
   }
 
   const limiter = getLimiter();
   if (process.env.NODE_ENV === 'production' && !limiter) {
-    return jsonResponse({ error: 'Rate limiting is not configured' }, 503);
+    return chatErrorResponse(
+      CHAT_ERROR_CODE.SERVICE_UNAVAILABLE,
+      503,
+      'Rate limiting is not configured'
+    );
   }
 
   if (limiter) {
     const { success } = await limiter.limit(clientIp(req));
     if (!success) {
-      return jsonResponse({ error: 'Too many requests. Please wait a moment.' }, 429);
+      return chatErrorResponse(CHAT_ERROR_CODE.RATE_LIMIT, 429);
     }
   }
 
@@ -121,12 +163,12 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return jsonResponse({ error: 'Invalid JSON body' }, 400);
+    return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400);
   }
 
   const messages = (body as { messages?: UIMessage[] }).messages;
   if (!Array.isArray(messages)) {
-    return jsonResponse({ error: 'Expected a messages array' }, 400);
+    return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400);
   }
 
   const validation = validateMessages(messages);
@@ -136,7 +178,11 @@ export async function POST(req: Request) {
   try {
     context = await loadContextMarkdown();
   } catch {
-    return jsonResponse({ error: `Missing or unreadable ${CONTEXT_FILENAME} at project root` }, 500);
+    return chatErrorResponse(
+      CHAT_ERROR_CODE.SERVICE_UNAVAILABLE,
+      500,
+      `Missing or unreadable ${CONTEXT_FILENAME} at project root`
+    );
   }
 
   const system = `${SYSTEM_INSTRUCTIONS}
@@ -164,6 +210,6 @@ ${context}`;
       originalMessages: messages,
     });
   } catch {
-    return jsonResponse({ error: 'Something went wrong — please try again.' }, 500);
+    return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 500);
   }
 }

@@ -1,0 +1,124 @@
+.root {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-chat-error-banner-stroke-default);
+  border-radius: var(--radius-md);
+  background: var(--color-chat-error-banner-surface-default);
+  color: var(--color-chat-error-banner-text-default);
+}
+
+.rootSingleLine {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: var(--spacing-sm);
+}
+
+.rootMultiline {
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--spacing-sm);
+}
+
+.rootEnter {
+  animation: chatErrorJitter 0.45s ease-in-out;
+}
+
+.message {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: left;
+  word-break: break-word;
+}
+
+.rootSingleLine .message {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.rootMultiline .message {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: var(--spacing-sm);
+}
+
+.message strong {
+  font-weight: 600;
+}
+
+.cutoffSnippet {
+  font-weight: 600;
+  padding: 0 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-chat-error-banner-stroke-default) 14%, transparent);
+}
+
+.dismissButton {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-chat-error-banner-text-default);
+  cursor: pointer;
+}
+
+.rootSingleLine .dismissButton {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+
+.rootMultiline .dismissButton {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  justify-self: end;
+}
+
+.dismissButton:hover {
+  background: color-mix(in srgb, var(--color-chat-error-banner-stroke-default) 12%, transparent);
+}
+
+.dismissButton:focus-visible {
+  outline: 2px solid var(--color-chat-error-banner-stroke-default);
+  outline-offset: 2px;
+}
+
+.dismissButton svg path {
+  fill: currentColor;
+}
+
+@keyframes chatErrorJitter {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rootEnter {
+    animation: none;
+  }
+}

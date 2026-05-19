@@ -174,6 +174,10 @@
 
 /** Figma `Chatinput` gradient (360:921) — fade from transparent to surface. */
 .composerGradient {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
@@ -220,6 +224,23 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--spacing-md);
+  width: 100%;
+}
+
+.chatWarning {
+  margin: var(--spacing-sm) 0 0;
+  font-size: var(--font-size-label);
+  line-height: var(--font-line-height-label);
+  color: var(--color-text-fill-secondary-2);
+  text-align: center;
+}
+
+/** Error banner + chat input: 8px between banner and field (Figma). */
+.composerInputBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
   width: 100%;
 }
 
@@ -330,21 +351,6 @@
   align-items: stretch;
   gap: var(--spacing-md);
   width: 100%;
-}
-
-.chatError {
-  margin: 0;
-  font-size: var(--font-size-body);
-  line-height: var(--font-line-height-body);
-  color: var(--color-orange-400);
-}
-
-.chatWarning {
-  margin: var(--spacing-sm) 0 0;
-  font-size: var(--font-size-label);
-  line-height: var(--font-line-height-label);
-  color: var(--color-text-fill-secondary-2);
-  text-align: center;
 }
 
 .chipScrollWrap {
