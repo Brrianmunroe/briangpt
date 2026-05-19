@@ -17,9 +17,8 @@
 }
 
 .rootMultiline {
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  column-gap: var(--spacing-sm);
+  position: relative;
+  display: block;
 }
 
 .rootEnter {
@@ -40,9 +39,7 @@
 }
 
 .rootMultiline .message {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  margin-top: var(--spacing-sm);
+  padding-right: calc(32px + var(--spacing-sm));
 }
 
 .message strong {
@@ -79,10 +76,9 @@
 }
 
 .rootMultiline .dismissButton {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: start;
-  justify-self: end;
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
 }
 
 .dismissButton:hover {
