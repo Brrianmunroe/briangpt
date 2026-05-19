@@ -6,6 +6,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Card } from '@/components/card';
+import { ChatErrorBanner } from '@/components/chat-error-banner';
 import { ChatInput } from '@/components/chat-input';
 import { NameTag } from '@/components/name-tag';
 import { Close, Menu, Prompt } from '@/components/icons';
@@ -17,6 +18,13 @@ import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { ConversationPanel } from '@/components/conversation-panel';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
+import { CHAT_ERROR_CODE } from '@/lib/chat-error-codes';
+import {
+  preflightChatError,
+  resolveChatErrorDisplay,
+  type ChatDisplayError,
+} from '@/lib/chat-errors';
+import { useOnlineStatus } from '@/lib/use-online-status';
 import styles from './portfolio.module.css';
 
 const MOBILE_SHELL_MQ = '(max-width: 768px)';
@@ -120,10 +128,31 @@ export function PortfolioPage() {
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
   const lastSentTextRef = React.useRef<string | null>(null);
+  const [localError, setLocalError] = React.useState<ChatDisplayError | null>(null);
+  const online = useOnlineStatus();
 
   const { messages, sendMessage, stop, status, setMessages, error, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
+
+  const dismissError = React.useCallback(() => {
+    clearError();
+    setLocalError(null);
+  }, [clearError]);
+
+  const apiDisplayError = React.useMemo(
+    () => resolveChatErrorDisplay({ online, apiError: error ?? null, draft }),
+    [online, error, draft]
+  );
+
+  const displayError = localError ?? apiDisplayError;
+
+  const errorBanner =
+    displayError != null ? (
+      <ChatErrorBanner animationKey={displayError.key} onDismiss={dismissError}>
+        <strong>Error:</strong> {displayError.body}
+      </ChatErrorBanner>
+    ) : null;
 
   const streaming = status === 'streaming';
   const requestInFlight = status === 'submitted' || status === 'streaming';
@@ -175,7 +204,15 @@ export function PortfolioPage() {
   const handleSend = React.useCallback(
     async (trimmed: string) => {
       if (!trimmed || requestInFlight) return;
+
+      const preflight = preflightChatError(trimmed, messages.length, online);
+      if (preflight) {
+        setLocalError(preflight);
+        return;
+      }
+
       clearError();
+      setLocalError(null);
       lastSentTextRef.current = trimmed;
       setDraft('');
       try {
@@ -190,7 +227,7 @@ export function PortfolioPage() {
       }
       lastSentTextRef.current = null;
     },
-    [clearError, requestInFlight, sendMessage]
+    [clearError, messages.length, online, requestInFlight, sendMessage]
   );
 
   const handleStop = React.useCallback(() => {
@@ -204,6 +241,7 @@ export function PortfolioPage() {
 
   const handleNewChat = React.useCallback(() => {
     clearError();
+    setLocalError(null);
     setMessages([]);
     setDraft('');
     if (isMobileShell) setMobileNavOpen(false);
@@ -215,6 +253,7 @@ export function PortfolioPage() {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (e.button !== 0) return;
       clearError();
+      setLocalError(null);
       setMessages([]);
       setDraft('');
       if (isMobileShell) setMobileNavOpen(false);
@@ -250,6 +289,12 @@ export function PortfolioPage() {
   React.useEffect(() => {
     if (conversationMode) setMobileNavOpen(false);
   }, [conversationMode]);
+
+  React.useEffect(() => {
+    if (online && localError?.code === CHAT_ERROR_CODE.OFFLINE) {
+      setLocalError(null);
+    }
+  }, [online, localError]);
 
   const promptChipIconColor = requestInFlight ? 'grey' : 'orange';
   const promptChipIcon = <Prompt color={promptChipIconColor} size={16} aria-hidden />;
@@ -382,25 +427,22 @@ export function PortfolioPage() {
                         </HeroTag>
                       </div>
                       <div ref={composerHostRef} className={styles.composerHostLanding}>
-                        <ChatInput
-                          value={draft}
-                          onChange={(e) => setDraft(e.target.value)}
-                          onSubmit={(t) => void handleSend(t)}
-                          streaming={requestInFlight}
-                          onStop={handleStop}
-                          rotatingPlaceholderPrompts={ROTATING_PLACEHOLDER_PROMPTS}
-                          followUpPlaceholder="Ask a follow up"
-                          followUpEmphasis={false}
-                          layout="stacked"
-                          maxWidth="full"
-                          textareaProps={{ autoFocus: true }}
-                        />
-
-                        {error ? (
-                          <p className={styles.chatError} role="alert">
-                            Something went wrong — please try again.
-                          </p>
-                        ) : null}
+                        <div className={styles.composerInputBlock}>
+                          {errorBanner}
+                          <ChatInput
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            onSubmit={(t) => void handleSend(t)}
+                            streaming={requestInFlight}
+                            onStop={handleStop}
+                            rotatingPlaceholderPrompts={ROTATING_PLACEHOLDER_PROMPTS}
+                            followUpPlaceholder="Ask a follow up"
+                            followUpEmphasis={false}
+                            layout="stacked"
+                            maxWidth="full"
+                            textareaProps={{ autoFocus: true }}
+                          />
+                        </div>
 
                         <div className={styles.chipScrollWrap}>
                           <div
@@ -494,22 +536,24 @@ export function PortfolioPage() {
 
                 <div className={styles.composerDock}>
                   <div className={styles.composerGradient}>
-                    <ChatInput
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onSubmit={(t) => void handleSend(t)}
-                      streaming={requestInFlight}
-                      onStop={handleStop}
-                      followUpPlaceholder="Ask a follow up"
-                      followUpEmphasis
-                      layout="stacked"
-                      maxWidth="full"
-                    />
-                    {error ? (
-                      <p className={styles.chatError} role="alert">
-                        Something went wrong — please try again.
-                      </p>
-                    ) : null}
+                    <div className={styles.composerInputBlock}>
+                      {errorBanner}
+                      <ChatInput
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onSubmit={(t) => void handleSend(t)}
+                        streaming={requestInFlight}
+                        onStop={handleStop}
+                        followUpPlaceholder="Ask a follow up"
+                        followUpEmphasis
+                        layout="stacked"
+                        maxWidth="full"
+                      />
+                    </div>
+                    <p className={styles.chatWarning}>
+                      Heads up: I&apos;m still refining the system prompt, so some answers may be
+                      inaccurate.
+                    </p>
                   </div>
                 </div>
               </div>

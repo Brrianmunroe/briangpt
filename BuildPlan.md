@@ -185,7 +185,7 @@ Repeat for **5+** questions total.
 
 # Contact & hard fallback
 
-Email: [hello@brianmunroe.com](mailto:hello@brianmunroe.com)
+Email: [brian_munroe@icloud.com](mailto:brian_munroe@icloud.com)
 LinkedIn: [your LinkedIn URL]
 Website: [your portfolio OR GitHub]
 **If something isn’t in this file:** [exact behavior — admit gap; point to email / featured projects / resume; never bluff]
@@ -296,7 +296,7 @@ Build the system string using the context file content. The model should:
 - Sound conversational, warm, and confident
 - Never fabricate projects or experience not in the context file
 - Keep responses to 2-4 sentences unless more detail is requested
-- If it cannot answer: suggest **[hello@brianmunroe.com](mailto:hello@brianmunroe.com)** (or your real contact from `context.md`)
+- If it cannot answer: suggest **[brian_munroe@icloud.com](mailto:brian_munroe@icloud.com)** (or your real contact from `context.md`)
 
 LAYER 6 — STREAM RESPONSE  
 Use `streamText` from `ai` with `openai('gpt-4o')`, validated model messages, and `maxTokens: 500`.  
