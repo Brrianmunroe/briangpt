@@ -87,6 +87,7 @@ All mapped tokens inspected are **colors**. Names describe **UI surfaces**, grou
 
 - `color/button/primary|secondary|ghost/...`
 - `color/case-study-card/primary|secondary/...`
+- `color/work/case-study/card/surface` (work modal shell card fill)
 - `color/prompt-chip/...`
 - `color/text/...`, `color/chat-input/...`, `color/icon/...`, `color/background/...`
 

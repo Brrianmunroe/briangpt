@@ -171,6 +171,7 @@
     { "figma": "color/case-study-card/secondary/surface/focused", "var": "--color-case-study-card-secondary-surface-focused", "ref": "--color-neutral-300" },
     { "figma": "color/case-study-card/secondary/surface/hover", "var": "--color-case-study-card-secondary-surface-hover", "ref": "--color-neutral-400" },
     { "figma": "color/case-study-card/secondary/surface/pressed", "var": "--color-case-study-card-secondary-surface-pressed", "ref": "--color-neutral-200" },
+    { "figma": "color/work/case-study/card/surface", "var": "--color-work-case-study-card-surface", "ref": "--color-neutral-300" },
     { "figma": "color/chat-input/stroke/active", "var": "--color-chat-input-stroke-active", "ref": "--color-orange-400" },
     { "figma": "color/chat-input/stroke/default", "var": "--color-chat-input-stroke-default", "ref": "--color-neutral-500" },
     { "figma": "color/chat-input/stroke/focused", "var": "--color-chat-input-stroke-focused", "ref": "--color-orange-400" },

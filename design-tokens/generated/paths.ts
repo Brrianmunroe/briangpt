@@ -175,6 +175,7 @@ export const mappedPaths = {
   "color/case-study-card/secondary/surface/focused": "--color-case-study-card-secondary-surface-focused",
   "color/case-study-card/secondary/surface/hover": "--color-case-study-card-secondary-surface-hover",
   "color/case-study-card/secondary/surface/pressed": "--color-case-study-card-secondary-surface-pressed",
+  "color/work/case-study/card/surface": "--color-work-case-study-card-surface",
   "color/chat-input/stroke/active": "--color-chat-input-stroke-active",
   "color/chat-input/stroke/default": "--color-chat-input-stroke-default",
   "color/chat-input/stroke/focused": "--color-chat-input-stroke-focused",
