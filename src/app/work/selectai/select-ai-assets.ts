@@ -23,10 +23,9 @@ export const selectAiImg = {
   prototype: s('prototype.png'),
   highfi: s('highfi.png'),
   flow: s('flow.png'),
-  designDecisions: s('design decisions.png'),
   upload: s('upload.png'),
   contextBrief: s('context brief.png'),
   /** Full timeline / program layout screen (`public/work/selexAI/SelexAI-Timeline-Screen.png`). */
-  timeline: s('SelexAI-Timeline-Screen.png'),
+  timeline: s('timeline.png'),
   reasoning: s('reasoning.png'),
 } as const;
