@@ -64,8 +64,6 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
 
       <img src={selectAiImg.flow} alt="User flow across SelexAI" className={styles.blockImg} />
 
-      <img src={selectAiImg.designDecisions} alt="Design decisions" className={styles.blockImg} />
-
       <img src={selectAiImg.upload} alt="Upload media experience" className={styles.blockImg} />
 
       <img src={selectAiImg.contextBrief} alt="Context brief" className={styles.blockImg} />
