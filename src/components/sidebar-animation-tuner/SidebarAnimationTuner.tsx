@@ -9,12 +9,12 @@ import styles from './SidebarAnimationTuner.module.css';
 /* ------------------------------------------------------------------ */
 
 const DEFAULTS = {
-  railDuration: 0.35,
-  railEase: [0.75, 0.15, 0.05, 0.70] as [number, number, number, number],
-  contentDuration: 0.30,
-  contentDelay: 0.10,
-  contentEase: [0.75, 0.15, 0.01, 1.00] as [number, number, number, number],
-  collapseDuration: 0.50,
+  railDuration: 0.32,
+  railEase: [0.6, 0, 0.2, 1] as [number, number, number, number],
+  contentDuration: 0.24,
+  contentDelay: 0.16,
+  contentEase: [0.3, 0, 0.3, 1] as [number, number, number, number],
+  collapseDuration: 0.12,
   blurPeak: 4,
 } as const;
 
@@ -338,7 +338,7 @@ export function SidebarAnimationTuner() {
             <div className={styles.sectionHeader}>Collapse (close)</div>
 
             <SliderRow
-              label="Collapse duration"
+              label="Text fade-out"
               value={collapseDuration}
               min={0}
               max={1}
