@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
 import styles from './FeatureHighlightCard.module.css';
 
 export type FeatureHighlightCardCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -12,8 +15,13 @@ export type FeatureHighlightCardProps = {
   /** Defaults to `image` when `mediaSrc` is set. */
   mediaKind?: FeatureHighlightMediaKind;
   mediaAlt?: string;
+  /** When true, the card is fully expanded — video playback starts after the expand settles. */
+  active?: boolean;
   className?: string;
 };
+
+/** Roughly matches the 0.38s card-expand transition; play once the card has settled. */
+const VIDEO_PLAY_DELAY_MS = 420;
 
 export function FeatureHighlightCard({
   corner,
@@ -22,9 +30,27 @@ export function FeatureHighlightCard({
   mediaSrc,
   mediaKind = 'image',
   mediaAlt = '',
+  active = false,
   className,
 }: FeatureHighlightCardProps) {
   const rootClass = [styles.root, className].filter(Boolean).join(' ');
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (active) {
+      const timer = window.setTimeout(() => {
+        video.play().catch(() => {});
+      }, VIDEO_PLAY_DELAY_MS);
+      return () => window.clearTimeout(timer);
+    }
+
+    // Collapsed: hold paused on the first frame for the next open.
+    video.pause();
+    video.currentTime = 0;
+  }, [active]);
 
   return (
     <article className={rootClass} data-corner={corner}>
@@ -32,13 +58,13 @@ export function FeatureHighlightCard({
         <div className={styles.media}>
           {mediaKind === 'video' ? (
             <video
+              ref={videoRef}
               className={styles.mediaVideo}
               src={mediaSrc}
               muted
               playsInline
               loop
-              autoPlay
-              preload="metadata"
+              preload="auto"
               aria-label={mediaAlt || undefined}
             />
           ) : (

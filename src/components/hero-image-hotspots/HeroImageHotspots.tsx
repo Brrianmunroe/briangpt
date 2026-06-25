@@ -50,11 +50,12 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
       {hotspots.map((spot) => {
         const expanded = imageActive && activeHotspotId === spot.id;
         const stackClass = [styles.stack, expanded ? styles.stackExpanded : ''].filter(Boolean).join(' ');
+        const hotspotClass = [styles.hotspot, expanded ? styles.hotspotActive : ''].filter(Boolean).join(' ');
 
         return (
           <div
             key={spot.id}
-            className={styles.hotspot}
+            className={hotspotClass}
             style={{ left: `${spot.leftPct}%`, top: `${spot.topPct}%` }}
             onMouseEnter={() => setActiveHotspotId(spot.id)}
             onMouseLeave={() => setActiveHotspotId((prev) => (prev === spot.id ? null : prev))}
@@ -71,6 +72,7 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
                   mediaSrc={spot.mediaSrc}
                   mediaKind={spot.mediaKind}
                   mediaAlt={spot.mediaAlt ?? ''}
+                  active={expanded}
                 />
               </div>
             </div>

@@ -45,6 +45,11 @@
   pointer-events: auto;
 }
 
+/* Expanded popup sits above neighboring hotspots/dots so its card is never clipped by them. */
+.hotspotActive {
+  z-index: 5;
+}
+
 /**
  * Indicators: fade + scale together, no stagger (all hotspots in sync).
  * Easing overshoots slightly past 1 → quick “pop” on hero hover.
