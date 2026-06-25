@@ -15,5 +15,14 @@ export const curioImg = {
   flow: c('Flow.png'),
 } as const;
 
+/** Popup videos in public/work/curio/videos/ — URLs must match filenames on disk. */
+const cv = (filename: string) => `/work/curio/videos/${encodeURIComponent(filename)}`;
+
+export const curioVideo = {
+  expandable: cv('expandable.mp4'),
+  swapSong: cv('swap-song_1.mp4'),
+  promptChips: cv('prompt-chips.mp4'),
+} as const;
+
 /** Bottom grid videos — add MP4/WebM files to public/work/curio/ and list paths here. */
 export const curioGalleryVideos: readonly string[] = [];
