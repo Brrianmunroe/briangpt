@@ -173,7 +173,14 @@ export function WorkCaseShell({
         onClick={requestClose}
       />
       <div className={modalClass}>
-        <div className={styles.cardWrap}>
+        <div
+          className={styles.cardWrap}
+          /** Click the empty area around the card to dismiss. mousedown-on-backdrop only,
+           * so selecting text inside the card and releasing outside doesn't close it. */
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) requestClose();
+          }}
+        >
           <div className={styles.card}>
             <div
               className={[
