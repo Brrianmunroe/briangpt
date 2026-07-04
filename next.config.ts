@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { source: '/components', destination: '/', permanent: false },
       { source: '/gallery', destination: '/', permanent: false },
       { source: '/g', destination: '/', permanent: false },
+      { source: '/work/selectai', destination: '/work/selexai', permanent: true },
     ];
   },
 };
