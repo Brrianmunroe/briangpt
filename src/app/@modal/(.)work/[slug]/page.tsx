@@ -20,14 +20,14 @@ export default async function InterceptedCaseStudyPage({ params }: PageProps) {
   const body =
     slug === 'curio' ? (
       <CurioCaseStudy study={study} />
-    ) : slug === 'selectai' ? (
+    ) : slug === 'selexai' ? (
       <SelectAiCaseStudy study={study} />
     ) : (
       <CaseStudyContent study={study} />
     );
 
   return (
-    <WorkCaseShell scaleBackground headerExtraGap={slug === 'selectai'}>
+    <WorkCaseShell scaleBackground headerExtraGap={slug === 'selexai'}>
       {body}
     </WorkCaseShell>
   );

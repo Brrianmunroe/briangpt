@@ -33,13 +33,13 @@ export default async function CaseStudyPage({ params }: PageProps) {
   const body =
     slug === 'curio' ? (
       <CurioCaseStudy study={study} />
-    ) : slug === 'selectai' ? (
+    ) : slug === 'selexai' ? (
       <SelectAiCaseStudy study={study} />
     ) : (
       <CaseStudyContent study={study} />
     );
 
   return (
-    <WorkCaseShell headerExtraGap={slug === 'selectai'}>{body}</WorkCaseShell>
+    <WorkCaseShell headerExtraGap={slug === 'selexai'}>{body}</WorkCaseShell>
   );
 }

@@ -23,7 +23,7 @@ export function CaseStudyContent({ study }: { study: CaseStudy }) {
           </div>
         </div>
         <ul className={styles.featureList} data-stagger style={{ '--stagger-index': 1 } as CSSProperties}>
-          {study.features.map((feature) => (
+          {study.features?.map((feature) => (
             <li key={feature} className={styles.featureItem}>
               <span className={styles.check} aria-hidden>
                 ✓
@@ -35,7 +35,7 @@ export function CaseStudyContent({ study }: { study: CaseStudy }) {
       </div>
 
       <div className={styles.panelGrid}>
-        {study.panels.map((panel, i) => (
+        {study.panels?.map((panel, i) => (
           <section
             key={panel.heading}
             className={styles.panel}

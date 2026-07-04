@@ -1,4 +1,4 @@
-export const CASE_STUDY_SLUGS = ['selectai', 'curio'] as const;
+export const CASE_STUDY_SLUGS = ['selexai', 'curio'] as const;
 
 export type CaseStudySlug = (typeof CASE_STUDY_SLUGS)[number];
 
@@ -8,8 +8,8 @@ export type CaseStudy = {
   title: string;
   subtitle: string;
   description: string;
-  features: readonly string[];
-  panels: readonly { heading: string; body: string }[];
+  features?: readonly string[];
+  panels?: readonly { heading: string; body: string }[];
 };
 
 export const CASE_STUDIES = {
@@ -36,28 +36,13 @@ export const CASE_STUDIES = {
       },
     ],
   },
-  selectai: {
-    slug: 'selectai',
+  selexai: {
+    slug: 'selexai',
     variant: 'primary',
     title: 'SelexAI',
     subtitle: 'Tackling the Corporate Work Paradox',
     description:
-      'SelexAI helps video editors cut interviews faster without losing creative control. As sole designer, I led end-to-end discovery, design, and development from research to MVP. User interviews surfaced what I call the "corporate work paradox": corporate projects pay the most but feel the least creatively fulfilling. Combined with post-production overhead, the result is procrastination and burnout. After mapping workflows, I uncovered three bottlenecks and scoped the MVP around the one editors ranked highest: cutting interview selects. My hypothesis was that AI could surface strong moments, letting editors move straight into crafting the narrative. Usability testing confirmed the prototype felt intuitive but exposed a key tension — editors feared losing details by delegating to AI. Rather than hiding AI\'s role, I built features that made its decisions visible and kept creators in control. In testing, early users estimated up to 30% time savings in post-production. Next would be to launch in beta and talk with users about time saved and quality of the AI cuts.',
-    features: [
-      'Scoped the MVP on the highest-ranked bottleneck: cutting interview selects from long-form interviews.',
-      'Made AI decisions visible and kept editors in control after usability tests surfaced fear of losing detail.',
-      'Estimated up to 30% post-production time savings in early testing; next step is beta launch and outcome validation.',
-    ],
-    panels: [
-      {
-        heading: 'Corporate work paradox',
-        body: 'Interviews showed well-paid corporate work often felt the least creatively fulfilling, which — combined with post-production overhead — led to procrastination and burnout. That reframed the problem around reducing edit friction without stripping agency.',
-      },
-      {
-        heading: 'Trust and transparency',
-        body: 'Editors worried about handing judgment to AI. The product direction emphasized surfacing what the model was doing so creators could stay in the loop instead of hiding automation behind a black box.',
-      },
-    ],
+      'SelexAI helps video editors cut interview footage faster without giving up creative control. As the sole designer, I led the project from discovery through MVP, starting with interviews to understand the biggest friction points in editors’ workflows. Those conversations revealed what I call the “corporate work paradox”: corporate projects often pay the most, but feel the least creatively fulfilling. As repetitive post-production tasks pile up, that tension can turn already uninspiring work into procrastination and burnout. After mapping the editing workflow, I narrowed the MVP around the clearest pain point: cutting interview selects. My hypothesis was that AI could surface strong moments earlier in the review process, helping editors move faster from raw footage into shaping the story. Usability testing confirmed the early prototype felt intuitive, but revealed a deeper insight: editors often avoided delegating edits to other editors or AI because they feared important details would fall through the cracks. In response, I designed features that kept editors in control while showing why the AI selected certain moments, giving them more confidence in what was being surfaced. Early users estimated up to 30% time savings in post-production.',
   },
 } as const satisfies Record<CaseStudySlug, CaseStudy>;
 
