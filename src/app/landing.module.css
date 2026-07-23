@@ -65,9 +65,7 @@
   min-height: 100svh;
   overflow: hidden;
   color: var(--color-neutral-900);
-  background:
-    radial-gradient(circle at 75% 48%, rgba(255, 108, 34, 0.13), transparent 27%),
-    var(--color-background-surface-default);
+  background: var(--color-background-surface-default);
 }
 
 .page::before {
@@ -126,11 +124,13 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
   align-items: center;
-  gap: clamp(44px, 5vw, 88px);
+  gap: clamp(24px, 2.5vw, 40px);
   flex: 1;
+  max-width: 1280px;
   padding-block: clamp(36px, 6vh, 72px);
+  transform: translateX(-32px);
 }
 
 .copy {
@@ -389,6 +389,7 @@
     grid-template-columns: 1fr;
     gap: 42px;
     padding-block: 44px;
+    transform: none;
   }
 
   .heroTitle {
