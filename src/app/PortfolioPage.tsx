@@ -455,7 +455,7 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
                           </HeroTag>
                           <span className={styles.promptAvatar}>
                             <img
-                              src="/headshot.png"
+                              src="/headshot-upscaled.png"
                               alt=""
                               width={72}
                               height={72}

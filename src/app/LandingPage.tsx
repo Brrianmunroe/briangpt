@@ -99,6 +99,7 @@ export type LandingPageProps = {
 export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPageProps) {
   const router = useRouter();
   const isMobileShell = useIsMobileShell();
+  const portraitFrameRef = React.useRef<HTMLDivElement>(null);
   const [sidebarDensity, setSidebarDensity] =
     React.useState<SidebarDensity>(initialSidebarDensity);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
@@ -106,6 +107,46 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   const sidebarDensityEffective: SidebarDensity = isMobileShell ? 'comfortable' : sidebarDensity;
   const brianGptHref =
     !isMobileShell && sidebarDensity === 'comfortable' ? '/briangpt?menu=open' : '/briangpt';
+
+  React.useEffect(() => {
+    const portraitFrame = portraitFrameRef.current;
+    const canTrack = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!portraitFrame || !canTrack || reduceMotion) return;
+
+    let animationFrame = 0;
+
+    const resetGaze = () => {
+      portraitFrame.style.setProperty('--gaze-x', '0px');
+      portraitFrame.style.setProperty('--gaze-y', '0px');
+    };
+
+    const trackPointer = (event: PointerEvent) => {
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        const bounds = portraitFrame.getBoundingClientRect();
+        const deltaX = event.clientX - (bounds.left + bounds.width / 2);
+        const deltaY = event.clientY - (bounds.top + bounds.height / 2);
+        const distance = Math.hypot(deltaX, deltaY) || 1;
+        const strength = Math.min(distance / Math.max(bounds.width, bounds.height), 1);
+
+        portraitFrame.style.setProperty('--gaze-x', `${(deltaX / distance) * strength * 2.75}px`);
+        portraitFrame.style.setProperty('--gaze-y', `${(deltaY / distance) * strength * 2.25}px`);
+      });
+    };
+
+    window.addEventListener('pointermove', trackPointer, { passive: true });
+    window.addEventListener('blur', resetGaze);
+    document.documentElement.addEventListener('mouseleave', resetGaze);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener('pointermove', trackPointer);
+      window.removeEventListener('blur', resetGaze);
+      document.documentElement.removeEventListener('mouseleave', resetGaze);
+    };
+  }, []);
 
   const handleMenuClick = React.useCallback(() => {
     if (isMobileShell) setMobileNavOpen((open) => !open);
@@ -255,15 +296,33 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
           </div>
 
           <div className={styles.portraitStage}>
-            <div className={styles.portraitFrame}>
+            <div ref={portraitFrameRef} className={styles.portraitFrame}>
               <Image
                 className={styles.portrait}
-                src="/headshot.png"
+                src="/headshot-eye-base.png"
                 alt="Memoji portrait of Brian Munroe"
-                width={540}
-                height={540}
+                width={1254}
+                height={1254}
                 priority
                 sizes="(max-width: 760px) 78vw, 42vw"
+              />
+              <span className={styles.detachedIrisLeft} aria-hidden="true">
+                <img className={styles.detachedIrisArtwork} src="/left-iris.png" alt="" />
+              </span>
+              <span className={`${styles.eyeLayer} ${styles.eyeLayerRight}`} aria-hidden="true">
+                <img className={styles.eyeArtwork} src="/headshot-upscaled.png" alt="" />
+              </span>
+              <img
+                className={styles.portraitForeground}
+                src="/headshot-upscaled.png"
+                alt=""
+                aria-hidden="true"
+              />
+              <img
+                className={styles.leftEyelidForeground}
+                src="/headshot-upscaled.png"
+                alt=""
+                aria-hidden="true"
               />
             </div>
           </div>
