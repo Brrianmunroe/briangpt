@@ -78,24 +78,26 @@
   background-size: 16px 16px;
 }
 
+.header,
 .hero,
 .footer {
   position: relative;
-  z-index: 1;
-  width: min(100% - 64px, 1440px);
+  width: min(100% - 64px, 1280px);
   margin-inline: auto;
 }
 
+.hero,
+.footer {
+  z-index: 1;
+}
+
 .header {
-  position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   min-height: 0;
-  margin: 0;
-  padding: 6px var(--spacing-md) var(--spacing-sm);
+  padding: 6px 0 var(--spacing-sm);
 }
 
 .headerLeading {
@@ -126,11 +128,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
   align-items: center;
-  gap: clamp(24px, 2.5vw, 40px);
+  gap: clamp(48px, 4vw, 64px);
   flex: 1;
-  max-width: 1280px;
   padding-block: clamp(36px, 6vh, 72px);
-  transform: translateX(-32px);
 }
 
 .copy {
@@ -202,7 +202,7 @@
 
 .portraitStage {
   justify-self: end;
-  width: min(34vw, 460px);
+  width: min(34vw, 440px);
 }
 
 .portraitFrame {
@@ -375,6 +375,7 @@
 }
 
 @media (max-width: 860px) {
+  .header,
   .hero,
   .footer {
     width: min(100% - 36px, 720px);
@@ -389,7 +390,6 @@
     grid-template-columns: 1fr;
     gap: 42px;
     padding-block: 44px;
-    transform: none;
   }
 
   .heroTitle {

@@ -8,7 +8,6 @@ import { Sidebar, type SidebarDensity } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
-import { navigateWithViewTransition } from '@/lib/view-transition-navigation';
 import styles from './landing.module.css';
 
 const MOBILE_SHELL_MQ = '(max-width: 768px)';
@@ -110,17 +109,6 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
     !isMobileShell && sidebarDensity === 'comfortable' ? '/briangpt?menu=open' : '/briangpt';
 
   React.useEffect(() => {
-    router.prefetch(brianGptHref);
-  }, [brianGptHref, router]);
-
-  const navigateToBrianGpt = React.useCallback(() => {
-    navigateWithViewTransition(
-      () => router.push(brianGptHref),
-      '[data-briangpt-destination]'
-    );
-  }, [brianGptHref, router]);
-
-  React.useEffect(() => {
     const portraitFrame = portraitFrameRef.current;
     const canTrack = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -218,7 +206,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
                 'aria-expanded': isMobileShell ? mobileNavOpen : sidebarDensity === 'comfortable',
               }}
             />
-            <Sidebar.NewChatButton onClick={navigateToBrianGpt}>
+            <Sidebar.NewChatButton onClick={() => window.location.assign(brianGptHref)}>
               New Chat
             </Sidebar.NewChatButton>
             <Sidebar.NavSection sectionLabel="Projects">
@@ -300,16 +288,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               </span>
             </p>
             <div className={styles.actions}>
-              <a
-                className={styles.primaryAction}
-                href={brianGptHref}
-                onClick={(event) => {
-                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                  if (event.button !== 0) return;
-                  event.preventDefault();
-                  navigateToBrianGpt();
-                }}
-              >
+              <a className={styles.primaryAction} href={brianGptHref}>
                 Explore BrianGPT
                 <span aria-hidden="true">↗</span>
               </a>

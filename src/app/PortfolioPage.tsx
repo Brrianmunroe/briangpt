@@ -22,7 +22,6 @@ import {
   type ChatDisplayError,
 } from '@/lib/chat-errors';
 import { useOnlineStatus } from '@/lib/use-online-status';
-import { navigateWithViewTransition } from '@/lib/view-transition-navigation';
 import styles from './portfolio.module.css';
 
 const MOBILE_SHELL_MQ = '(max-width: 768px)';
@@ -303,23 +302,16 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
   const desktopSidebarExpanded = !isMobileShell && sidebarDensity === 'comfortable';
   const homeHref = desktopSidebarExpanded ? '/?menu=open' : '/';
 
-  React.useEffect(() => {
-    router.prefetch(homeHref);
-  }, [homeHref, router]);
-
   const handleBrandHomeClick = React.useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (e.button !== 0) return;
       if (pathname === '/briangpt') {
         e.preventDefault();
-        navigateWithViewTransition(
-          () => router.push(homeHref),
-          '[data-home-destination]'
-        );
+        window.location.assign(homeHref);
       }
     },
-    [homeHref, pathname, router]
+    [homeHref, pathname]
   );
 
   const HeroTag = isMobileShell ? 'h2' : 'h1';
