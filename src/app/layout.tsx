@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { ResponsiveConstructionGate } from './ResponsiveConstructionGate';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="appBackground">{children}</div>
+        <ResponsiveConstructionGate />
         {modal}
         <Analytics />
         <SpeedInsights />

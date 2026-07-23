@@ -33,6 +33,10 @@ body {
   transform: scale(1);
 }
 
+.responsiveConstructionGate {
+  display: none;
+}
+
 @view-transition {
   navigation: auto;
 }
@@ -132,6 +136,82 @@ body[data-case-modal-state='closing'] .appBackground {
   transform: scale(1);
   transition: transform 180ms cubic-bezier(0.4, 0, 1, 1);
   will-change: transform;
+}
+
+@media (max-width: 860px) {
+  body[data-responsive-construction-gate='open'] {
+    overflow: hidden;
+  }
+
+  body[data-responsive-construction-gate='open'] .appBackground {
+    min-height: 100svh;
+    pointer-events: none;
+    filter: blur(8px);
+    transform: scale(0.985);
+  }
+
+  .responsiveConstructionGate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: var(--spacing-md);
+    background: var(--overlay-scrim-background);
+    -webkit-backdrop-filter: blur(var(--overlay-scrim-blur));
+    backdrop-filter: blur(var(--overlay-scrim-blur));
+  }
+
+  .responsiveConstructionCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    width: min(100%, 440px);
+    padding: var(--spacing-xl);
+    border: var(--stroke-sm) solid var(--color-neutral-500);
+    border-radius: var(--radius-xl);
+    color: var(--color-text-fill-primary);
+    background: var(--color-neutral-300);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  }
+
+  .responsiveConstructionAvatar {
+    flex: 0 0 auto;
+    align-self: center;
+    border: var(--stroke-sm) solid var(--color-icon-surface-orange);
+    border-radius: var(--radius-full);
+    background: var(--color-orange-400);
+  }
+
+  .responsiveConstructionCopy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .responsiveConstructionCard h1 {
+    margin: 0;
+    font-family: var(--font-style-primary), system-ui, sans-serif;
+    font-size: var(--font-size-heading03);
+    font-weight: 600;
+    line-height: var(--font-line-height-heading03);
+  }
+
+  #responsive-construction-description {
+    margin: var(--spacing-sm) 0 0;
+    color: var(--color-text-fill-secondary-2);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+  }
+
+  .responsiveConstructionActions {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
