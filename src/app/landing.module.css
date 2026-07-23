@@ -150,8 +150,8 @@
 }
 
 .role {
-  margin: clamp(28px, 4vh, 44px) 0 0;
-  color: var(--color-neutral-700);
+  margin: var(--spacing-md) 0 0;
+  color: var(--color-text-fill-secondary-2);
   font-size: clamp(24px, 2.5vw, 38px);
   font-weight: 400;
   letter-spacing: -0.035em;
@@ -159,8 +159,20 @@
   animation: homepage-support-in 450ms 468ms both ease;
 }
 
+.typedAction {
+  color: var(--color-text-fill-secondary-2);
+}
+
+.typingCaret {
+  display: inline-block;
+  margin-left: var(--scale-200);
+  color: var(--color-icon-surface-orange);
+  font-weight: 300;
+  animation: typing-caret-blink 900ms steps(1, end) infinite;
+}
+
 .actions {
-  margin-top: clamp(30px, 4vh, 46px);
+  margin-top: var(--spacing-xl);
   animation: homepage-support-in 450ms 508ms both ease;
 }
 
@@ -168,12 +180,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: var(--spacing-lg);
   min-height: 54px;
   padding: 0 26px;
   border-radius: var(--radius-full);
-  color: var(--color-neutral-200);
-  background: var(--color-orange-400);
+  color: var(--color-button-primary-text-default);
+  background: var(--color-button-primary-surface-default);
   font-size: 15px;
   font-weight: 650;
   text-decoration: none;
@@ -184,7 +196,7 @@
 
 .primaryAction:hover,
 .primaryAction:focus-visible {
-  background: var(--color-orange-300);
+  background: var(--color-button-primary-surface-hover);
   transform: translateY(-2px);
 }
 
@@ -253,6 +265,18 @@
   }
 }
 
+@keyframes typing-caret-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  49%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 860px) {
   .hero,
   .footer {
@@ -272,14 +296,6 @@
 
   .heroTitle {
     font-size: clamp(72px, 23vw, 130px);
-  }
-
-  .role {
-    margin-top: 26px;
-  }
-
-  .actions {
-    margin-top: 28px;
   }
 
   .portraitStage {
@@ -318,6 +334,10 @@
   .role,
   .actions,
   .footer {
+    animation: none;
+  }
+
+  .typingCaret {
     animation: none;
   }
 }

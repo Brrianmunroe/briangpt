@@ -11,6 +11,11 @@ import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './landing.module.css';
 
 const MOBILE_SHELL_MQ = '(max-width: 768px)';
+const DESIGNER_ACTIONS = ['researches.', 'collaborates.', 'simplifies.', 'builds.', 'ships.'] as const;
+const TYPE_MS = 56;
+const DELETE_MS = 34;
+const HOLD_AFTER_FULL_MS = 1250;
+const PAUSE_BETWEEN_ACTIONS_MS = 320;
 
 function useIsMobileShell(): boolean {
   const subscribe = React.useCallback((onStoreChange: () => void) => {
@@ -24,6 +29,60 @@ function useIsMobileShell(): boolean {
     () => window.matchMedia(MOBILE_SHELL_MQ).matches,
     () => false
   );
+}
+
+function useDesignerActionTypewriter(): string {
+  const [action, setAction] = React.useState('');
+
+  React.useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setAction(DESIGNER_ACTIONS[0]);
+      return;
+    }
+
+    let cancelled = false;
+    let actionIndex = 0;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const runAction = () => {
+      if (cancelled) return;
+      const phrase = DESIGNER_ACTIONS[actionIndex % DESIGNER_ACTIONS.length];
+
+      const typeNextCharacter = (length: number) => {
+        if (cancelled) return;
+        if (length <= phrase.length) {
+          setAction(phrase.slice(0, length));
+          timeoutId = setTimeout(() => typeNextCharacter(length + 1), TYPE_MS);
+          return;
+        }
+
+        timeoutId = setTimeout(() => deleteNextCharacter(phrase.length - 1), HOLD_AFTER_FULL_MS);
+      };
+
+      const deleteNextCharacter = (length: number) => {
+        if (cancelled) return;
+        if (length >= 0) {
+          setAction(phrase.slice(0, length));
+          timeoutId = setTimeout(() => deleteNextCharacter(length - 1), DELETE_MS);
+          return;
+        }
+
+        actionIndex = (actionIndex + 1) % DESIGNER_ACTIONS.length;
+        timeoutId = setTimeout(runAction, PAUSE_BETWEEN_ACTIONS_MS);
+      };
+
+      typeNextCharacter(1);
+    };
+
+    runAction();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  return action;
 }
 
 const LINKS = {
@@ -43,6 +102,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   const [sidebarDensity, setSidebarDensity] =
     React.useState<SidebarDensity>(initialSidebarDensity);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+  const designerAction = useDesignerActionTypewriter();
   const sidebarDensityEffective: SidebarDensity = isMobileShell ? 'comfortable' : sidebarDensity;
   const brianGptHref =
     !isMobileShell && sidebarDensity === 'comfortable' ? '/briangpt?menu=open' : '/briangpt';
@@ -177,7 +237,15 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               <br />
               Munroe<span className={styles.accent}>.</span>
             </h1>
-            <p className={styles.role}>Product Designer</p>
+            <p
+              className={styles.role}
+              aria-label="Product Designer who researches, collaborates, simplifies, builds, and ships"
+            >
+              <span aria-hidden="true">
+                Product Designer who <span className={styles.typedAction}>{designerAction}</span>
+                <span className={styles.typingCaret}>|</span>
+              </span>
+            </p>
             <div className={styles.actions}>
               <a className={styles.primaryAction} href={brianGptHref}>
                 Explore BrianGPT
