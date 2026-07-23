@@ -174,7 +174,7 @@
 }
 
 .actions {
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-lg);
   animation: homepage-support-in 450ms 508ms both ease;
 }
 
