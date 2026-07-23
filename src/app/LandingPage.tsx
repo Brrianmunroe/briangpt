@@ -1,12 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Close, Menu } from '@/components/icons';
 import { Sidebar, type SidebarDensity } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
+import { SharedViewTransition } from '@/components/shared-view-transition/SharedViewTransition';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
 import styles from './landing.module.css';
 
@@ -109,6 +111,10 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
     !isMobileShell && sidebarDensity === 'comfortable' ? '/briangpt?menu=open' : '/briangpt';
 
   React.useEffect(() => {
+    router.prefetch(brianGptHref);
+  }, [brianGptHref, router]);
+
+  React.useEffect(() => {
     const portraitFrame = portraitFrameRef.current;
     const canTrack = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -206,7 +212,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
                 'aria-expanded': isMobileShell ? mobileNavOpen : sidebarDensity === 'comfortable',
               }}
             />
-            <Sidebar.NewChatButton onClick={() => window.location.assign(brianGptHref)}>
+            <Sidebar.NewChatButton onClick={() => router.push(brianGptHref)}>
               New Chat
             </Sidebar.NewChatButton>
             <Sidebar.NavSection sectionLabel="Projects">
@@ -273,11 +279,13 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
 
         <section className={styles.hero} aria-labelledby="landing-title">
           <div className={styles.copy}>
-            <h1 id="landing-title" className={styles.heroTitle}>
-              Brian
-              <br />
-              Munroe<span className={styles.accent}>.</span>
-            </h1>
+            <SharedViewTransition name="homepage-title">
+              <h1 id="landing-title" className={styles.heroTitle}>
+                Brian
+                <br />
+                Munroe<span className={styles.accent}>.</span>
+              </h1>
+            </SharedViewTransition>
             <p
               className={styles.role}
               aria-label="Product Designer who researches, collaborates, simplifies, builds, and ships"
@@ -288,49 +296,51 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               </span>
             </p>
             <div className={styles.actions}>
-              <a className={styles.primaryAction} href={brianGptHref}>
+              <Link className={styles.primaryAction} href={brianGptHref} prefetch>
                 Explore BrianGPT
                 <span aria-hidden="true">↗</span>
-              </a>
+              </Link>
             </div>
           </div>
 
           <div className={styles.portraitStage}>
-            <div ref={portraitFrameRef} className={styles.portraitFrame}>
-              <Image
-                className={styles.portrait}
-                src="/headshot-eye-base.png"
-                alt="Memoji portrait of Brian Munroe"
-                width={1254}
-                height={1254}
-                priority
-                sizes="(max-width: 760px) 78vw, 42vw"
-              />
-              <span className={styles.detachedIrisLeft} aria-hidden="true">
-                <img className={styles.detachedIrisArtwork} src="/left-iris.png" alt="" />
-              </span>
-              <span className={`${styles.eyeLayer} ${styles.eyeLayerRight}`} aria-hidden="true">
-                <img className={styles.eyeArtwork} src="/headshot-upscaled.png" alt="" />
-              </span>
-              <img
-                className={styles.portraitForeground}
-                src="/headshot-upscaled.png"
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                className={styles.leftEyelidForeground}
-                src="/headshot-upscaled.png"
-                alt=""
-                aria-hidden="true"
-              />
-            </div>
+            <SharedViewTransition name="hero-avatar">
+              <div ref={portraitFrameRef} className={styles.portraitFrame}>
+                <Image
+                  className={styles.portrait}
+                  src="/headshot-eye-base.png"
+                  alt="Memoji portrait of Brian Munroe"
+                  width={1254}
+                  height={1254}
+                  priority
+                  sizes="(max-width: 760px) 78vw, 42vw"
+                />
+                <span className={styles.detachedIrisLeft} aria-hidden="true">
+                  <img className={styles.detachedIrisArtwork} src="/left-iris.png" alt="" />
+                </span>
+                <span className={`${styles.eyeLayer} ${styles.eyeLayerRight}`} aria-hidden="true">
+                  <img className={styles.eyeArtwork} src="/headshot-upscaled.png" alt="" />
+                </span>
+                <img
+                  className={styles.portraitForeground}
+                  src="/headshot-upscaled.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className={styles.leftEyelidForeground}
+                  src="/headshot-upscaled.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+            </SharedViewTransition>
           </div>
         </section>
 
         <footer className={styles.footer}>
           <span>Designing from curiosity to shipped product.</span>
-          <span>Boston · Halifax</span>
+          <span>Currently based in Boston</span>
         </footer>
       </main>
     </div>

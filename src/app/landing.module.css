@@ -78,7 +78,6 @@
   background-size: 16px 16px;
 }
 
-.header,
 .hero,
 .footer {
   position: relative;
@@ -92,12 +91,15 @@
 }
 
 .header {
+  position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   min-height: 0;
-  padding: 6px 0 var(--spacing-sm);
+  margin: 0;
+  padding: 6px var(--spacing-md) var(--spacing-sm);
 }
 
 .headerLeading {
@@ -375,7 +377,6 @@
 }
 
 @media (max-width: 860px) {
-  .header,
   .hero,
   .footer {
     width: min(100% - 36px, 720px);

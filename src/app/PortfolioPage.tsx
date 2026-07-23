@@ -12,6 +12,7 @@ import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
+import { SharedViewTransition } from '@/components/shared-view-transition/SharedViewTransition';
 import { ConversationPanel } from '@/components/conversation-panel';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
@@ -302,16 +303,20 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
   const desktopSidebarExpanded = !isMobileShell && sidebarDensity === 'comfortable';
   const homeHref = desktopSidebarExpanded ? '/?menu=open' : '/';
 
+  React.useEffect(() => {
+    router.prefetch(homeHref);
+  }, [homeHref, router]);
+
   const handleBrandHomeClick = React.useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (e.button !== 0) return;
       if (pathname === '/briangpt') {
         e.preventDefault();
-        window.location.assign(homeHref);
+        router.push(homeHref);
       }
     },
-    [homeHref, pathname]
+    [homeHref, pathname, router]
   );
 
   const HeroTag = isMobileShell ? 'h2' : 'h1';
@@ -442,20 +447,24 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
                     <div className={styles.landingCluster}>
                       <div className={styles.messageHeader}>
                         <div className={styles.promptTitleRow}>
-                          <HeroTag className={styles.heroH1}>
-                            Hi, I&apos;m Brian!
-                            <br />
-                            Ask me a question.
-                          </HeroTag>
-                          <span className={styles.promptAvatar}>
-                            <img
-                              src="/headshot-upscaled.png"
-                              alt=""
-                              width={72}
-                              height={72}
-                              decoding="async"
-                            />
-                          </span>
+                          <SharedViewTransition name="chat-title">
+                            <HeroTag className={styles.heroH1}>
+                              Hi, I&apos;m Brian!
+                              <br />
+                              Ask me a question.
+                            </HeroTag>
+                          </SharedViewTransition>
+                          <SharedViewTransition name="hero-avatar">
+                            <span className={styles.promptAvatar}>
+                              <img
+                                src="/headshot-upscaled.png"
+                                alt=""
+                                width={72}
+                                height={72}
+                                decoding="async"
+                              />
+                            </span>
+                          </SharedViewTransition>
                         </div>
                       </div>
                       <div
