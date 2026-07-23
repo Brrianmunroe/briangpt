@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { Menu, Plus, DownChevron } from '@/components/icons';
+import { Menu, NewChat, DownChevron } from '@/components/icons';
 import styles from './Sidebar.module.css';
 
 /** Comfortable `Sidebar` (341:656); compact rail (`Side Bar` 3:78). */
@@ -150,7 +150,7 @@ const SidebarNewChatButton = React.forwardRef<HTMLButtonElement, SidebarNewChatB
   function SidebarNewChatButton({ children = 'New chat', className, ...rest }, ref) {
     return (
       <button ref={ref} type="button" className={mergeClassNames(styles.newChat, className)} {...rest}>
-        <Plus color="orange" size={16} aria-hidden />
+        <NewChat color="orange" size={18} weight="semibold" aria-hidden />
         <span className={styles.newChatLabel}>{children}</span>
       </button>
     );

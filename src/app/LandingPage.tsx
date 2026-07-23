@@ -4,7 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
-import { Close, Menu } from '@/components/icons';
+import { ButtonLink } from '@/components/button';
+import { Close, Menu, NewChat } from '@/components/icons';
 import { Sidebar, type SidebarDensity } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
@@ -296,10 +297,23 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               </span>
             </p>
             <div className={styles.actions}>
-              <Link className={styles.primaryAction} href={brianGptHref} prefetch>
-                Explore BrianGPT
-                <span aria-hidden="true">↗</span>
-              </Link>
+              <ButtonLink
+                className={styles.primaryAction}
+                href={brianGptHref}
+                prefetch
+                icon={
+                  <NewChat
+                    fill="var(--button-icon-fill)"
+                    size={20}
+                    weight="semibold"
+                    strokeWidth={0.825}
+                    aria-hidden
+                  />
+                }
+                iconPosition="end"
+              >
+                Try BrianGPT
+              </ButtonLink>
             </div>
           </div>
 

@@ -7,6 +7,12 @@ export {
   type DownChevronProps,
 } from './DownChevron';
 export { Plus, type PlusColor, type PlusProps } from './Plus';
+export {
+  NewChat,
+  type NewChatColor,
+  type NewChatProps,
+  type NewChatWeight,
+} from './NewChat';
 export { Prompt, type PromptColor, type PromptProps } from './Prompt';
 export { Menu, type MenuColor, type MenuProps } from './Menu';
 export { Close, type CloseColor, type CloseProps } from './Close';

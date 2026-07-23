@@ -174,32 +174,18 @@
 }
 
 .actions {
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
   animation: homepage-support-in 450ms 508ms both ease;
 }
 
 .primaryAction {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-lg);
-  min-height: 54px;
-  padding: 0 26px;
-  border-radius: var(--radius-full);
-  color: var(--color-button-primary-text-default);
-  background: var(--color-button-primary-surface-default);
-  font-size: 15px;
-  font-weight: 650;
-  text-decoration: none;
-  transition:
-    background 160ms ease,
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.primaryAction:hover,
-.primaryAction:focus-visible {
-  background: var(--color-button-primary-surface-hover);
-  transform: translateY(-2px);
+  gap: 8px;
+  min-height: var(--scale-1200);
+  padding: 0 calc(var(--spacing-md) + 1px);
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  line-height: var(--font-line-height-body);
+  letter-spacing: 0;
 }
 
 .portraitStage {

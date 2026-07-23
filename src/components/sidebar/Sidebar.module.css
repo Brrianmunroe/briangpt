@@ -393,8 +393,8 @@ a.brandTitle:focus-visible {
 
 .newChat svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -406,9 +406,9 @@ a.brandTitle:focus-visible {
    * isn't animatable, so the plus icon darted to the middle of the still-wide
    * pill on click. Instead the icon stays put and the padding below leaves it
    * optically centered once the pill has shrunk to a circle around it.
-   * Padding = (button - 2×border - 16px icon) / 2.
+   * Padding = (button - 2×border - 18px icon) / 2.
    */
-  padding: 0 calc((var(--scale-1200) - 2 * var(--stroke-sm) - 16px) / 2);
+  padding: 0 calc((var(--scale-1200) - 2 * var(--stroke-sm) - 18px) / 2);
   gap: 0;
   align-self: center;
   /* Pill-to-circle morph rides the same delayed timeline as the rail. */
