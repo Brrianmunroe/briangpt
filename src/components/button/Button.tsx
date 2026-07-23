@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 import { UpArrow } from '@/components/icons';
 import styles from './Button.module.css';
 
@@ -28,6 +29,39 @@ const variantClass: Record<ButtonVariant, string> = {
   ghost: styles.ghost,
 };
 
+type ButtonVisualProps = {
+  variant?: ButtonVariant;
+  children?: React.ReactNode;
+  showIcon?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'start' | 'end';
+};
+
+function buttonClassName(variant: ButtonVariant, className?: string) {
+  return [styles.root, variantClass[variant], className].filter(Boolean).join(' ');
+}
+
+function ButtonContent({
+  children,
+  showIcon = true,
+  icon,
+  iconPosition = 'start',
+}: Omit<ButtonVisualProps, 'variant'>) {
+  const iconElement = showIcon ? (
+    <span className={styles.icon} aria-hidden>
+      {icon ?? <UpArrow aria-hidden size={16} fill="var(--button-icon-fill)" />}
+    </span>
+  ) : null;
+
+  return (
+    <>
+      {iconPosition === 'start' ? iconElement : null}
+      {children != null ? <span className={styles.label}>{children}</span> : null}
+      {iconPosition === 'end' ? iconElement : null}
+    </>
+  );
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
@@ -44,12 +78,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) {
     const showIconResolved = iconOnly ? true : showIcon;
-    const rootClass = [
-      styles.root,
-      variantClass[variant],
-      iconOnly ? styles.iconOnly : null,
-      className,
-    ]
+    const rootClass = [buttonClassName(variant), iconOnly ? styles.iconOnly : null, className]
       .filter(Boolean)
       .join(' ');
 
@@ -76,6 +105,33 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <span className={styles.label}>{children}</span>
         ) : null}
       </button>
+    );
+  }
+);
+
+export type ButtonLinkProps = Omit<React.ComponentProps<typeof Link>, 'children'> &
+  ButtonVisualProps;
+
+/** Link counterpart to `Button`; shares the same visual variants and states. */
+export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+  function ButtonLink(
+    {
+      variant = 'primary',
+      children,
+      showIcon = true,
+      icon,
+      iconPosition = 'start',
+      className,
+      ...rest
+    },
+    ref
+  ) {
+    return (
+      <Link ref={ref} className={buttonClassName(variant, className)} {...rest}>
+        <ButtonContent showIcon={showIcon} icon={icon} iconPosition={iconPosition}>
+          {children}
+        </ButtonContent>
+      </Link>
     );
   }
 );
