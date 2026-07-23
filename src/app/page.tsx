@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
-import { PortfolioPage } from './PortfolioPage';
+import { LandingPage } from './LandingPage';
 
 export const metadata: Metadata = {
-  title: 'BrianGPT — Portfolio',
-  description: 'Brian Munroe’s portfolio with an AI assistant grounded in context.md.',
+  title: 'Brian Munroe — Product Designer',
+  description:
+    'Product designer creating thoughtful, useful digital experiences. Explore Brian Munroe’s work and meet BrianGPT.',
 };
 
-export default function Home() {
-  return <PortfolioPage />;
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ menu?: string }>;
+}) {
+  const { menu } = await searchParams;
+  return <LandingPage initialSidebarDensity={menu === 'open' ? 'comfortable' : 'compact'} />;
 }

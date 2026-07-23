@@ -39,7 +39,7 @@ export const SocialLinksToolbar = React.forwardRef<HTMLElement, SocialLinksToolb
       linkedinAriaLabel = 'LinkedIn',
       githubAriaLabel = 'GitHub',
       mailAriaLabel = 'Email',
-      resumeAriaLabel = 'Download resume',
+      resumeAriaLabel = 'Resume',
       websiteAriaLabel = 'Website',
       themeAriaLabel = 'Toggle color theme',
       themePressed = false,
@@ -58,6 +58,7 @@ export const SocialLinksToolbar = React.forwardRef<HTMLElement, SocialLinksToolb
           href={linkedinHref}
           className={styles.hit}
           aria-label={linkedinAriaLabel}
+          data-tooltip={linkedinAriaLabel}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -67,18 +68,25 @@ export const SocialLinksToolbar = React.forwardRef<HTMLElement, SocialLinksToolb
           href={githubHref}
           className={styles.hit}
           aria-label={githubAriaLabel}
+          data-tooltip={githubAriaLabel}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Github color="grey" size={16} />
         </a>
-        <a href={mailHref} className={styles.hit} aria-label={mailAriaLabel}>
+        <a
+          href={mailHref}
+          className={styles.hit}
+          aria-label={mailAriaLabel}
+          data-tooltip={mailAriaLabel}
+        >
           <Mail color="grey" size={16} />
         </a>
         <a
           href={resumeHref}
           className={styles.hit}
           aria-label={resumeAriaLabel}
+          data-tooltip={resumeAriaLabel}
           download="Brian_Munroe_Resume_Product_Design.pdf"
         >
           <Resume color="grey" size={16} />

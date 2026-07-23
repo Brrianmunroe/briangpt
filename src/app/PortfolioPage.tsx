@@ -3,18 +3,16 @@
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type ChatStatus, type UIMessage } from 'ai';
 import * as React from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Card } from '@/components/card';
 import { ChatErrorBanner } from '@/components/chat-error-banner';
 import { ChatInput } from '@/components/chat-input';
-import { NameTag } from '@/components/name-tag';
 import { Close, Menu, Prompt } from '@/components/icons';
 import { PromptChip } from '@/components/prompt-chip';
 import type { SidebarDensity } from '@/components/sidebar';
 import { Sidebar } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
+import { SharedViewTransition } from '@/components/shared-view-transition/SharedViewTransition';
 import { ConversationPanel } from '@/components/conversation-panel';
 import { SidebarAnimationTuner } from '@/components/sidebar-animation-tuner';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
@@ -117,12 +115,17 @@ function shouldAppendThinkingRow(messages: UIMessage[], status: ChatStatus): boo
   return Boolean(last && last.role === 'user');
 }
 
-export function PortfolioPage() {
+export type PortfolioPageProps = {
+  initialSidebarDensity?: SidebarDensity;
+};
+
+export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isMobileShell = useIsMobileShell();
   const [draft, setDraft] = React.useState('');
-  const [sidebarDensity, setSidebarDensity] = React.useState<SidebarDensity>('comfortable');
+  const [sidebarDensity, setSidebarDensity] =
+    React.useState<SidebarDensity>(initialSidebarDensity);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const chipRowRef = React.useRef<HTMLDivElement>(null);
   const composerHostRef = React.useRef<HTMLDivElement | null>(null);
@@ -253,25 +256,16 @@ export function PortfolioPage() {
   }, [clearError, isMobileShell, setMessages]);
 
   /** Home link must clear chat when already on `/` — same URL does not remount or reset `useChat`. */
-  const handleBrandHomeClick = React.useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      if (e.button !== 0) return;
-      clearError();
-      setLocalError(null);
-      setChatEngaged(false);
-      setMessages([]);
-      setDraft('');
-      if (isMobileShell) setMobileNavOpen(false);
-      if (pathname === '/') {
-        e.preventDefault();
-      }
-    },
-    [clearError, isMobileShell, pathname, setMessages]
-  );
-
   const toggleSidebarDensity = React.useCallback(() => {
-    setSidebarDensity((d) => (d === 'comfortable' ? 'compact' : 'comfortable'));
+    setSidebarDensity((density) => {
+      const nextDensity = density === 'comfortable' ? 'compact' : 'comfortable';
+      window.history.replaceState(
+        window.history.state,
+        '',
+        nextDensity === 'comfortable' ? '/briangpt?menu=open' : '/briangpt'
+      );
+      return nextDensity;
+    });
   }, []);
 
   const handleSidebarMenuClick = React.useCallback(() => {
@@ -306,11 +300,29 @@ export function PortfolioPage() {
   const promptChipIcon = <Prompt color={promptChipIconColor} size={16} aria-hidden />;
 
   const sidebarDensityEffective: SidebarDensity = isMobileShell ? 'comfortable' : sidebarDensity;
+  const desktopSidebarExpanded = !isMobileShell && sidebarDensity === 'comfortable';
+  const homeHref = desktopSidebarExpanded ? '/?menu=open' : '/';
+
+  React.useEffect(() => {
+    router.prefetch(homeHref);
+  }, [homeHref, router]);
+
+  const handleBrandHomeClick = React.useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.button !== 0) return;
+      if (pathname === '/briangpt') {
+        e.preventDefault();
+        router.push(homeHref);
+      }
+    },
+    [homeHref, pathname, router]
+  );
 
   const HeroTag = isMobileShell ? 'h2' : 'h1';
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} data-briangpt-destination>
       {isMobileShell && mobileNavOpen ? (
         <button
           type="button"
@@ -321,7 +333,9 @@ export function PortfolioPage() {
       ) : null}
 
       <div
-        className={`${styles.sidebarHost}${isMobileShell ? ` ${styles.sidebarHostMobile}` : ''}${
+        className={`${styles.sidebarHost}${
+          desktopSidebarExpanded ? ` ${styles.sidebarHostExpanded}` : ''
+        }${isMobileShell ? ` ${styles.sidebarHostMobile}` : ''}${
           isMobileShell && mobileNavOpen ? ` ${styles.sidebarHostMobileOpen}` : ''
         }`}
         {...(isMobileShell && !mobileNavOpen ? ({ inert: true } as const) : {})}
@@ -334,8 +348,8 @@ export function PortfolioPage() {
         >
           <Sidebar.Stack className={styles.drawerStack}>
             <Sidebar.HeaderRow
-              title="BrianGPT"
-              brandHref="/"
+              title="Home"
+              brandHref={homeHref}
               brandLinkProps={{ onClick: handleBrandHomeClick }}
               showBrandMark={false}
               onMenuClick={handleSidebarMenuClick}
@@ -386,6 +400,10 @@ export function PortfolioPage() {
         </Sidebar>
       </div>
 
+      <a className={styles.homeLink} href={homeHref} aria-label="Back home">
+        <span aria-hidden="true">←</span>
+      </a>
+
       <main className={styles.main}>
         <div
           className={
@@ -397,21 +415,23 @@ export function PortfolioPage() {
           {!conversationMode ? (
             <>
               <header className={`${styles.mainHeader} ${styles.mainHeaderConversation}`}>
-                {isMobileShell ? (
-                  <button
-                    type="button"
-                    className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
-                    aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
-                    aria-expanded={mobileNavOpen}
-                    onClick={() => setMobileNavOpen((open) => !open)}
-                  >
-                    {mobileNavOpen ? (
-                      <Close color="grey" size={16} aria-hidden />
-                    ) : (
-                      <Menu color="grey" size={16} aria-hidden />
-                    )}
-                  </button>
-                ) : null}
+                <div className={styles.headerLeading}>
+                  {isMobileShell ? (
+                    <button
+                      type="button"
+                      className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
+                      aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+                      aria-expanded={mobileNavOpen}
+                      onClick={() => setMobileNavOpen((open) => !open)}
+                    >
+                      {mobileNavOpen ? (
+                        <Close color="grey" size={16} aria-hidden />
+                      ) : (
+                        <Menu color="grey" size={16} aria-hidden />
+                      )}
+                    </button>
+                  ) : null}
+                </div>
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}
@@ -426,14 +446,31 @@ export function PortfolioPage() {
                   <div className={styles.landingColumn}>
                     <div className={styles.landingCluster}>
                       <div className={styles.messageHeader}>
-                        <NameTag />
-                        <HeroTag className={styles.heroH1}>
-                          Hi, I&apos;m Brian!
-                          <br />
-                          Ask me a question.
-                        </HeroTag>
+                        <div className={styles.promptTitleRow}>
+                          <SharedViewTransition name="chat-title">
+                            <HeroTag className={styles.heroH1}>
+                              Hi, I&apos;m Brian!
+                              <br />
+                              Ask me a question.
+                            </HeroTag>
+                          </SharedViewTransition>
+                          <SharedViewTransition name="hero-avatar">
+                            <span className={styles.promptAvatar}>
+                              <img
+                                src="/headshot-upscaled.png"
+                                alt=""
+                                width={72}
+                                height={72}
+                                decoding="async"
+                              />
+                            </span>
+                          </SharedViewTransition>
+                        </div>
                       </div>
-                      <div ref={composerHostRef} className={styles.composerHostLanding}>
+                      <div
+                        ref={composerHostRef}
+                        className={`${styles.composerHostLanding} ${styles.destinationReveal}`}
+                      >
                         <div className={styles.composerInputBlock}>
                           <ChatInput
                             autoGrow={false}
@@ -483,24 +520,6 @@ export function PortfolioPage() {
                     </div>
                   </div>
 
-                <div className={styles.cardsRow}>
-                  {CASE_STUDY_LIST.map((c) => (
-                    <div key={c.slug} className={styles.cardCell}>
-                      <Link
-                        href={`/work/${c.slug}`}
-                        className={styles.cardLink}
-                        aria-label={`Open case study: ${c.title}`}
-                      >
-                        <Card
-                          className={styles.homeCard}
-                          variant={c.variant}
-                          title={c.title}
-                          subtitle={c.subtitle}
-                        />
-                      </Link>
-                    </div>
-                  ))}
-                </div>
               </div>
               </div>
             </>
@@ -509,21 +528,23 @@ export function PortfolioPage() {
               <header
                 className={`${styles.mainHeader} ${styles.mainHeaderConversation} ${styles.mainHeaderChatStroke}`}
               >
-                {isMobileShell ? (
-                  <button
-                    type="button"
-                    className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
-                    aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
-                    aria-expanded={mobileNavOpen}
-                    onClick={() => setMobileNavOpen((open) => !open)}
-                  >
-                    {mobileNavOpen ? (
-                      <Close color="grey" size={16} aria-hidden />
-                    ) : (
-                      <Menu color="grey" size={16} aria-hidden />
-                    )}
-                  </button>
-                ) : null}
+                <div className={styles.headerLeading}>
+                  {isMobileShell ? (
+                    <button
+                      type="button"
+                      className={`${sidebarStyles.menuButton} ${styles.mobileMenuButton}`}
+                      aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+                      aria-expanded={mobileNavOpen}
+                      onClick={() => setMobileNavOpen((open) => !open)}
+                    >
+                      {mobileNavOpen ? (
+                        <Close color="grey" size={16} aria-hidden />
+                      ) : (
+                        <Menu color="grey" size={16} aria-hidden />
+                      )}
+                    </button>
+                  ) : null}
+                </div>
                 <SocialLinksToolbar
                   variant="links"
                   linkedinHref={LINKS.linkedin}
