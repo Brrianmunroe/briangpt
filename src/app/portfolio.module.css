@@ -148,7 +148,6 @@
   background-image: radial-gradient(var(--main-dot-fill) 1px, transparent 1px);
   background-size: var(--main-dot-grid) var(--main-dot-grid);
   background-position: 0 0;
-  animation: destination-background-reveal 320ms 690ms both ease-out;
 }
 
 .mainColumn {
@@ -470,28 +469,19 @@
 }
 
 .destinationReveal {
-  animation: destination-rise-in 300ms 540ms both ease;
+  animation: destination-rise-in 450ms 540ms both ease;
 }
 
 @keyframes destination-rise-in {
   from {
     opacity: 0;
+    filter: blur(4px);
     transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes destination-background-reveal {
-  from {
-    opacity: 0;
-    filter: blur(8px);
-  }
-  to {
-    opacity: 1;
     filter: blur(0);
+    transform: translateY(0);
   }
 }
 
@@ -771,7 +761,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .main::before,
   .destinationReveal,
   .homeLink {
     animation: none;

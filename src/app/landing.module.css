@@ -145,7 +145,7 @@
   font-size: clamp(88px, 11.3vw, 178px);
   font-weight: 760;
   line-height: 0.77;
-  letter-spacing: -0.055em;
+  letter-spacing: 2px;
   view-transition-name: homepage-title;
 }
 
@@ -156,12 +156,12 @@
   font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1.15;
-  animation: homepage-support-in 300ms 520ms both ease;
+  animation: homepage-support-in 450ms 468ms both ease;
 }
 
 .actions {
   margin-top: clamp(30px, 4vh, 46px);
-  animation: homepage-support-in 300ms 560ms both ease;
+  animation: homepage-support-in 450ms 508ms both ease;
 }
 
 .primaryAction {
@@ -237,15 +237,19 @@
   color: var(--color-neutral-600);
   font-size: 12px;
   letter-spacing: 0.04em;
-  animation: homepage-support-in 300ms 600ms both ease;
+  animation: homepage-support-in 450ms 548ms both ease;
 }
 
 @keyframes homepage-support-in {
   from {
     opacity: 0;
+    filter: blur(4px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
   }
 }
 
