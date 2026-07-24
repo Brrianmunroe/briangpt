@@ -516,7 +516,8 @@
   bottom: var(--spacing-sm);
   z-index: 1;
   width: min(62%, 390px);
-  aspect-ratio: 1861 / 1157;
+  height: calc(100% - var(--spacing-lg));
+  max-height: 280px;
   overflow: visible;
   background: transparent;
   transform: none;
@@ -527,6 +528,7 @@
   right: calc(11% - 3px);
   bottom: calc((var(--scale-1900) * -1) + 5px);
   width: min(29%, 174px);
+  height: auto;
   aspect-ratio: 373 / 748;
   transform: rotate(7deg) scale(1.15);
   transform-origin: top center;
@@ -538,7 +540,7 @@
 }
 
 .posterCard_selexai .posterArtworkImage {
-  object-position: center;
+  object-position: right bottom;
 }
 
 .posterCard_curio .posterArtworkImage {
