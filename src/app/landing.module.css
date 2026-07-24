@@ -525,8 +525,9 @@
 }
 
 .posterCard_curio .posterArtwork {
+  top: var(--spacing-lg);
   right: calc(11% - 3px);
-  bottom: calc((var(--scale-1900) * -1) + 5px);
+  bottom: auto;
   width: min(29%, 174px);
   height: auto;
   aspect-ratio: 373 / 748;
