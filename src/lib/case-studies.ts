@@ -17,7 +17,7 @@ export const CASE_STUDIES = {
     slug: 'curio',
     variant: 'secondary',
     title: 'Curio',
-    subtitle: 'Conversational AI built for retention',
+    subtitle: 'A faster path to personalized music',
     description:
       'Curio is a concept chatbot feature that helps users build a hyper-personalized Spotify library faster. When Spotify set a goal of adding 10M MAUs in a quarter, I explored whether growth could come from converting users on competing platforms. I surveyed 23 users and 70% said they would never consider switching. Interviews with Spotify and Apple Music users revealed why: users were deeply satisfied. Their libraries felt personal, recommendations were dialed, and both reinforced a strong sense of investment. An import tool could remove friction, but without intent to switch, there was no real opportunity. The real opportunity was accelerating personalization for brand new users. Operating on this new hypothesis, I tested two concepts, Chat and Curate. Chat, a playlist building chatbot, performed stronger in usability testing. Curate was shelved while Chat was integrated into onboarding, aiming to help users build one or more personalized playlist before signing up. Although this carries potential risks, I would monitor for dips in activation rates and I would track 7-day and 30-day retention compared to the standard sign up flow to validate success.',
     features: [
@@ -40,7 +40,7 @@ export const CASE_STUDIES = {
     slug: 'selexai',
     variant: 'primary',
     title: 'SelexAI',
-    subtitle: 'Tackling the Corporate Work Paradox',
+    subtitle: 'Up to 30% estimated time savings',
     description:
       'SelexAI helps video editors cut interview footage faster without giving up creative control. As the sole designer, I led the project from discovery through MVP, starting with interviews to understand the biggest friction points in editors’ workflows. Those conversations revealed what I call the “corporate work paradox”: corporate projects often pay the most, but feel the least creatively fulfilling. As repetitive post-production tasks pile up, that tension can turn already uninspiring work into procrastination and burnout. After mapping the editing workflow, I narrowed the MVP around the clearest pain point: cutting interview selects. My hypothesis was that AI could surface strong moments earlier in the review process, helping editors move faster from raw footage into shaping the story. Usability testing confirmed the early prototype felt intuitive, but revealed a deeper insight: editors often avoided delegating edits to other editors or AI because they feared important details would fall through the cracks. In response, I designed features that kept editors in control while showing why the AI selected certain moments, giving them more confidence in what was being surfaced. Early users estimated up to 30% time savings in post-production.',
   },
