@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
-import { ButtonLink } from '@/components/button';
-import { Close, Menu, NewChat } from '@/components/icons';
+import { Button, ButtonLink } from '@/components/button';
+import { Close, DownChevron, Menu, NewChat } from '@/components/icons';
 import { Sidebar, type SidebarDensity } from '@/components/sidebar';
 import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
@@ -19,6 +19,17 @@ const TYPE_MS = 56;
 const DELETE_MS = 34;
 const HOLD_AFTER_FULL_MS = 1250;
 const PAUSE_BETWEEN_ACTIONS_MS = 320;
+
+const CASE_STUDY_POSTER_META = {
+  selexai: {
+    eyebrow: '01 AI-powered video editor',
+    image: '/work/selexAI/homepage-poster.png',
+  },
+  curio: {
+    eyebrow: '02 · Conversational AI',
+    image: '/work/curio/homepage-poster.png',
+  },
+} as const;
 
 function useIsMobileShell(): boolean {
   const subscribe = React.useCallback((onStoreChange: () => void) => {
@@ -103,9 +114,12 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   const router = useRouter();
   const isMobileShell = useIsMobileShell();
   const portraitFrameRef = React.useRef<HTMLDivElement>(null);
+  const caseStudyButtonRef = React.useRef<HTMLButtonElement>(null);
+  const caseStudyDrawerRef = React.useRef<HTMLElement>(null);
   const [sidebarDensity, setSidebarDensity] =
     React.useState<SidebarDensity>(initialSidebarDensity);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+  const [caseStudyDrawerOpen, setCaseStudyDrawerOpen] = React.useState(false);
   const designerAction = useDesignerActionTypewriter();
   const sidebarDensityEffective: SidebarDensity = isMobileShell ? 'comfortable' : sidebarDensity;
   const brianGptHref =
@@ -114,6 +128,35 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   React.useEffect(() => {
     router.prefetch(brianGptHref);
   }, [brianGptHref, router]);
+
+  React.useEffect(() => {
+    if (!caseStudyDrawerOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (
+        caseStudyButtonRef.current?.contains(target) ||
+        caseStudyDrawerRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setCaseStudyDrawerOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setCaseStudyDrawerOpen(false);
+      caseStudyButtonRef.current?.focus();
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [caseStudyDrawerOpen]);
 
   React.useEffect(() => {
     const portraitFrame = portraitFrameRef.current;
@@ -314,6 +357,17 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               >
                 Try BrianGPT
               </ButtonLink>
+              <Button
+                ref={caseStudyButtonRef}
+                className={styles.secondaryAction}
+                variant="secondary"
+                showIcon={false}
+                aria-expanded={caseStudyDrawerOpen}
+                aria-controls="homepage-case-study-posters"
+                onClick={() => setCaseStudyDrawerOpen((open) => !open)}
+              >
+                View case studies
+              </Button>
             </div>
           </div>
 
@@ -352,10 +406,62 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
           </div>
         </section>
 
-        <footer className={styles.footer}>
-          <span>Designing from curiosity to shipped product.</span>
-          <span>Currently based in Boston</span>
-        </footer>
+        <div className={styles.workDrawerDock}>
+          <section
+            ref={caseStudyDrawerRef}
+            className={`${styles.workDrawer}${
+              caseStudyDrawerOpen ? ` ${styles.workDrawerOpen}` : ''
+            }`}
+            aria-label="Selected case studies"
+          >
+            <button
+              type="button"
+              className={styles.workDrawerTrigger}
+              aria-expanded={caseStudyDrawerOpen}
+              aria-controls="homepage-case-study-posters"
+              onClick={() => setCaseStudyDrawerOpen((open) => !open)}
+            >
+              <span>View selected work</span>
+              <span className={styles.workDrawerHint}>Two case studies</span>
+              <DownChevron
+                className={styles.workDrawerChevron}
+                color="grey"
+                size={16}
+                aria-hidden
+              />
+            </button>
+
+            <div id="homepage-case-study-posters" className={styles.posterGrid}>
+              {CASE_STUDY_LIST.map((caseStudy) => {
+                const meta = CASE_STUDY_POSTER_META[caseStudy.slug];
+                return (
+                  <Link
+                    key={caseStudy.slug}
+                    className={`${styles.posterCard} ${styles[`posterCard_${caseStudy.slug}`]}`}
+                    href={`/work/${caseStudy.slug}`}
+                    aria-label={`Open case study: ${caseStudy.title}`}
+                    onClick={() => setCaseStudyDrawerOpen(false)}
+                  >
+                    <span className={styles.posterEyebrow}>{meta.eyebrow}</span>
+                    <span className={styles.posterCopy}>
+                      <strong className={styles.posterTitle}>{caseStudy.title}</strong>
+                      <span className={styles.posterDetail}>{caseStudy.subtitle}</span>
+                    </span>
+                    <span className={styles.posterArtwork} aria-hidden="true">
+                      <Image
+                        className={styles.posterArtworkImage}
+                        src={meta.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 480px) 70vw, 36vw"
+                      />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );
