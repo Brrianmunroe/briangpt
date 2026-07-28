@@ -2,6 +2,8 @@
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type ChatStatus, type UIMessage } from 'ai';
+import Image from 'next/image';
+import Link from 'next/link';
 import * as React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { ChatErrorBanner } from '@/components/chat-error-banner';
@@ -400,9 +402,39 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
         </Sidebar>
       </div>
 
-      <a className={styles.homeLink} href={homeHref} aria-label="Back home">
+      <Link className={styles.homeLink} href={homeHref} prefetch aria-label="Back home">
         <span aria-hidden="true">←</span>
-      </a>
+      </Link>
+
+      <div className={styles.homePortraitPreload} aria-hidden="true">
+        <Image
+          src="/headshot-eye-base.png"
+          alt=""
+          width={1254}
+          height={1254}
+          sizes="(max-width: 760px) 78vw, 42vw"
+          loading="eager"
+          decoding="async"
+        />
+        <Image
+          src="/headshot-upscaled.png"
+          alt=""
+          width={1254}
+          height={1254}
+          sizes="(max-width: 760px) 78vw, 42vw"
+          loading="eager"
+          decoding="async"
+        />
+        <Image
+          src="/left-iris.png"
+          alt=""
+          width={345}
+          height={345}
+          sizes="32px"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
 
       <main className={styles.main}>
         <div
@@ -456,12 +488,14 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
                           </SharedViewTransition>
                           <SharedViewTransition name="hero-avatar">
                             <span className={styles.promptAvatar}>
-                              <img
+                              <Image
                                 src="/headshot-upscaled.png"
                                 alt=""
                                 width={72}
                                 height={72}
-                                decoding="async"
+                                sizes="64px"
+                                priority
+                                decoding="sync"
                               />
                             </span>
                           </SharedViewTransition>
