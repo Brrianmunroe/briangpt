@@ -340,10 +340,21 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               </span>
             </p>
             <div className={styles.actions}>
-              <ButtonLink
+              <Button
+                ref={caseStudyButtonRef}
                 className={styles.primaryAction}
+                showIcon={false}
+                aria-expanded={caseStudyDrawerOpen}
+                aria-controls="homepage-case-study-posters"
+                onClick={() => setCaseStudyDrawerOpen((open) => !open)}
+              >
+                View case studies
+              </Button>
+              <ButtonLink
+                className={styles.secondaryAction}
                 href={brianGptHref}
                 prefetch
+                variant="secondary"
                 icon={
                   <NewChat
                     fill="var(--button-icon-fill)"
@@ -357,17 +368,6 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               >
                 Try BrianGPT
               </ButtonLink>
-              <Button
-                ref={caseStudyButtonRef}
-                className={styles.secondaryAction}
-                variant="secondary"
-                showIcon={false}
-                aria-expanded={caseStudyDrawerOpen}
-                aria-controls="homepage-case-study-posters"
-                onClick={() => setCaseStudyDrawerOpen((open) => !open)}
-              >
-                View case studies
-              </Button>
             </div>
           </div>
 
