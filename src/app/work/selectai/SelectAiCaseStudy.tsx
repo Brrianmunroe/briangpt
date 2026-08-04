@@ -1,7 +1,7 @@
 import type { CaseStudy } from '@/lib/case-studies';
 import type { CSSProperties } from 'react';
-import { SelectAiHeroHotspots } from '@/components/select-ai-hero-hotspots/SelectAiHeroHotspots';
 import { SelectAiSummaryCarousel } from './SelectAiSummaryCarousel';
+import { SelectAiTrustExplorer } from './SelectAiTrustExplorer';
 import { selectAiImg } from './select-ai-assets';
 import styles from './select-ai-case-study.module.css';
 
@@ -10,25 +10,6 @@ const toolIcons = [
   { src: selectAiImg.toolCursor, label: 'Cursor' },
   { src: selectAiImg.toolFigma, label: 'Figma' },
   { src: selectAiImg.toolAvatar, label: 'AI image generation' },
-] as const;
-
-const decisions = [
-  {
-    label: 'Iteration 02',
-    title: 'A creative brief keeps the editor in control',
-    body: 'Editors can define the story, audience, and key themes before the AI reviews their footage.',
-    image: selectAiImg.decisionBrief,
-    imageAlt: 'Creative brief form in SelexAI',
-    imageClass: styles.decisionBrief,
-  },
-  {
-    label: 'Iteration 04',
-    title: 'Exporting to existing tools kept the product focused',
-    body: 'Rather than replacing professional editing software, SelexAI solves the most time-consuming step and exports the timeline into the editor’s preferred NLE.',
-    image: selectAiImg.decisionExport,
-    imageAlt: 'SelexAI export options for professional editing tools',
-    imageClass: styles.decisionExport,
-  },
 ] as const;
 
 export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
@@ -124,30 +105,7 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
             title="Usability wasn't the challenge, trust was"
             body="Editors understood the workflow, but worried AI might overlook a detail that mattered to the story. This shifted my focus from automating the process to building trust within the product, making every AI decision visible and reversible."
           />
-          <div className={styles.productPreview}>
-            <SelectAiHeroHotspots
-              src={selectAiImg.caseHero}
-              alt="SelexAI product preview"
-              imgClassName={styles.productPreviewImage}
-            />
-          </div>
-        </div>
-
-        <div className={styles.decisionList}>
-          {decisions.map((decision, index) => (
-            <article className={styles.decisionRow} key={`${decision.label}-${decision.title}`} data-decision={index + 1}>
-              <div className={styles.decisionCopy}>
-                <p className={styles.iterationLabel}>{decision.label}</p>
-                <h3>{decision.title}</h3>
-                <p>{decision.body}</p>
-              </div>
-              <img
-                className={`${styles.decisionImage} ${decision.imageClass}`}
-                src={decision.image}
-                alt={decision.imageAlt}
-              />
-            </article>
-          ))}
+          <SelectAiTrustExplorer />
         </div>
       </section>
 
