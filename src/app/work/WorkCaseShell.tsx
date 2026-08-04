@@ -172,7 +172,10 @@ export function WorkCaseShell({
     .join(' ');
 
   return (
-    <div ref={sceneRef} className={styles.scene}>
+    <div
+      ref={sceneRef}
+      className={`${styles.scene} ${initiallyVisible ? styles.directModalScene : ''}`}
+    >
       <button
         type="button"
         className={scrimClass}
