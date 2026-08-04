@@ -6,10 +6,10 @@ import { selectAiImg } from './select-ai-assets';
 import styles from './select-ai-case-study.module.css';
 
 const toolIcons = [
-  { src: selectAiImg.toolPerplexity, label: 'Perplexity' },
-  { src: selectAiImg.toolCursor, label: 'Cursor' },
-  { src: selectAiImg.toolFigma, label: 'Figma' },
-  { src: selectAiImg.toolAvatar, label: 'AI image generation' },
+  { src: selectAiImg.toolPerplexity, label: 'Perplexity', lightBackground: false },
+  { src: selectAiImg.toolCursor, label: 'Cursor', lightBackground: true },
+  { src: selectAiImg.toolFigma, label: 'Figma', lightBackground: false },
+  { src: selectAiImg.toolAvatar, label: 'AI image generation', lightBackground: false },
 ] as const;
 
 export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
@@ -38,7 +38,10 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
             <p className={styles.eyebrow}>Tools</p>
             <ul className={styles.toolList} aria-label="Tools used">
               {toolIcons.map((tool) => (
-                <li key={tool.label} className={styles.toolItem}>
+                <li
+                  key={tool.label}
+                  className={`${styles.toolItem} ${tool.lightBackground ? styles.toolItemLight : ''}`}
+                >
                   <img src={tool.src} alt={tool.label} />
                 </li>
               ))}
