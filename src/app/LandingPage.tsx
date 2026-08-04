@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
+import { flushSync } from 'react-dom';
 import { Button, ButtonLink } from '@/components/button';
 import { Close, DownChevron, Menu, NewChat } from '@/components/icons';
 import { Sidebar, type SidebarDensity } from '@/components/sidebar';
@@ -11,6 +12,7 @@ import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { SharedViewTransition } from '@/components/shared-view-transition/SharedViewTransition';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
+import { CASE_STUDY_NAVIGATION_SETTLED_EVENT } from './work/case-study-navigation';
 import styles from './landing.module.css';
 
 const MOBILE_SHELL_MQ = '(max-width: 768px)';
@@ -118,6 +120,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   const caseStudyDrawerRef = React.useRef<HTMLElement>(null);
   const [sidebarDensity, setSidebarDensity] =
     React.useState<SidebarDensity>(initialSidebarDensity);
+  const [caseStudyTransitioning, setCaseStudyTransitioning] = React.useState(false);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [caseStudyDrawerOpen, setCaseStudyDrawerOpen] = React.useState(false);
   const designerAction = useDesignerActionTypewriter();
@@ -128,6 +131,20 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   React.useEffect(() => {
     router.prefetch(brianGptHref);
   }, [brianGptHref, router]);
+
+  React.useEffect(() => {
+    let resetTimer: number | undefined;
+    const resetCaseStudyTransition = () => {
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => setCaseStudyTransitioning(false), 800);
+    };
+
+    window.addEventListener(CASE_STUDY_NAVIGATION_SETTLED_EVENT, resetCaseStudyTransition);
+    return () => {
+      window.clearTimeout(resetTimer);
+      window.removeEventListener(CASE_STUDY_NAVIGATION_SETTLED_EVENT, resetCaseStudyTransition);
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!caseStudyDrawerOpen) return;
@@ -213,6 +230,25 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
     }
   }, [isMobileShell]);
 
+  const prepareCaseStudyNavigation = React.useCallback(() => {
+    /** Remove the homepage's shared-transition boundaries before Next starts its route
+     * transition. The case-study shell owns this animation; retaining both layers creates
+     * a top-layer portrait snapshot over the modal. */
+    flushSync(() => {
+      setCaseStudyTransitioning(true);
+      setCaseStudyDrawerOpen(false);
+      if (isMobileShell) setMobileNavOpen(false);
+    });
+  }, [isMobileShell]);
+
+  const openCaseStudy = React.useCallback(
+    (slug: string) => {
+      prepareCaseStudyNavigation();
+      router.push(`/work/${slug}`);
+    },
+    [prepareCaseStudyNavigation, router]
+  );
+
   return (
     <div className={styles.shell}>
       {isMobileShell && mobileNavOpen ? (
@@ -263,10 +299,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               {CASE_STUDY_LIST.map((caseStudy) => (
                 <Sidebar.NavItem
                   key={caseStudy.slug}
-                  onClick={() => {
-                    router.push(`/work/${caseStudy.slug}`);
-                    if (isMobileShell) setMobileNavOpen(false);
-                  }}
+                  onClick={() => openCaseStudy(caseStudy.slug)}
                 >
                   {caseStudy.title}
                 </Sidebar.NavItem>
@@ -323,7 +356,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
 
         <section className={styles.hero} aria-labelledby="landing-title">
           <div className={styles.copy}>
-            <SharedViewTransition name="homepage-title">
+            <SharedViewTransition disabled={caseStudyTransitioning} name="homepage-title">
               <h1 id="landing-title" className={styles.heroTitle}>
                 Brian
                 <br />
@@ -372,7 +405,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
           </div>
 
           <div className={styles.portraitStage}>
-            <SharedViewTransition name="hero-avatar">
+            <SharedViewTransition disabled={caseStudyTransitioning} name="hero-avatar">
               <div ref={portraitFrameRef} className={styles.portraitFrame}>
                 <Image
                   className={styles.portrait}
@@ -463,7 +496,18 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
                     className={`${styles.posterCard} ${styles[`posterCard_${caseStudy.slug}`]}`}
                     href={`/work/${caseStudy.slug}`}
                     aria-label={`Open case study: ${caseStudy.title}`}
-                    onClick={() => setCaseStudyDrawerOpen(false)}
+                    onClick={(event) => {
+                      if (
+                        event.button !== 0 ||
+                        event.metaKey ||
+                        event.ctrlKey ||
+                        event.shiftKey ||
+                        event.altKey
+                      ) {
+                        return;
+                      }
+                      prepareCaseStudyNavigation();
+                    }}
                   >
                     <span className={styles.posterEyebrow}>{meta.eyebrow}</span>
                     <span className={styles.posterCopy}>

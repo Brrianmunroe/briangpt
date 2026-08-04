@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button/Button';
+import { CASE_STUDY_NAVIGATION_SETTLED_EVENT } from './case-study-navigation';
 import { parseWorkShellDurationMs } from './parseWorkShellDurationMs';
 import styles from './work-shell.module.css';
 
@@ -36,6 +37,7 @@ export function WorkCaseShell({
   const [surfaceReady, setSurfaceReady] = React.useState(initiallyVisible);
   const [visible, setVisible] = React.useState(initiallyVisible);
   const [exiting, setExiting] = React.useState(false);
+  const [removed, setRemoved] = React.useState(false);
   const [transitioning, setTransitioning] = React.useState(!initiallyVisible);
   const exitTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const settleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -115,11 +117,17 @@ export function WorkCaseShell({
     if (scaleBackground && typeof document !== 'undefined') {
       delete document.body.dataset.caseModalState;
     }
-    /** Intercepted modal routes share history with `/`; `back()` clears the slot reliably. `push('/')` can leave a transparent layer catching clicks. */
+    window.dispatchEvent(new Event(CASE_STUDY_NAVIGATION_SETTLED_EVENT));
+
+    /** Intercepted modal routes share history with `/`; `back()` clears the slot reliably. */
     if (scaleBackground) {
       router.back();
     } else {
-      router.push('/');
+      /** A direct request already rendered the complete homepage behind the modal. Replacing
+       * the URL and removing the shell preserves that live page instead of navigating from
+       * one homepage instance to another and replaying every shared transition. */
+      window.history.replaceState(window.history.state, '', '/');
+      setRemoved(true);
     }
   }, [clearTimers, scaleBackground, router]);
 
@@ -170,6 +178,8 @@ export function WorkCaseShell({
   ]
     .filter(Boolean)
     .join(' ');
+
+  if (removed) return null;
 
   return (
     <div
