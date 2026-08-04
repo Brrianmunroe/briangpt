@@ -27,7 +27,11 @@ export default async function InterceptedCaseStudyPage({ params }: PageProps) {
     );
 
   return (
-    <WorkCaseShell scaleBackground headerExtraGap={slug === 'selexai'}>
+    <WorkCaseShell
+      scaleBackground
+      headerExtraGap={slug === 'selexai'}
+      selectAiSurface={slug === 'selexai'}
+    >
       {body}
     </WorkCaseShell>
   );

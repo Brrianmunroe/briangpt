@@ -4,7 +4,7 @@ import { CASE_STUDY_SLUGS, getCaseStudy, isCaseStudySlug } from '@/lib/case-stud
 import { CaseStudyContent } from '../CaseStudyContent';
 import { CurioCaseStudy } from '../curio/CurioCaseStudy';
 import { SelectAiCaseStudy } from '../selectai/SelectAiCaseStudy';
-import { WorkCaseShell } from '../WorkCaseShell';
+import { WorkDirectShell } from '../WorkDirectShell';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -40,6 +40,11 @@ export default async function CaseStudyPage({ params }: PageProps) {
     );
 
   return (
-    <WorkCaseShell headerExtraGap={slug === 'selexai'}>{body}</WorkCaseShell>
+    <WorkDirectShell
+      headerExtraGap={slug === 'selexai'}
+      selectAiSurface={slug === 'selexai'}
+    >
+      {body}
+    </WorkDirectShell>
   );
 }
