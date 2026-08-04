@@ -382,6 +382,22 @@
   box-shadow: 0 0 0 var(--stroke-lg) var(--color-orange-400);
 }
 
+/** Warm the homepage's shared portrait assets without adding visible layout or interaction. */
+.homePortraitPreload {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.homePortraitPreload img {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
+
 /** Chat view only: divider under the social toolbar (home uses the same toolbar alignment without a line). */
 .mainHeader.mainHeaderConversation.mainHeaderChatStroke {
   border-bottom: var(--stroke-xs) solid var(--color-sidebar-edge-stroke);

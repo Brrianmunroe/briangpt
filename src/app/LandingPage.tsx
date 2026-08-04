@@ -340,10 +340,21 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               </span>
             </p>
             <div className={styles.actions}>
-              <ButtonLink
+              <Button
+                ref={caseStudyButtonRef}
                 className={styles.primaryAction}
+                showIcon={false}
+                aria-expanded={caseStudyDrawerOpen}
+                aria-controls="homepage-case-study-posters"
+                onClick={() => setCaseStudyDrawerOpen((open) => !open)}
+              >
+                View case studies
+              </Button>
+              <ButtonLink
+                className={styles.secondaryAction}
                 href={brianGptHref}
                 prefetch
+                variant="secondary"
                 icon={
                   <NewChat
                     fill="var(--button-icon-fill)"
@@ -357,17 +368,6 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               >
                 Try BrianGPT
               </ButtonLink>
-              <Button
-                ref={caseStudyButtonRef}
-                className={styles.secondaryAction}
-                variant="secondary"
-                showIcon={false}
-                aria-expanded={caseStudyDrawerOpen}
-                aria-controls="homepage-case-study-posters"
-                onClick={() => setCaseStudyDrawerOpen((open) => !open)}
-              >
-                View case studies
-              </Button>
             </div>
           </div>
 
@@ -381,25 +381,48 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
                   width={1254}
                   height={1254}
                   priority
+                  decoding="sync"
                   sizes="(max-width: 760px) 78vw, 42vw"
                 />
                 <span className={styles.detachedIrisLeft} aria-hidden="true">
-                  <img className={styles.detachedIrisArtwork} src="/left-iris.png" alt="" />
+                  <Image
+                    className={styles.detachedIrisArtwork}
+                    src="/left-iris.png"
+                    alt=""
+                    width={345}
+                    height={345}
+                    sizes="32px"
+                    priority
+                    decoding="sync"
+                  />
                 </span>
                 <span className={`${styles.eyeLayer} ${styles.eyeLayerRight}`} aria-hidden="true">
-                  <img className={styles.eyeArtwork} src="/headshot-upscaled.png" alt="" />
+                  <Image
+                    className={styles.eyeArtwork}
+                    src="/headshot-upscaled.png"
+                    alt=""
+                    width={1254}
+                    height={1254}
+                    sizes="(max-width: 760px) 78vw, 42vw"
+                    priority
+                    decoding="sync"
+                  />
                 </span>
-                <img
+                <Image
                   className={styles.portraitForeground}
                   src="/headshot-upscaled.png"
                   alt=""
-                  aria-hidden="true"
+                  width={1254}
+                  height={1254}
+                  sizes="(max-width: 760px) 78vw, 42vw"
                 />
-                <img
+                <Image
                   className={styles.leftEyelidForeground}
                   src="/headshot-upscaled.png"
                   alt=""
-                  aria-hidden="true"
+                  width={1254}
+                  height={1254}
+                  sizes="(max-width: 760px) 78vw, 42vw"
                 />
               </div>
             </SharedViewTransition>
