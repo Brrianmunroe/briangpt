@@ -19,18 +19,24 @@ export function WorkCaseShell({
   children,
   scaleBackground = false,
   headerExtraGap = false,
+  selectAiSurface = false,
+  initiallyVisible = false,
 }: {
   children: React.ReactNode;
   scaleBackground?: boolean;
   /** Extra space below the header close (SelectAI). */
   headerExtraGap?: boolean;
+  /** Match the narrower, darker SelectAI case-study frame. */
+  selectAiSurface?: boolean;
+  /** Direct routes render visibly on the server; intercepted modals animate in after mount. */
+  initiallyVisible?: boolean;
 }) {
   const router = useRouter();
   const sceneRef = React.useRef<HTMLDivElement | null>(null);
-  const [surfaceReady, setSurfaceReady] = React.useState(false);
-  const [visible, setVisible] = React.useState(false);
+  const [surfaceReady, setSurfaceReady] = React.useState(initiallyVisible);
+  const [visible, setVisible] = React.useState(initiallyVisible);
   const [exiting, setExiting] = React.useState(false);
-  const [transitioning, setTransitioning] = React.useState(false);
+  const [transitioning, setTransitioning] = React.useState(!initiallyVisible);
   const exitTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const settleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -47,6 +53,7 @@ export function WorkCaseShell({
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (initiallyVisible) return;
     let cancelled = false;
     let rafEnter1 = 0;
     let rafEnter2 = 0;
@@ -88,7 +95,7 @@ export function WorkCaseShell({
         settleTimerRef.current = null;
       }
     };
-  }, []);
+  }, [initiallyVisible]);
 
   React.useEffect(() => () => clearTimers(), [clearTimers]);
 
@@ -181,7 +188,7 @@ export function WorkCaseShell({
             if (e.target === e.currentTarget) requestClose();
           }}
         >
-          <div className={styles.card}>
+          <div className={`${styles.card} ${selectAiSurface ? styles.cardSelectAi : ''}`}>
             <div
               className={[
                 styles.cardHeader,

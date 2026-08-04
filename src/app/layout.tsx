@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning style={{ isolation: 'isolate' }}>
         <div className="appBackground">{children}</div>
         <ResponsiveConstructionGate />
         {modal}
