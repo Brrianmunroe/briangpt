@@ -5,6 +5,7 @@ import * as React from 'react';
 import { SpeechBubble } from '@/components/speech-bubble';
 import { ThinkingIndicator } from '@/components/thinking-indicator';
 import { groupMessagesIntoTurns } from '@/app/conversationScroll';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './ConversationPanel.module.css';
 
 export type ConversationPanelProps = {
@@ -34,6 +35,7 @@ export function ConversationPanel({
 }: ConversationPanelProps) {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const latestTurnRef = React.useRef<HTMLElement | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const turns = React.useMemo(() => groupMessagesIntoTurns(messages), [messages]);
   const lastUserId = turns[turns.length - 1]?.user.id ?? null;
@@ -52,10 +54,13 @@ export function ConversationPanel({
       // viewport is the nearest scrollable ancestor. `block: 'start'` aligns
       // the latest turn's top with the viewport's top edge; `scroll-margin-top`
       // on `.turn` adds the 16px header gap.
-      turnEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      turnEl.scrollIntoView({
+        block: 'start',
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
     });
     return () => cancelAnimationFrame(raf);
-  }, [lastUserId]);
+  }, [lastUserId, prefersReducedMotion]);
 
   return (
     <div

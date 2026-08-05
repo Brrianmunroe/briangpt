@@ -134,12 +134,17 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
   const [chipScrollFadeRightVisible, setChipScrollFadeRightVisible] = React.useState(false);
   const [chipScrollFadeLeftVisible, setChipScrollFadeLeftVisible] = React.useState(false);
   const lastSentTextRef = React.useRef<string | null>(null);
+  const sendFailedRef = React.useRef(false);
   const [localError, setLocalError] = React.useState<ChatDisplayError | null>(null);
   const [chatEngaged, setChatEngaged] = React.useState(false);
   const online = useOnlineStatus();
 
   const { messages, sendMessage, stop, status, setMessages, error, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
+    // AI SDK reports transport/stream failures here and resolves sendMessage afterward.
+    onError: () => {
+      sendFailedRef.current = true;
+    },
   });
 
   const dismissError = React.useCallback(() => {
@@ -222,21 +227,26 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
 
       clearError();
       setLocalError(null);
+      sendFailedRef.current = false;
       lastSentTextRef.current = trimmed;
       setDraft('');
       try {
         await sendMessage({ text: trimmed });
       } catch {
-        const snap = lastSentTextRef.current;
-        if (snap != null) {
-          setDraft(snap);
-          lastSentTextRef.current = null;
-        }
+        // Retain support for failures thrown before the SDK starts its managed request.
+        sendFailedRef.current = true;
+      }
+
+      const sentText = lastSentTextRef.current;
+      if (sendFailedRef.current && sentText != null) {
+        setDraft(sentText);
+        setMessages((prev) => rollbackLastSendTurn(prev, sentText));
+        lastSentTextRef.current = null;
         return;
       }
       lastSentTextRef.current = null;
     },
-    [clearError, messages.length, online, requestInFlight, sendMessage]
+    [clearError, messages.length, online, requestInFlight, sendMessage, setMessages]
   );
 
   const handleStop = React.useCallback(() => {
@@ -249,13 +259,16 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
   }, [setMessages, stop]);
 
   const handleNewChat = React.useCallback(() => {
+    if (requestInFlight) void stop();
+    lastSentTextRef.current = null;
+    sendFailedRef.current = false;
     clearError();
     setLocalError(null);
     setChatEngaged(false);
     setMessages([]);
     setDraft('');
     if (isMobileShell) setMobileNavOpen(false);
-  }, [clearError, isMobileShell, setMessages]);
+  }, [clearError, isMobileShell, requestInFlight, setMessages, stop]);
 
   /** Home link must clear chat when already on `/` — same URL does not remount or reset `useChat`. */
   const toggleSidebarDensity = React.useCallback(() => {
@@ -388,6 +401,7 @@ export function PortfolioPage({ initialSidebarDensity = 'compact' }: PortfolioPa
               roleLine="Product Designer"
               showChevron={false}
               disableRowHover
+              interactive={false}
               avatar={
                 <img
                   src="/avatars/brian-profile.png"

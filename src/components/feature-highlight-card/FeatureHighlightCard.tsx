@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './FeatureHighlightCard.module.css';
 
 export type FeatureHighlightCardCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -35,12 +36,13 @@ export function FeatureHighlightCard({
 }: FeatureHighlightCardProps) {
   const rootClass = [styles.root, className].filter(Boolean).join(' ');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (active) {
+    if (active && !prefersReducedMotion) {
       const timer = window.setTimeout(() => {
         video.play().catch(() => {});
       }, VIDEO_PLAY_DELAY_MS);
@@ -50,7 +52,7 @@ export function FeatureHighlightCard({
     // Collapsed: hold paused on the first frame for the next open.
     video.pause();
     video.currentTime = 0;
-  }, [active]);
+  }, [active, prefersReducedMotion]);
 
   return (
     <article className={rootClass} data-corner={corner}>

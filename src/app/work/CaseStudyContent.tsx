@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import type { CaseStudy } from '@/lib/case-studies';
+import { CASE_STUDY_TITLE_ID } from './case-study-navigation';
 import styles from './[slug]/case-study.module.css';
 
 export function CaseStudyContent({ study }: { study: CaseStudy }) {
@@ -9,7 +10,7 @@ export function CaseStudyContent({ study }: { study: CaseStudy }) {
       <div className={styles.heroGrid}>
         <div className={styles.headlineBlock} data-stagger style={{ '--stagger-index': 0 } as CSSProperties}>
           <div>
-            <h1 className={styles.title}>{study.title}</h1>
+            <h1 id={CASE_STUDY_TITLE_ID} className={styles.title}>{study.title}</h1>
             <p className={styles.subtitle}>{study.subtitle}</p>
           </div>
           <p className={styles.lede}>{study.description}</p>

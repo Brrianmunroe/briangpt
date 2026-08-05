@@ -37,3 +37,10 @@
     transform: scale(1.05);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    opacity: 0.7;
+    animation: none;
+  }
+}
