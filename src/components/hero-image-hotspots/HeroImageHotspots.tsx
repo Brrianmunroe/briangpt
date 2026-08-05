@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { FeatureHighlightCardIndicator } from '@/components/feature-highlight-card-indicator/FeatureHighlightCardIndicator';
 import {
   FeatureHighlightCard,
@@ -29,6 +29,7 @@ export type HeroImageHotspotsProps = {
 };
 
 export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: HeroImageHotspotsProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [imageActive, setImageActive] = useState(false);
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
 
@@ -37,6 +38,7 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
   }, []);
 
   const onWrapLeave = useCallback(() => {
+    if (wrapRef.current?.contains(document.activeElement)) return;
     setImageActive(false);
     setActiveHotspotId(null);
   }, []);
@@ -44,7 +46,24 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
   const wrapClass = [styles.heroWrap, imageActive ? styles.wrapActive : ''].filter(Boolean).join(' ');
 
   return (
-    <div className={wrapClass} onMouseEnter={onWrapEnter} onMouseLeave={onWrapLeave}>
+    <div
+      ref={wrapRef}
+      className={wrapClass}
+      onMouseEnter={onWrapEnter}
+      onMouseLeave={onWrapLeave}
+      onBlur={(event) => {
+        if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+          return;
+        }
+        setImageActive(false);
+        setActiveHotspotId(null);
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== 'Escape' || activeHotspotId == null) return;
+        event.preventDefault();
+        setActiveHotspotId(null);
+      }}
+    >
       <img src={src} alt={alt} className={[styles.heroImg, imgClassName].filter(Boolean).join(' ')} />
       <div className={styles.overlay} aria-hidden />
       {hotspots.map((spot) => {
@@ -61,10 +80,26 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
             onMouseLeave={() => setActiveHotspotId((prev) => (prev === spot.id ? null : prev))}
           >
             <div className={stackClass}>
-              <div className={styles.indicatorLayer}>
-                <FeatureHighlightCardIndicator label={`${spot.title} — highlight marker`} />
-              </div>
-              <div className={styles.cardLayer} data-card-corner={spot.corner}>
+              <button
+                type="button"
+                className={`${styles.indicatorLayer} ${styles.indicatorButton}`}
+                aria-label={`${spot.title} feature highlight`}
+                aria-expanded={expanded}
+                aria-controls={`desktop-hotspot-${spot.id}`}
+                onFocus={() => setImageActive(true)}
+                onClick={() => {
+                  setImageActive(true);
+                  setActiveHotspotId((current) => current === spot.id ? null : spot.id);
+                }}
+              >
+                <FeatureHighlightCardIndicator />
+              </button>
+              <div
+                id={`desktop-hotspot-${spot.id}`}
+                className={styles.cardLayer}
+                data-card-corner={spot.corner}
+                aria-hidden={!expanded}
+              >
                 <FeatureHighlightCard
                   corner={spot.corner}
                   title={spot.title}
@@ -79,6 +114,41 @@ export function HeroImageHotspots({ src, alt = '', imgClassName, hotspots }: Her
           </div>
         );
       })}
+
+      <div className={styles.mobileHotspotList} role="list" aria-label="Feature highlights">
+        {hotspots.map((spot) => {
+          const expanded = activeHotspotId === spot.id;
+          return (
+            <div key={spot.id} className={styles.mobileHotspotItem} role="listitem">
+              <button
+                type="button"
+                className={styles.mobileHotspotTrigger}
+                aria-expanded={expanded}
+                aria-controls={`mobile-hotspot-${spot.id}`}
+                onClick={() => setActiveHotspotId((current) => current === spot.id ? null : spot.id)}
+              >
+                <span>{spot.title}</span>
+                <span className={styles.mobileHotspotGlyph} aria-hidden>
+                  {expanded ? '−' : '+'}
+                </span>
+              </button>
+              {expanded ? (
+                <div id={`mobile-hotspot-${spot.id}`} className={styles.mobileHotspotCard}>
+                  <FeatureHighlightCard
+                    corner={spot.corner}
+                    title={spot.title}
+                    body={spot.body}
+                    mediaSrc={spot.mediaSrc}
+                    mediaKind={spot.mediaKind}
+                    mediaAlt={spot.mediaAlt ?? ''}
+                    active
+                  />
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

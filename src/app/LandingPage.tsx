@@ -12,6 +12,7 @@ import sidebarStyles from '@/components/sidebar/Sidebar.module.css';
 import { SocialLinksToolbar } from '@/components/social-links-toolbar';
 import { SharedViewTransition } from '@/components/shared-view-transition/SharedViewTransition';
 import { CASE_STUDY_LIST } from '@/lib/case-studies';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import { CASE_STUDY_NAVIGATION_SETTLED_EVENT } from './work/case-study-navigation';
 import styles from './landing.module.css';
 
@@ -49,9 +50,10 @@ function useIsMobileShell(): boolean {
 
 function useDesignerActionTypewriter(): string {
   const [action, setAction] = React.useState('');
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion) {
       setAction(DESIGNER_ACTIONS[0]);
       return;
     }
@@ -96,7 +98,7 @@ function useDesignerActionTypewriter(): string {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return action;
 }
@@ -118,6 +120,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   const portraitFrameRef = React.useRef<HTMLDivElement>(null);
   const caseStudyButtonRef = React.useRef<HTMLButtonElement>(null);
   const caseStudyDrawerRef = React.useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [sidebarDensity, setSidebarDensity] =
     React.useState<SidebarDensity>(initialSidebarDensity);
   const [caseStudyTransitioning, setCaseStudyTransitioning] = React.useState(false);
@@ -178,8 +181,11 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
   React.useEffect(() => {
     const portraitFrame = portraitFrameRef.current;
     const canTrack = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!portraitFrame || !canTrack || reduceMotion) return;
+    if (!portraitFrame || !canTrack || prefersReducedMotion) {
+      portraitFrame?.style.setProperty('--gaze-x', '0px');
+      portraitFrame?.style.setProperty('--gaze-y', '0px');
+      return;
+    }
 
     let animationFrame = 0;
 
@@ -213,7 +219,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
       window.removeEventListener('blur', resetGaze);
       document.documentElement.removeEventListener('mouseleave', resetGaze);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleMenuClick = React.useCallback(() => {
     if (isMobileShell) setMobileNavOpen((open) => !open);
@@ -312,6 +318,7 @@ export function LandingPage({ initialSidebarDensity = 'compact' }: LandingPagePr
               roleLine="Product Designer"
               showChevron={false}
               disableRowHover
+              interactive={false}
               avatar={
                 <img
                   src="/avatars/brian-profile.png"

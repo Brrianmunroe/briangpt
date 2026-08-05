@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Button } from '@/components/button';
+import { syncApplicationInertState } from './work/case-study-navigation';
 
 const CONSTRUCTION_GATE_MQ = '(max-width: 860px)';
 
@@ -10,14 +11,13 @@ export function ResponsiveConstructionGate() {
   const continueButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
-    const appBackground = document.querySelector<HTMLElement>('.appBackground');
     const mediaQuery = window.matchMedia(CONSTRUCTION_GATE_MQ);
 
     const syncGateState = () => {
       const blocking = mediaQuery.matches && !dismissed;
-      if (appBackground) appBackground.inert = blocking;
       if (blocking) document.body.dataset.responsiveConstructionGate = 'open';
       else delete document.body.dataset.responsiveConstructionGate;
+      syncApplicationInertState();
       if (blocking) continueButtonRef.current?.focus();
     };
 
@@ -26,10 +26,22 @@ export function ResponsiveConstructionGate() {
 
     return () => {
       mediaQuery.removeEventListener('change', syncGateState);
-      if (appBackground) appBackground.inert = false;
       delete document.body.dataset.responsiveConstructionGate;
+      syncApplicationInertState();
     };
   }, [dismissed]);
+
+  const dismissGate = React.useCallback(() => {
+    delete document.body.dataset.responsiveConstructionGate;
+    syncApplicationInertState();
+    setDismissed(true);
+    window.requestAnimationFrame(() => {
+      const focusTarget =
+        document.querySelector<HTMLElement>('[data-case-study-close]') ??
+        document.querySelector<HTMLElement>('.appBackground button, .appBackground a[href]');
+      focusTarget?.focus({ preventScroll: true });
+    });
+  }, []);
 
   if (dismissed) return null;
 
@@ -61,7 +73,7 @@ export function ResponsiveConstructionGate() {
               ref={continueButtonRef}
               variant="primary"
               showIcon={false}
-              onClick={() => setDismissed(true)}
+              onClick={dismissGate}
             >
               Continue anyway
             </Button>

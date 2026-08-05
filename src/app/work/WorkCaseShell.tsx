@@ -3,7 +3,11 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button/Button';
-import { CASE_STUDY_NAVIGATION_SETTLED_EVENT } from './case-study-navigation';
+import {
+  CASE_STUDY_NAVIGATION_SETTLED_EVENT,
+  CASE_STUDY_TITLE_ID,
+  syncApplicationInertState,
+} from './case-study-navigation';
 import { parseWorkShellDurationMs } from './parseWorkShellDurationMs';
 import styles from './work-shell.module.css';
 
@@ -22,6 +26,8 @@ export function WorkCaseShell({
   headerExtraGap = false,
   selectAiSurface = false,
   initiallyVisible = false,
+  onCloseStart,
+  onCloseComplete,
 }: {
   children: React.ReactNode;
   scaleBackground?: boolean;
@@ -31,9 +37,16 @@ export function WorkCaseShell({
   selectAiSurface?: boolean;
   /** Direct routes render visibly on the server; intercepted modals animate in after mount. */
   initiallyVisible?: boolean;
+  /** Lets the direct-route background synchronize with the modal exit without remounting. */
+  onCloseStart?: () => void;
+  /** Runs when the exit animation has finished and the direct background becomes interactive. */
+  onCloseComplete?: () => void;
 }) {
   const router = useRouter();
   const sceneRef = React.useRef<HTMLDivElement | null>(null);
+  const dialogRef = React.useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const restoreFocusRef = React.useRef<HTMLElement | null>(null);
   const [surfaceReady, setSurfaceReady] = React.useState(initiallyVisible);
   const [visible, setVisible] = React.useState(initiallyVisible);
   const [exiting, setExiting] = React.useState(false);
@@ -102,13 +115,41 @@ export function WorkCaseShell({
   React.useEffect(() => () => clearTimers(), [clearTimers]);
 
   React.useEffect(() => {
+    syncApplicationInertState();
+    return () => syncApplicationInertState();
+  }, []);
+
+  React.useEffect(() => {
+    if (!scaleBackground) return;
+    const activeElement = document.activeElement;
+    restoreFocusRef.current = activeElement instanceof HTMLElement ? activeElement : null;
+    return () => {
+      const target = restoreFocusRef.current;
+      restoreFocusRef.current = null;
+      if (!target?.isConnected) return;
+      window.requestAnimationFrame(() => target.focus({ preventScroll: true }));
+    };
+  }, [scaleBackground]);
+
+  React.useEffect(() => {
+    if (!visible || exiting) return;
+    if (document.body.dataset.responsiveConstructionGate === 'open') return;
+    const frame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [exiting, visible]);
+
+  React.useEffect(() => {
     if (!scaleBackground) return;
     if (typeof document === 'undefined') return;
     const body = document.body;
     if (!surfaceReady) return;
     body.dataset.caseModalState = exiting ? 'closing' : visible ? 'open' : 'opening';
+    syncApplicationInertState();
     return () => {
       if (!exiting) delete body.dataset.caseModalState;
+      syncApplicationInertState();
     };
   }, [scaleBackground, surfaceReady, visible, exiting]);
 
@@ -116,7 +157,9 @@ export function WorkCaseShell({
     clearTimers();
     if (scaleBackground && typeof document !== 'undefined') {
       delete document.body.dataset.caseModalState;
+      syncApplicationInertState();
     }
+    onCloseComplete?.();
     window.dispatchEvent(new Event(CASE_STUDY_NAVIGATION_SETTLED_EVENT));
 
     /** Intercepted modal routes share history with `/`; `back()` clears the slot reliably. */
@@ -126,30 +169,62 @@ export function WorkCaseShell({
       /** A direct request already rendered the complete homepage behind the modal. Replacing
        * the URL and removing the shell preserves that live page instead of navigating from
        * one homepage instance to another and replaying every shared transition. */
-      window.history.replaceState(window.history.state, '', '/');
+      // Passing null lets Next copy its internal state and update its canonical URL.
+      window.history.replaceState(null, '', '/');
       setRemoved(true);
     }
-  }, [clearTimers, scaleBackground, router]);
+  }, [clearTimers, onCloseComplete, scaleBackground, router]);
 
   const requestClose = React.useCallback(() => {
     if (exiting) return;
+    onCloseStart?.();
     setExiting(true);
     setTransitioning(true);
     const ms = motionReduced()
       ? Math.max(1, Math.round(EXIT_MS_FALLBACK / 2))
       : parseWorkShellDurationMs(sceneRef.current, '--work-modal-exit-duration', EXIT_MS_FALLBACK);
     exitTimerRef.current = setTimeout(finishClose, ms);
-  }, [exiting, finishClose]);
+  }, [exiting, finishClose, onCloseStart]);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      requestClose();
+      if (document.body.dataset.responsiveConstructionGate === 'open') return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        requestClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !visible || exiting) return;
+
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter(
+        (element) =>
+          !element.hidden &&
+          element.getAttribute('aria-hidden') !== 'true' &&
+          element.getClientRects().length > 0,
+      );
+      const first = focusable[0] ?? dialog;
+      const last = focusable[focusable.length - 1] ?? dialog;
+      const active = document.activeElement;
+      const focusOutside = !(active instanceof Node) || !dialog.contains(active);
+
+      if (e.shiftKey && (active === first || focusOutside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || focusOutside)) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [requestClose]);
+  }, [exiting, requestClose, visible]);
 
   const scrimClass = [
     styles.scrim,
@@ -185,14 +260,24 @@ export function WorkCaseShell({
     <div
       ref={sceneRef}
       className={`${styles.scene} ${initiallyVisible ? styles.directModalScene : ''}`}
+      data-case-study-modal
     >
       <button
         type="button"
         className={scrimClass}
         aria-label="Close case study"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={requestClose}
       />
-      <div className={modalClass}>
+      <div
+        ref={dialogRef}
+        className={modalClass}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={CASE_STUDY_TITLE_ID}
+        tabIndex={-1}
+      >
         <div
           className={styles.cardWrap}
           /** Click the empty area around the card to dismiss. mousedown-on-backdrop only,
@@ -211,6 +296,8 @@ export function WorkCaseShell({
                 .join(' ')}
             >
               <Button
+                ref={closeButtonRef}
+                data-case-study-close
                 buttonType="button"
                 variant="secondary"
                 iconOnly

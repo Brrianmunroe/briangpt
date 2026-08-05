@@ -1,6 +1,7 @@
 import type { CaseStudy } from '@/lib/case-studies';
 import { CurioHeroHotspots } from '@/components/curio-hero-hotspots/CurioHeroHotspots';
 import { curioGalleryVideos, curioImg } from './curio-assets';
+import { CASE_STUDY_TITLE_ID } from '../case-study-navigation';
 import styles from './curio-case-study.module.css';
 
 export function CurioCaseStudy({ study }: { study: CaseStudy }) {
@@ -9,7 +10,7 @@ export function CurioCaseStudy({ study }: { study: CaseStudy }) {
       <div className={styles.heroTop}>
         <div className={styles.headlineCol}>
           <div className={styles.titleBlock}>
-            <h1 className={styles.title}>{study.title}</h1>
+            <h1 id={CASE_STUDY_TITLE_ID} className={styles.title}>{study.title}</h1>
             <p className={styles.subtitle}>{study.subtitle}</p>
           </div>
           <div className={styles.toolsWrap}>

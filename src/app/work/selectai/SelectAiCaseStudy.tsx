@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { SelectAiSummaryCarousel } from './SelectAiSummaryCarousel';
 import { SelectAiTrustExplorer } from './SelectAiTrustExplorer';
 import { selectAiImg } from './select-ai-assets';
+import { CASE_STUDY_TITLE_ID } from '../case-study-navigation';
 import styles from './select-ai-case-study.module.css';
 
 const toolIcons = [
@@ -18,7 +19,7 @@ export function SelectAiCaseStudy({ study }: { study: CaseStudy }) {
       <header className={styles.hero} data-case-section="hero">
         <div className={styles.heroContent} data-stagger style={{ '--stagger-index': 0 } as CSSProperties}>
           <div className={styles.heroIntro}>
-            <h1 className={styles.heroTitle}>
+            <h1 id={CASE_STUDY_TITLE_ID} className={styles.heroTitle}>
               {study.title}<span className={styles.accent}>.</span>
             </h1>
             <p className={styles.bodySecondary}>

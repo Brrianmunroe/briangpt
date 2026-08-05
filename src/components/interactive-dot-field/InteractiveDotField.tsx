@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './InteractiveDotField.module.css';
 
 /** Grid step (px) — matches Figma / `--main-dot-grid`. */
@@ -26,29 +27,6 @@ const AMBIENT_SPATIAL_FREQ = 0.028;
 /** Extra draw margin so displaced dots near edges are not clipped. */
 const VIEWPORT_MARGIN_PX = 48;
 
-function subscribeReducedMotion(cb: () => void): () => void {
-  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  mq.addEventListener('change', cb);
-  return () => mq.removeEventListener('change', cb);
-}
-
-function getReducedMotionSnapshot(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-/** Server / SSR: assume motion OK; hydrate to real preference immediately. */
-function getReducedMotionServerSnapshot(): boolean {
-  return false;
-}
-
-export function usePrefersReducedMotion(): boolean {
-  return React.useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot
-  );
-}
-
 function resolveDotFill(container: HTMLElement): string {
   const probe = document.createElement('span');
   probe.setAttribute('aria-hidden', 'true');
@@ -65,6 +43,7 @@ export function InteractiveDotField({
 }: {
   containerRef: React.RefObject<HTMLElement | null>;
 }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const fillRef = React.useRef<string>('rgba(160, 160, 160, 0.35)');
   const targetRef = React.useRef({ x: 0, y: 0, inside: false });
@@ -141,10 +120,10 @@ export function InteractiveDotField({
     }
     ctx.fill();
 
-    if (aliveRef.current) {
+    if (aliveRef.current && !prefersReducedMotion) {
       rafRef.current = requestAnimationFrame(paintFrame);
     }
-  }, [containerRef]);
+  }, [containerRef, prefersReducedMotion]);
 
   React.useLayoutEffect(() => {
     const container = containerRef.current;

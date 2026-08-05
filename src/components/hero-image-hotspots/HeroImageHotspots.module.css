@@ -92,6 +92,21 @@
     filter 0.34s ease;
 }
 
+.indicatorButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.indicatorButton:focus-visible {
+  outline: var(--stroke-md) solid var(--color-orange-400);
+  outline-offset: var(--spacing-xs);
+}
+
 .cardLayer {
   position: absolute;
   z-index: 2;
@@ -146,10 +161,76 @@
   pointer-events: auto;
 }
 
-/** Case study mobile layout — hero is image-only (no hover hotspots). */
+.mobileHotspotList {
+  display: none;
+}
+
+/** Touch devices without hover keep the positioned markers visible and tappable. */
+@media (hover: none) {
+  .heroWrap .hotspot {
+    pointer-events: auto;
+  }
+
+  .heroWrap .stack {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/** On narrow screens, preserve the hotspot content as tap-friendly disclosures. */
 @media (max-width: 720px) {
   .hotspot {
     display: none;
+  }
+
+  .mobileHotspotList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+
+  .mobileHotspotItem {
+    overflow: hidden;
+    border: var(--stroke-sm) solid var(--color-neutral-400);
+    border-radius: var(--radius-md);
+    background: var(--color-background-surface-default);
+  }
+
+  .mobileHotspotTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    width: 100%;
+    margin: 0;
+    padding: var(--spacing-md);
+    border: 0;
+    color: var(--color-text-fill-primary);
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mobileHotspotTrigger:focus-visible {
+    outline: var(--stroke-md) solid var(--color-orange-400);
+    outline-offset: calc(var(--stroke-md) * -1);
+  }
+
+  .mobileHotspotGlyph {
+    color: var(--color-icon-surface-orange);
+    font-size: var(--font-size-heading03);
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .mobileHotspotCard {
+    display: flex;
+    justify-content: center;
+    padding: 0 var(--spacing-md) var(--spacing-md);
   }
 }
 

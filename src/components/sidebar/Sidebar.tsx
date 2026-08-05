@@ -205,23 +205,27 @@ export type SidebarProfileProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElem
   showChevron?: boolean;
   /** When true, skip row hover background and default cursor (shell until menu returns). */
   disableRowHover?: boolean;
+  /** Render profile information without button semantics when the row has no action. */
+  interactive?: boolean;
 };
 
 const SidebarProfile = React.forwardRef<HTMLButtonElement, SidebarProfileProps>(
   function SidebarProfile(
-    { name, roleLine, avatar, showChevron = true, disableRowHover = false, className, ...rest },
+    {
+      name,
+      roleLine,
+      avatar,
+      showChevron = true,
+      disableRowHover = false,
+      interactive = true,
+      className,
+      ...rest
+    },
     ref
   ) {
     const aria = `${name}, ${roleLine}`;
-
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={mergeClassNames(styles.profile, disableRowHover && styles.profileNoRowHover, className)}
-        aria-label={aria}
-        {...rest}
-      >
+    const content = (
+      <>
         <span className={styles.avatar}>{avatar}</span>
         <span className={styles.profileMeta}>
           <span className={styles.profileName}>{name}</span>
@@ -232,6 +236,28 @@ const SidebarProfile = React.forwardRef<HTMLButtonElement, SidebarProfileProps>(
             <DownChevron color="grey" size={16} aria-hidden />
           </span>
         ) : null}
+      </>
+    );
+
+    if (!interactive) {
+      return (
+        <div
+          className={mergeClassNames(styles.profile, styles.profileNoRowHover, className)}
+        >
+          {content}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={mergeClassNames(styles.profile, disableRowHover && styles.profileNoRowHover, className)}
+        aria-label={aria}
+        {...rest}
+      >
+        {content}
       </button>
     );
   }

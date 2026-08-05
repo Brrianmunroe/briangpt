@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { selectAiImg } from './select-ai-assets';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './select-ai-case-study.module.css';
 
 type TrustFeature = {
@@ -89,6 +90,7 @@ export function SelectAiTrustExplorer() {
   const [direction, setDirection] = React.useState<1 | -1>(1);
   const [editorEnabled, setEditorEnabled] = React.useState(false);
   const [copyStatus, setCopyStatus] = React.useState('Copy values');
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [placements, setPlacements] = React.useState<TrustPlacement[]>(
     () => FEATURES.map((feature) => ({ ...feature.placement })),
   );
@@ -210,6 +212,7 @@ export function SelectAiTrustExplorer() {
             className={`${styles.trustMediaLayer} ${styles.trustMediaExit}`}
             direction={direction}
             placement={previousPlacement}
+            prefersReducedMotion={prefersReducedMotion}
           />
         ) : null}
         <TrustMedia
@@ -218,6 +221,7 @@ export function SelectAiTrustExplorer() {
           className={`${styles.trustMediaLayer} ${styles.trustMediaEnter}`}
           direction={direction}
           placement={placements[activeIndex]}
+          prefersReducedMotion={prefersReducedMotion}
           onPlacementChange={editorEnabled ? (patch) => updatePlacement(activeIndex, patch) : undefined}
           active
         />
@@ -242,6 +246,7 @@ function TrustMedia({
   direction,
   placement,
   onPlacementChange,
+  prefersReducedMotion,
   active = false,
 }: {
   feature: TrustFeature;
@@ -249,9 +254,11 @@ function TrustMedia({
   direction: 1 | -1;
   placement: TrustPlacement;
   onPlacementChange?: (patch: Partial<TrustPlacement>) => void;
+  prefersReducedMotion: boolean;
   active?: boolean;
 }) {
   const directionClass = direction === 1 ? styles.trustMediaForward : styles.trustMediaBackward;
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const dragStart = React.useRef<{ pointerX: number; pointerY: number; x: number; y: number } | null>(null);
   const placementStyle = {
     '--trust-media-x': `${placement.x}px`,
@@ -260,6 +267,17 @@ function TrustMedia({
     '--trust-media-object-position': `${placement.focusX}% ${placement.focusY}%`,
     '--trust-media-fit': placement.fit,
   } as React.CSSProperties;
+
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (active && !prefersReducedMotion) {
+      void video.play().catch(() => {});
+      return;
+    }
+    video.pause();
+    if (prefersReducedMotion) video.currentTime = 0;
+  }, [active, prefersReducedMotion]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!onPlacementChange) return;
@@ -299,9 +317,10 @@ function TrustMedia({
       >
         {feature.mediaType === 'video' ? (
           <video
+            ref={videoRef}
             src={feature.media}
             aria-label={feature.mediaAlt}
-            autoPlay={active}
+            autoPlay={active && !prefersReducedMotion}
             muted
             loop
             playsInline

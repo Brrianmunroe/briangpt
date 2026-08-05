@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Stop, UpArrow } from '@/components/icons';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './ChatInput.module.css';
 
 const DEFAULT_PLACEHOLDER = 'Ask about ...';
@@ -16,15 +17,21 @@ const PAUSE_BETWEEN_PROMPTS_MS = 450;
 
 function useRotatingTypewriterSuffix(prompts: readonly string[], enabled: boolean): string {
   const [suffix, setSuffix] = React.useState('');
+  const prefersReducedMotion = usePrefersReducedMotion();
   const promptsKey = JSON.stringify(prompts);
 
   React.useEffect(() => {
-    if (!enabled || prompts.length === 0) {
+    const list = JSON.parse(promptsKey) as string[];
+    if (!enabled || list.length === 0) {
       setSuffix('');
       return;
     }
 
-    const list = JSON.parse(promptsKey) as string[];
+    if (prefersReducedMotion) {
+      setSuffix(list[0] ?? '');
+      return;
+    }
+
     let cancelled = false;
     let promptIndex = 0;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -65,7 +72,7 @@ function useRotatingTypewriterSuffix(prompts: readonly string[], enabled: boolea
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [enabled, promptsKey]);
+  }, [enabled, prefersReducedMotion, promptsKey]);
 
   return suffix;
 }

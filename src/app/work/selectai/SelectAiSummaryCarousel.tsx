@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { selectAiImg } from './select-ai-assets';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 import styles from './select-ai-case-study.module.css';
 
 const SLIDE_COUNT = 4;
@@ -10,14 +11,18 @@ export function SelectAiSummaryCarousel() {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const frameRef = React.useRef<number | null>(null);
   const [activeSlide, setActiveSlide] = React.useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  const goToSlide = React.useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
+  const goToSlide = React.useCallback((index: number, behavior?: ScrollBehavior) => {
     const viewport = viewportRef.current;
     const slide = viewport?.children.item(index) as HTMLElement | null;
     if (!viewport || !slide) return;
-    viewport.scrollTo({ left: slide.offsetLeft, behavior });
+    viewport.scrollTo({
+      left: slide.offsetLeft,
+      behavior: behavior ?? (prefersReducedMotion ? 'auto' : 'smooth'),
+    });
     setActiveSlide(index);
-  }, []);
+  }, [prefersReducedMotion]);
 
   const syncActiveSlide = React.useCallback(() => {
     const viewport = viewportRef.current;

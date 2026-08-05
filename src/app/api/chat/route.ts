@@ -16,6 +16,8 @@ export const maxDuration = 60;
 
 const BEHAVIOR_FILENAME = 'context.behavior.md';
 const PORTFOLIO_DATA_FILENAME = 'portfolio.data.json';
+const MAX_CHAT_REQUEST_BYTES = 128_000;
+const MAX_ASSISTANT_MESSAGE_CHARS = 8_000;
 
 const SYSTEM_INSTRUCTIONS = `You are Brian Munroe speaking directly to visitors on his portfolio site (BrianGPT).
 
@@ -103,13 +105,25 @@ function textLengthFromMessage(message: UIMessage): number {
     .reduce((sum, part) => sum + part.text.length, 0);
 }
 
-function validateMessages(messages: UIMessage[]):
-  | { ok: true }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isTextPart(part: unknown): part is { type: 'text'; text: string } {
+  return isRecord(part) && part.type === 'text' && typeof part.text === 'string';
+}
+
+function invalidRequestResponse(): Response {
+  return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400);
+}
+
+function validateMessages(messages: unknown[]):
+  | { ok: true; messages: UIMessage[] }
   | { ok: false; response: Response } {
   if (messages.length === 0) {
     return {
       ok: false,
-      response: chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400),
+      response: invalidRequestResponse(),
     };
   }
   if (messages.length > MAX_CHAT_MESSAGES) {
@@ -118,16 +132,51 @@ function validateMessages(messages: UIMessage[]):
       response: chatErrorResponse(CHAT_ERROR_CODE.THREAD_TOO_LONG, 400),
     };
   }
-  for (const message of messages) {
-    const len = textLengthFromMessage(message);
-    if (len > MAX_CHAT_MESSAGE_CHARS) {
+  const validatedMessages: UIMessage[] = [];
+  for (let index = 0; index < messages.length; index += 1) {
+    const message = messages[index];
+    const expectedRole = index % 2 === 0 ? 'user' : 'assistant';
+    if (
+      !isRecord(message) ||
+      typeof message.id !== 'string' ||
+      message.id.length === 0 ||
+      message.role !== expectedRole
+    ) {
+      return { ok: false, response: invalidRequestResponse() };
+    }
+
+    const parts = message.parts;
+    if (!Array.isArray(parts) || parts.length === 0 || !parts.every(isTextPart)) {
+      return { ok: false, response: invalidRequestResponse() };
+    }
+
+    const validatedMessage: UIMessage = {
+      id: message.id,
+      role: expectedRole,
+      parts,
+    };
+    validatedMessages.push(validatedMessage);
+
+    const len = textLengthFromMessage(validatedMessage);
+    if (validatedMessage.role === 'user' && len === 0) {
+      return { ok: false, response: invalidRequestResponse() };
+    }
+    if (validatedMessage.role === 'user' && len > MAX_CHAT_MESSAGE_CHARS) {
       return {
         ok: false,
         response: chatErrorResponse(CHAT_ERROR_CODE.MESSAGE_TOO_LONG, 400),
       };
     }
+    if (validatedMessage.role === 'assistant' && len > MAX_ASSISTANT_MESSAGE_CHARS) {
+      return { ok: false, response: invalidRequestResponse() };
+    }
   }
-  return { ok: true };
+
+  if (validatedMessages[validatedMessages.length - 1]?.role !== 'user') {
+    return { ok: false, response: invalidRequestResponse() };
+  }
+
+  return { ok: true, messages: validatedMessages };
 }
 
 async function loadPromptContext(): Promise<{
@@ -184,20 +233,37 @@ export async function POST(req: Request) {
     }
   }
 
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400);
+  const declaredLength = Number(req.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_CHAT_REQUEST_BYTES) {
+    return invalidRequestResponse();
   }
 
-  const messages = (body as { messages?: UIMessage[] }).messages;
+  let rawBody: string;
+  try {
+    rawBody = await req.text();
+  } catch {
+    return invalidRequestResponse();
+  }
+
+  if (new TextEncoder().encode(rawBody).byteLength > MAX_CHAT_REQUEST_BYTES) {
+    return invalidRequestResponse();
+  }
+
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return invalidRequestResponse();
+  }
+
+  const messages = isRecord(body) ? body.messages : undefined;
   if (!Array.isArray(messages)) {
-    return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 400);
+    return invalidRequestResponse();
   }
 
   const validation = validateMessages(messages);
   if (!validation.ok) return validation.response;
+  const validatedMessages = validation.messages;
 
   let behavior: string;
   let portfolioDataJson: string;
@@ -233,7 +299,7 @@ ${portfolioDataJson}`;
 
   try {
     const modelMessages = await convertToModelMessages(
-      messages.map(({ id: _id, ...rest }) => rest),
+      validatedMessages.map(({ id: _id, ...rest }) => rest),
       { ignoreIncompleteToolCalls: true }
     );
 
@@ -245,7 +311,7 @@ ${portfolioDataJson}`;
     });
 
     return result.toUIMessageStreamResponse({
-      originalMessages: messages,
+      originalMessages: validatedMessages,
     });
   } catch {
     return chatErrorResponse(CHAT_ERROR_CODE.SERVICE_UNAVAILABLE, 500);
